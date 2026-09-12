@@ -115,7 +115,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         <!-- Data de Abertura (Somente Leitura) -->
         <div class="space-y-2">
@@ -123,6 +123,15 @@
             Data de Abertura do Ciclo <span class="text-brand-500 font-normal">(Apenas Dia 26)</span>
           </label>
           <input type="text" id="escalaDataAberturaView" readonly disabled placeholder="NÃO DEFINIDA"
+                 class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none cursor-not-allowed">
+        </div>
+
+        <!-- Data de Fechamento do Ciclo (Somente Leitura) -->
+        <div class="space-y-2">
+          <label for="escalaDataFechamentoView" class="block text-xs font-bold uppercase text-slate-300">
+            Data de Fechamento do Ciclo <span class="text-brand-500 font-normal">(Dia 25 do mês seguinte)</span>
+          </label>
+          <input type="text" id="escalaDataFechamentoView" readonly disabled placeholder="NÃO DEFINIDA"
                  class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none cursor-not-allowed">
         </div>
 
@@ -282,7 +291,7 @@
     </section>
 
     <!-- ORGANOGRAMA DA ESCALA (FORMULÁRIO) -->
-    <section class="bg-brand-card rounded-2xl border border-slate-800 p-6 sm:p-8 shadow-xl space-y-6">
+    <section id="secaoOrganogramaEscala" class="bg-brand-card rounded-2xl border border-slate-800 p-6 sm:p-8 shadow-xl space-y-6">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <div class="flex items-center space-x-2">
           <i class="fa-solid fa-clipboard-user text-brand-500 text-xl"></i>
@@ -538,6 +547,123 @@
         </div>
       </div>
     </section>
+
+    <!-- CICLOS FECHADOS (SINCRONIZADO COM A PÁGINA CICLOS) -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-box-archive text-blue-400 text-xl"></i>
+          <h2 class="text-lg font-bold uppercase tracking-wide text-white">Ciclos Fechados</h2>
+        </div>
+        <span class="text-xs text-slate-400">As escalas destes ciclos podem ser editadas aqui e permanecem sincronizadas com a página Ciclos.</span>
+      </div>
+      <div id="containerCiclosFechados" class="space-y-4">
+        <div class="bg-brand-card rounded-2xl border border-slate-800 p-8 text-center text-slate-500 italic">
+          Nenhum ciclo fechado até o momento.
+        </div>
+      </div>
+    </section>
+
+    <!-- MODAL DE EDIÇÃO DE ESCALA DE CICLO FECHADO -->
+    <div id="modalEdicaoCicloFechado" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 overflow-y-auto">
+      <div class="bg-brand-card border border-slate-800 rounded-2xl p-6 max-w-3xl w-full my-8 shadow-2xl space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h3 class="text-lg font-bold uppercase tracking-wide text-white"><i class="fa-solid fa-pen-to-square text-brand-500 mr-2"></i>Editar Escala do Ciclo Fechado</h3>
+          <button type="button" onclick="fecharModalEdicaoCicloFechado()" class="text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Data da Atividade *</label>
+            <input type="date" id="modalDataAtividade" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm">
+          </div>
+          <div>
+            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Horário de Saída *</label>
+            <input type="time" id="modalHorarioSaida" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm">
+          </div>
+          <div>
+            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Horário de Chegada *</label>
+            <input type="time" id="modalHorarioChegada" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm">
+          </div>
+        </div>
+
+        <hr class="border-slate-800">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- MANHÃ -->
+          <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/80 space-y-2">
+            <h4 class="text-xs font-black text-brand-500 uppercase flex items-center gap-1"><i class="fa-solid fa-sun"></i> Manhã</h4>
+            <input type="text" id="modalLocalManha" placeholder="Local" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
+            <select id="modalPernoiteManha" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
+              <option value="">Pernoite: N/A</option><option value="SIM">Pernoite: SIM</option><option value="NAO">Pernoite: NÃO</option>
+            </select>
+            <select id="modalJetonManha" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
+              <option value="">Jeton</option><option value="100.00">100,00</option><option value="220.00">220,00</option>
+            </select>
+            <div class="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-300">
+              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoManha" value="APOIO">APOIO</label>
+              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoManha" value="COORDENADOR">COORD.</label>
+              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoManha" value="MOTORISTA">MOTOR.</label>
+              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoManha" value="RELATOR">RELATOR</label>
+            </div>
+          </div>
+          <!-- TARDE -->
+          <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/80 space-y-2">
+            <h4 class="text-xs font-black text-amber-500 uppercase flex items-center gap-1"><i class="fa-solid fa-cloud-sun"></i> Tarde</h4>
+            <input type="text" id="modalLocalTarde" placeholder="Local" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
+            <select id="modalPernoiteTarde" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
+              <option value="">Pernoite: N/A</option><option value="SIM">Pernoite: SIM</option><option value="NAO">Pernoite: NÃO</option>
+            </select>
+            <select id="modalJetonTarde" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
+              <option value="">Jeton</option><option value="100.00">100,00</option><option value="220.00">220,00</option>
+            </select>
+            <div class="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-300">
+              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoTarde" value="APOIO">APOIO</label>
+              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoTarde" value="COORDENADOR">COORD.</label>
+              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoTarde" value="MOTORISTA">MOTOR.</label>
+              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoTarde" value="RELATOR">RELATOR</label>
+            </div>
+          </div>
+          <!-- NOITE -->
+          <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/80 space-y-2">
+            <h4 class="text-xs font-black text-indigo-400 uppercase flex items-center gap-1"><i class="fa-solid fa-moon"></i> Noite</h4>
+            <input type="text" id="modalLocalNoite" placeholder="Local" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
+            <select id="modalPernoiteNoite" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
+              <option value="">Pernoite: N/A</option><option value="SIM">Pernoite: SIM</option><option value="NAO">Pernoite: NÃO</option>
+            </select>
+            <select id="modalJetonNoite" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
+              <option value="">Jeton</option><option value="100.00">100,00</option><option value="220.00">220,00</option>
+            </select>
+            <div class="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-300">
+              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoNoite" value="APOIO">APOIO</label>
+              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoNoite" value="COORDENADOR">COORD.</label>
+              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoNoite" value="MOTORISTA">MOTOR.</label>
+              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoNoite" value="RELATOR">RELATOR</label>
+            </div>
+            <select id="modalPercepcaoQuartoJeton" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
+              <option value="">4º Jeton: N/A</option><option value="SIM">4º Jeton: SIM</option><option value="NAO">4º Jeton: NÃO</option>
+            </select>
+          </div>
+        </div>
+
+        <hr class="border-slate-800">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input type="text" id="modalNotaVtr" placeholder="VTR" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
+          <input type="text" id="modalNotaLocalManha" placeholder="Local - Manhã" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
+          <input type="text" id="modalNotaLocalTarde" placeholder="Local - Tarde" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
+          <input type="text" id="modalNotaLocalNoite" placeholder="Local - Noite" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
+          <input type="text" id="modalNotaOutros" placeholder="Outros Assuntos" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs sm:col-span-2">
+        </div>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" onclick="fecharModalEdicaoCicloFechado()" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">CANCELAR</button>
+          <button type="button" onclick="salvarEdicaoCicloFechado()" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-brand-600 text-white hover:bg-brand-700 transition shadow-lg shadow-brand-600/20">
+            <i class="fa-solid fa-floppy-disk mr-1"></i> SALVAR ALTERAÇÃO
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- FECHAMENTO DO CICLO -->
     <section id="secaoFechamentoCiclo" class="hidden bg-red-950/30 rounded-2xl border border-red-800/60 p-6 sm:p-8 shadow-xl space-y-4">
@@ -1067,7 +1193,10 @@
           if (j === 220 || j === 220.00) totalDobradas++;
         });
 
-        if (esc.localNoite) {
+        // A atividade Tripla (período da Noite preenchido) só é computada
+        // quando NÃO houver a percepção do 4º Jeton — a Quádrupla sobrepõe
+        // a Tripla, pois representa um nível superior da mesma atividade.
+        if (esc.localNoite && esc.percepcaoQuartoJeton !== 'SIM') {
           totalTriplas++;
         }
 
@@ -1102,15 +1231,7 @@
       document.getElementById('recValorTotalJeton').innerText = formatarMoeda(valorTotalJeton);
 
       const qtdEscalas = escalasSalvas.length;
-      const valorMedioEscala = qtdEscalas > 0 ? valorTotalJeton / qtdEscalas : 0;
-      document.getElementById('recValorMedioEscala').innerText = formatarMoeda(valorMedioEscala);
-
       const somaAtividades = totalSimples + totalDobradas + totalTriplas + totalQuadruplas;
-      const valorMedioAtividade = somaAtividades > 0 ? valorTotalJeton / somaAtividades : 0;
-      document.getElementById('recValorMedioAtividade').innerText = formatarMoeda(valorMedioAtividade);
-
-      const valorMedioHora = totalHorasNumerico > 0 ? valorTotalJeton / totalHorasNumerico : 0;
-      document.getElementById('recValorMedioHora').innerText = `${formatarMoeda(valorMedioHora)} /H`;
 
       // Atualiza os valores calculados de diárias e pernoites para exibição em tempo real
       recalcularEAtualizarCotasExtras();
@@ -1129,6 +1250,18 @@
 
       const valorRealJeton = (valorTotalJeton + valorDiarias + valorAuxilios) - valorDescontoIR;
       document.getElementById('recValorRealJeton').innerText = formatarMoeda(valorRealJeton);
+
+      // Valor Médio por Escala / por Atividade / por Hora Trabalhada agora são
+      // calculados a partir do VALOR REAL DE JETON (líquido de IR, já somado
+      // às diárias e auxílios), e não mais a partir do jeton bruto.
+      const valorMedioEscala = qtdEscalas > 0 ? valorRealJeton / qtdEscalas : 0;
+      document.getElementById('recValorMedioEscala').innerText = formatarMoeda(valorMedioEscala);
+
+      const valorMedioAtividade = somaAtividades > 0 ? valorRealJeton / somaAtividades : 0;
+      document.getElementById('recValorMedioAtividade').innerText = formatarMoeda(valorMedioAtividade);
+
+      const valorMedioHora = totalHorasNumerico > 0 ? valorRealJeton / totalHorasNumerico : 0;
+      document.getElementById('recValorMedioHora').innerText = `${formatarMoeda(valorMedioHora)} /H`;
     }
 
     ['pernoiteManha', 'pernoiteTarde', 'pernoiteNoite'].forEach(id => {
@@ -1164,6 +1297,34 @@
         await alertarCampoObrigatorio('dataAtividade', 'PREENCHA O CAMPO DATA DA ATIVIDADE.');
         return;
       }
+
+      // A DATA DA ATIVIDADE PRECISA ESTAR DENTRO DO PERÍODO DE ABERTURA/FECHAMENTO DO CICLO VIGENTE.
+      const cicloVigenteAtual = JSON.parse(localStorage.getItem(STORAGE_KEY_CICLO) || '{}');
+      if (cicloVigenteAtual.dataAbertura && data < cicloVigenteAtual.dataAbertura) {
+        await alertarCampoObrigatorio('dataAtividade', 'A DATA DA ATIVIDADE NÃO PODE SER ANTERIOR À DATA DE ABERTURA DO CICLO.');
+        return;
+      }
+      if (cicloVigenteAtual.dataFechamento && data > cicloVigenteAtual.dataFechamento) {
+        await alertarCampoObrigatorio('dataAtividade', 'A DATA DA ATIVIDADE NÃO PODE SER POSTERIOR À DATA DE FECHAMENTO DO CICLO.');
+        return;
+      }
+
+      // A DATA DA ATIVIDADE PRECISA SER POSTERIOR À DATA DA ÚLTIMA ATIVIDADE JÁ
+      // REGISTRADA NO CICLO (EXCETO A PRÓPRIA ESCALA, QUANDO EM EDIÇÃO).
+      {
+        const indiceEmEdicaoCheck = parseInt(document.getElementById('editIndex').value);
+        const escalasExistentesCheck = JSON.parse(localStorage.getItem(STORAGE_KEY_ESCALAS)) || [];
+        let maiorDataCheck = '';
+        escalasExistentesCheck.forEach((esc, idx) => {
+          if (indiceEmEdicaoCheck >= 0 && idx === indiceEmEdicaoCheck) return;
+          if (esc.data && (!maiorDataCheck || esc.data > maiorDataCheck)) maiorDataCheck = esc.data;
+        });
+        if (maiorDataCheck && data <= maiorDataCheck) {
+          await alertarCampoObrigatorio('dataAtividade', 'A DATA DA ATIVIDADE DEVE SER POSTERIOR À DATA DA ÚLTIMA ATIVIDADE JÁ REGISTRADA NO CICLO.');
+          return;
+        }
+      }
+
       if (!horarioSaida) {
         await alertarCampoObrigatorio('horarioSaida', 'PREENCHA O CAMPO HORÁRIO DE SAÍDA.');
         return;
@@ -1323,6 +1484,9 @@
       renderizarCardsEscalas();
       atualizarEstatisticasEReceitasCiclo();
       verificarDataDeFechamentoExistente();
+
+      // ROLA A TELA AUTOMATICAMENTE PARA O FINAL APÓS SALVAR A ESCALA.
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     });
 
     function obterDataAberturaCiclo() {
@@ -1347,12 +1511,65 @@
     // CARREGA (OU LIMPA) O CARD "DESCRIÇÃO DO PERÍODO" - CLONE SOMENTE LEITURA DA PÁGINA INICIAL
     function carregarDescricaoPeriodoEscalas() {
       const campoData = document.getElementById('escalaDataAberturaView');
+      const campoFechamento = document.getElementById('escalaDataFechamentoView');
       const campoRecebimento = document.getElementById('escalaRecebimentoEmView');
       if (!campoData || !campoRecebimento) return;
 
       const dados = JSON.parse(localStorage.getItem(STORAGE_KEY_CICLO) || '{}');
       campoData.value = dados.dataAbertura ? formatarDataBRPeriodo(dados.dataAbertura) : '';
+      if (campoFechamento) campoFechamento.value = dados.dataFechamento ? formatarDataBRPeriodo(dados.dataFechamento) : '';
       campoRecebimento.value = dados.recebimentoEm || '';
+
+      aplicarLimitesDataAtividade(dados.dataAbertura || '', dados.dataFechamento || '');
+    }
+
+    // RESTRINGE A "DATA DA ATIVIDADE" A SOMENTE DATAS DENTRO DO PERÍODO DE ABERTURA/FECHAMENTO DO CICLO VIGENTE,
+    // E, DENTRO DESSE PERÍODO, SOMENTE A DATAS POSTERIORES À ÚLTIMA ATIVIDADE JÁ REGISTRADA NO CICLO — AS DATAS
+    // JÁ PREENCHIDAS (E QUALQUER DATA ANTERIOR A ELAS) FICAM DESABILITADAS NO CALENDÁRIO.
+    function aplicarLimitesDataAtividade(dataAbertura, dataFechamento, indexEmEdicao) {
+      const campoDataAtividade = document.getElementById('dataAtividade');
+      if (!campoDataAtividade) return;
+
+      const escalasSalvas = JSON.parse(localStorage.getItem(STORAGE_KEY_ESCALAS)) || [];
+      let maiorData = '';
+      escalasSalvas.forEach((esc, idx) => {
+        if (indexEmEdicao !== undefined && indexEmEdicao !== null && idx === indexEmEdicao) return;
+        if (esc.data && (!maiorData || esc.data > maiorData)) maiorData = esc.data;
+      });
+
+      let minCalculado = dataAbertura || '';
+      if (maiorData) {
+        const proximoDia = adicionarDias(maiorData, 1);
+        if (!minCalculado || proximoDia > minCalculado) minCalculado = proximoDia;
+      }
+
+      // Ao editar uma escala cuja data é anterior ao mínimo calculado (com base
+      // nas DEMAIS escalas), relaxa o mínimo para não invalidar o valor atual.
+      if (indexEmEdicao !== undefined && indexEmEdicao !== null && escalasSalvas[indexEmEdicao]) {
+        const dataAtual = escalasSalvas[indexEmEdicao].data;
+        if (dataAtual && minCalculado && dataAtual < minCalculado) minCalculado = dataAtual;
+      }
+
+      if (minCalculado) {
+        campoDataAtividade.setAttribute('min', minCalculado);
+      } else {
+        campoDataAtividade.removeAttribute('min');
+      }
+      if (dataFechamento) {
+        campoDataAtividade.setAttribute('max', dataFechamento);
+      } else {
+        campoDataAtividade.removeAttribute('max');
+      }
+    }
+
+    // SOMA "dias" DIAS A UMA DATA NO FORMATO ISO (AAAA-MM-DD)
+    function adicionarDias(dataIso, dias) {
+      const d = new Date(dataIso + 'T00:00:00');
+      d.setDate(d.getDate() + dias);
+      const ano = d.getFullYear();
+      const mes = String(d.getMonth() + 1).padStart(2, '0');
+      const dia = String(d.getDate()).padStart(2, '0');
+      return `${ano}-${mes}-${dia}`;
     }
 
     function dataEhDataFechamentoCiclo(dataAtividade) {
@@ -1413,18 +1630,27 @@
       const secStats = document.querySelectorAll('main > section')[2];
       const secReceitas = document.querySelectorAll('main > section')[3];
 
+      const escalasAtuais = JSON.parse(localStorage.getItem(STORAGE_KEY_ESCALAS) || '[]');
+      const nomeCiclo = cicloAtual.nomeCiclo ||
+        `CICLO - ${formatarDataBRPeriodo(cicloAtual.dataAbertura)} À ${formatarDataBRPeriodo(cicloAtual.dataFechamento)}`;
+
       const registro = {
         id: 'ciclo-' + Date.now(),
         numero: ciclos.length + 1,
+        nome: nomeCiclo,
         fechadoEm: new Date().toISOString(),
         dataAbertura: cicloAtual.dataAbertura || '',
+        dataFechamento: cicloAtual.dataFechamento || '',
         recebimentoEm: cicloAtual.recebimentoEm || '',
         periodo: periodoHTML,
         organogramaDiarias: diariasHTML,
         organogramaAuxilios: auxiliosHTML,
         estatisticas: secStats ? secStats.outerHTML : '<div>DADOS NÃO DISPONÍVEIS.</div>',
         receitas: secReceitas ? secReceitas.outerHTML : '<div>DADOS NÃO DISPONÍVEIS.</div>',
-        escalas: gerarSnapshotEscalas()
+        escalas: gerarSnapshotEscalas(),
+        // CÓPIA ESTRUTURADA (NÃO APENAS HTML) DAS ESCALAS, PARA PERMITIR EDIÇÃO
+        // POSTERIOR NO CARD "CICLOS FECHADOS" DESTA PÁGINA.
+        escalasData: escalasAtuais
       };
 
       ciclos.push(registro);
@@ -1445,6 +1671,7 @@
       atualizarEstatisticasEReceitasCiclo();
       carregarDescricaoPeriodoEscalas();
       resetarFormularioEscala();
+      renderizarCiclosFechados();
       // Sem dados de período no novo ciclo, o organograma permanece bloqueado
       // até que a Data de Abertura seja definida novamente na Página Inicial.
       verificarDataDeFechamentoExistente();
@@ -1462,6 +1689,9 @@
       localStorage.removeItem(STORAGE_KEY_RASCUNHO);
       gerenciarCamposPernoite();
       calcularValoresEscala();
+
+      const dadosCicloAtual = JSON.parse(localStorage.getItem(STORAGE_KEY_CICLO) || '{}');
+      aplicarLimitesDataAtividade(dadosCicloAtual.dataAbertura || '', dadosCicloAtual.dataFechamento || '');
     }
 
     document.getElementById('btnCancelarEdicao').addEventListener('click', resetarFormularioEscala);
@@ -1508,7 +1738,12 @@
       document.getElementById('notaOutros').value = esc.anotacoes?.notaOutros || '';
 
       calcularValoresEscala();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      aplicarLimitesDataAtividade(
+        (JSON.parse(localStorage.getItem(STORAGE_KEY_CICLO) || '{}').dataAbertura) || '',
+        (JSON.parse(localStorage.getItem(STORAGE_KEY_CICLO) || '{}').dataFechamento) || '',
+        index
+      );
+      document.getElementById('secaoOrganogramaEscala').scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
     function renderizarCardsEscalas() {
@@ -1575,21 +1810,35 @@
 
       container.innerHTML = escalasFiltradas.map((esc) => {
         const index = escalasSalvas.indexOf(esc);
-        const dataFmt = esc.data ? new Date(esc.data + 'T00:00:00').toLocaleDateString('pt-BR') : '-';
-        const extrasCard = obterValoresExtrasEscala(esc.data, [
-          { local: esc.localManha, pernoite: esc.pernoiteManha },
-          { local: esc.localTarde, pernoite: esc.pernoiteTarde },
-          { local: esc.localNoite, pernoite: esc.pernoiteNoite }
-        ]);
-        const jetonCard = (parseFloat(esc.jetonManha) || 0) + (parseFloat(esc.jetonTarde) || 0) + ((parseFloat(esc.jetonNoite) || 0) * (esc.percepcaoQuartoJeton === 'SIM' ? 2 : 1));
-        const valorDiarioTotal = jetonCard + extrasCard.valorDiarias + extrasCard.valorAuxilios;
-        
-        let jetonNoiteEfetivoCard = esc.jetonNoite || 0;
-        if (esc.percepcaoQuartoJeton === 'SIM') {
-          jetonNoiteEfetivoCard *= 2;
-        }
-        
-        return `
+        return montarCardEscalaHTML(esc, index, 'ativo');
+      }).join('');
+    }
+
+    // TEMPLATE REUTILIZÁVEL DO CARD DE UMA ESCALA. "modo" = 'ativo' (ciclo em aberto,
+    // com botões editar/excluir ligados às escalas correntes) ou 'fechado' (escala
+    // dentro de um ciclo já fechado, com botão editar ligado ao registro arquivado
+    // identificado por "cicloId").
+    function montarCardEscalaHTML(esc, index, modo, cicloId) {
+      const dataFmt = esc.data ? new Date(esc.data + 'T00:00:00').toLocaleDateString('pt-BR') : '-';
+      const extrasCard = obterValoresExtrasEscala(esc.data, [
+        { local: esc.localManha, pernoite: esc.pernoiteManha },
+        { local: esc.localTarde, pernoite: esc.pernoiteTarde },
+        { local: esc.localNoite, pernoite: esc.pernoiteNoite }
+      ]);
+      const jetonCard = (parseFloat(esc.jetonManha) || 0) + (parseFloat(esc.jetonTarde) || 0) + ((parseFloat(esc.jetonNoite) || 0) * (esc.percepcaoQuartoJeton === 'SIM' ? 2 : 1));
+      const valorDiarioTotal = jetonCard + extrasCard.valorDiarias + extrasCard.valorAuxilios;
+
+      let jetonNoiteEfetivoCard = esc.jetonNoite || 0;
+      if (esc.percepcaoQuartoJeton === 'SIM') {
+        jetonNoiteEfetivoCard *= 2;
+      }
+
+      const botoesHTML = modo === 'fechado'
+        ? `<button type="button" onclick="editarEscalaCicloFechado('${cicloId}', ${index})" title="Editar Escala do Ciclo Fechado" class="text-slate-300 hover:text-white p-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 transition"><i class="fa-solid fa-pen-to-square"></i></button>`
+        : `<button type="button" onclick="editarEscala(${index})" title="Editar Escala" class="text-slate-300 hover:text-white p-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 transition"><i class="fa-solid fa-pen-to-square"></i></button>
+           <button type="button" onclick="excluirEscala(${index})" title="Excluir Escala" class="text-slate-500 hover:text-red-400 p-1.5 rounded-lg bg-slate-900 border border-slate-800"><i class="fa-solid fa-trash-can"></i></button>`;
+
+      return `
           <div class="bg-brand-card rounded-2xl border border-slate-800 p-6 shadow-xl space-y-4 uppercase">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-800 pb-3 gap-2">
               <div class="flex items-center space-x-3">
@@ -1598,8 +1847,7 @@
                 <span class="text-xs text-slate-400 font-mono"><i class="fa-solid fa-clock text-amber-400 mr-1"></i> ${esc.horarioSaida} ÀS ${esc.horarioChegada}</span>
               </div>
               <div class="flex items-center gap-2">
-                <button type="button" onclick="editarEscala(${index})" title="Editar Escala" class="text-slate-300 hover:text-white p-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 transition"><i class="fa-solid fa-pen-to-square"></i></button>
-                <button type="button" onclick="excluirEscala(${index})" title="Excluir Escala" class="text-slate-500 hover:text-red-400 p-1.5 rounded-lg bg-slate-900 border border-slate-800"><i class="fa-solid fa-trash-can"></i></button>
+                ${botoesHTML}
               </div>
             </div>
 
@@ -1660,6 +1908,7 @@
                   <div><strong>HORAS TRABALHADAS:</strong> <span class="text-amber-400 font-bold">${esc.horasTrabalhadasStr || '0H 00M'}</span></div>
                   <div><strong>VALOR DA HORA TRABALHADA:</strong> <span class="text-indigo-400 font-bold">${esc.valorHoraStr || 'R$ 0,00 /H'}</span></div>
                   <div class="pt-2 mt-2 border-t border-slate-800"><strong>VALOR DIÁRIO TOTAL:</strong> <span class="text-emerald-400 font-black text-sm">${formatarMoeda(valorDiarioTotal)}</span></div>
+                  <div><strong>VALOR DIÁRIO REAL APÓS IR:</strong> <span class="text-cyan-400 font-black text-sm">${formatarMoeda(jetonCard * 0.78 + extrasCard.valorDiarias + extrasCard.valorAuxilios)}</span></div>
                 </div>
               </div>
 
@@ -1676,8 +1925,376 @@
             </div>
           </div>
         `;
+    }
+
+    // =====================================================================
+    // CARD "CICLOS FECHADOS" DESTA PÁGINA — LÊ E GRAVA NO MESMO REGISTRO
+    // (STORAGE_KEY_CICLOS_FECHADOS) USADO PELA PÁGINA CICLOS.HTML, GARANTINDO
+    // A SINCRONIZAÇÃO ENTRE OS DOIS CARDS "CICLOS FECHADOS".
+    // =====================================================================
+
+    function nomeDoCicloFechado(ciclo) {
+      return ciclo.nome || `CICLO - ${formatarDataBRPeriodo(ciclo.dataAbertura)} À ${formatarDataBRPeriodo(ciclo.dataFechamento)}`;
+    }
+
+    function renderizarCiclosFechados() {
+      const container = document.getElementById('containerCiclosFechados');
+      if (!container) return;
+      const ciclos = JSON.parse(localStorage.getItem(STORAGE_KEY_CICLOS_FECHADOS) || '[]');
+
+      if (!ciclos.length) {
+        container.innerHTML = `
+          <div class="bg-brand-card rounded-2xl border border-slate-800 p-8 text-center text-slate-500 italic">
+            Nenhum ciclo fechado até o momento.
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = ciclos.slice().reverse().map((ciclo) => {
+        const idCiclo = ciclo.id;
+        const escalasArr = ciclo.escalasData || [];
+        const cardsHTML = escalasArr.length
+          ? escalasArr.map((esc, idx) => montarCardEscalaHTML(esc, idx, 'fechado', idCiclo)).join('')
+          : '<div class="p-6 text-center text-slate-500 italic">NENHUMA ESCALA NESTE CICLO.</div>';
+
+        return `
+          <article class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+            <div class="p-5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 cursor-pointer hover:bg-slate-900/40 transition" onclick="alternarCicloFechadoEscalas('${idCiclo}')">
+              <div class="flex items-center gap-3">
+                <i id="chevronEsc-${idCiclo}" class="fa-solid fa-chevron-right text-blue-400 transition-transform duration-200"></i>
+                <div>
+                  <h3 class="text-lg font-black text-blue-400 uppercase">${nomeDoCicloFechado(ciclo)}</h3>
+                  <p class="text-xs text-slate-400 mt-1 uppercase">${escalasArr.length} ESCALA(S) REGISTRADA(S) &nbsp;|&nbsp; FECHADO EM ${ciclo.fechadoEm ? new Date(ciclo.fechadoEm).toLocaleString('pt-BR') : '-'}</p>
+                </div>
+              </div>
+            </div>
+            <div id="corpoEsc-${idCiclo}" class="hidden p-5 space-y-6 bg-slate-950/60">
+              ${cardsHTML}
+            </div>
+          </article>
+        `;
       }).join('');
     }
+
+    function alternarCicloFechadoEscalas(id) {
+      const corpo = document.getElementById('corpoEsc-' + id);
+      const chevron = document.getElementById('chevronEsc-' + id);
+      if (!corpo) return;
+      const vaiExibir = corpo.classList.contains('hidden');
+      corpo.classList.toggle('hidden');
+      if (chevron) chevron.classList.toggle('rotate-90', vaiExibir);
+    }
+
+    // GERA O HTML DA SEÇÃO "ESCALAS CADASTRADAS" A PARTIR DE UM ARRAY DE ESCALAS,
+    // NO MESMO FORMATO ARQUIVADO ORIGINALMENTE, PARA MANTER A PÁGINA CICLOS.HTML
+    // (QUE LÊ ciclo.escalas COMO HTML) SEMPRE ATUALIZADA APÓS UMA EDIÇÃO.
+    function construirSnapshotEscalasHTML(escalasArr) {
+      const cardsHTML = escalasArr.map((esc, idx) => montarCardEscalaHTML(esc, idx, 'fechado', '')).join('');
+      return `
+        <section class="space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-list-check text-brand-500 text-xl"></i>
+              <h2 class="text-lg font-bold uppercase tracking-wide text-white">Escalas Cadastradas</h2>
+            </div>
+            <span class="text-xs font-semibold bg-slate-800 text-slate-300 px-3 py-1 rounded-full">${escalasArr.length} REGISTRADAS</span>
+          </div>
+          <div class="hidden"><input type="text" placeholder="Pesquisa Inteligente"></div>
+          <div id="containerCardsEscalas" class="grid grid-cols-1 gap-6">${cardsHTML}</div>
+        </section>
+      `;
+    }
+
+    // RECALCULA AS ESTATÍSTICAS E RECEITAS DE UM ARRAY ARBITRÁRIO DE ESCALAS
+    // (USADO PARA REGERAR O SNAPSHOT DE UM CICLO JÁ FECHADO APÓS UMA EDIÇÃO).
+    function calcularEstatisticasReceitasArray(escalasArr) {
+      let totalSimples = 0, totalDobradas = 0, totalTriplas = 0, totalQuadruplas = 0;
+      let totalMinutosTrabalhados = 0, valorTotalJeton = 0, valorDiarias = 0, valorAuxilios = 0;
+
+      escalasArr.forEach(esc => {
+        const jetons = [esc.jetonManha, esc.jetonTarde, esc.jetonNoite];
+        jetons.forEach(j => {
+          if (j === 100 || j === 100.00) totalSimples++;
+          if (j === 220 || j === 220.00) totalDobradas++;
+        });
+        if (esc.localNoite && esc.percepcaoQuartoJeton !== 'SIM') totalTriplas++;
+        if (esc.percepcaoQuartoJeton === 'SIM') totalQuadruplas++;
+
+        if (esc.horarioSaida && esc.horarioChegada) {
+          const [sH, sM] = esc.horarioSaida.split(':').map(Number);
+          const [cH, cM] = esc.horarioChegada.split(':').map(Number);
+          let mSaida = sH * 60 + sM;
+          let mChegada = cH * 60 + cM;
+          if (mChegada < mSaida) mChegada += 24 * 60;
+          totalMinutosTrabalhados += (mChegada - mSaida);
+        }
+
+        const jetonStat = (parseFloat(esc.jetonManha) || 0) + (parseFloat(esc.jetonTarde) || 0) + ((parseFloat(esc.jetonNoite) || 0) * (esc.percepcaoQuartoJeton === 'SIM' ? 2 : 1));
+        valorTotalJeton += jetonStat;
+        valorDiarias += parseFloat(esc.valorDiarias) || 0;
+        valorAuxilios += parseFloat(esc.valorAuxilios) || 0;
+      });
+
+      const horasTotais = Math.floor(totalMinutosTrabalhados / 60);
+      const minutosTotais = totalMinutosTrabalhados % 60;
+      const totalHorasNumerico = totalMinutosTrabalhados / 60;
+      const qtdEscalas = escalasArr.length;
+      const somaAtividades = totalSimples + totalDobradas + totalTriplas + totalQuadruplas;
+
+      const aliqIR = 22;
+      const valorDescontoIR = valorTotalJeton * (aliqIR / 100);
+      const valorRealJeton = (valorTotalJeton + valorDiarias + valorAuxilios) - valorDescontoIR;
+
+      // Valor Médio por Escala / por Atividade / por Hora Trabalhada calculados
+      // a partir do VALOR REAL DE JETON (líquido de IR + diárias + auxílios).
+      const valorMedioEscala = qtdEscalas > 0 ? valorRealJeton / qtdEscalas : 0;
+      const valorMedioAtividade = somaAtividades > 0 ? valorRealJeton / somaAtividades : 0;
+      const valorMedioHora = totalHorasNumerico > 0 ? valorRealJeton / totalHorasNumerico : 0;
+
+      return {
+        totalSimples, totalDobradas, totalTriplas, totalQuadruplas,
+        totalEscalas: qtdEscalas, horasTotais, minutosTotais,
+        valorTotalJeton, valorMedioEscala, valorMedioAtividade, valorMedioHora,
+        valorDiarias, valorAuxilios, valorDescontoIR, valorRealJeton
+      };
+    }
+
+    // RECONSTRÓI O HTML DA SEÇÃO "ESTATÍSTICA DO CICLO" A PARTIR DOS VALORES CALCULADOS
+    function construirEstatisticasHTML(v) {
+      return `
+        <section class="bg-brand-card rounded-2xl border border-slate-800 p-6 sm:p-8 shadow-xl space-y-6">
+          <div class="flex items-center space-x-2 border-b border-slate-800 pb-3">
+            <i class="fa-solid fa-chart-pie text-brand-500 text-xl"></i>
+            <h2 class="text-lg font-bold uppercase tracking-wide text-white">Estatística do Ciclo</h2>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Atividades Simples</span><span id="statSimples" class="text-xl font-black text-brand-400">${v.totalSimples}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Atividades Dobradas</span><span id="statDobradas" class="text-xl font-black text-amber-400">${v.totalDobradas}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Atividades Triplas</span><span id="statTriplas" class="text-xl font-black text-indigo-400">${v.totalTriplas}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Atividades Quádruplas</span><span id="statQuadruplas" class="text-xl font-black text-emerald-400">${v.totalQuadruplas}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Total de Escalas</span><span id="statTotalEscalas" class="text-xl font-black text-white">${v.totalEscalas}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Horas Trabalhadas</span><span id="statTotalHoras" class="text-xl font-black text-cyan-400">${v.horasTotais}H ${String(v.minutosTotais).padStart(2, '0')}M</span></div>
+          </div>
+        </section>
+      `;
+    }
+
+    // RECONSTRÓI O HTML DA SEÇÃO "RECEITAS DO CICLO" A PARTIR DOS VALORES CALCULADOS
+    function construirReceitasHTML(v) {
+      return `
+        <section class="bg-brand-card rounded-2xl border border-slate-800 p-6 sm:p-8 shadow-xl space-y-6">
+          <div class="flex items-center space-x-2 border-b border-slate-800 pb-3">
+            <i class="fa-solid fa-wallet text-emerald-500 text-xl"></i>
+            <h2 class="text-lg font-bold uppercase tracking-wide text-white">Receitas do Ciclo</h2>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Total de Jeton</span><span id="recValorTotalJeton" class="text-xl font-black text-brand-400">${formatarMoeda(v.valorTotalJeton)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Médio por Escala</span><span id="recValorMedioEscala" class="text-xl font-black text-slate-200">${formatarMoeda(v.valorMedioEscala)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Médio por Atividade</span><span id="recValorMedioAtividade" class="text-xl font-black text-slate-200">${formatarMoeda(v.valorMedioAtividade)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Médio por Hora Trabalhada</span><span id="recValorMedioHora" class="text-xl font-black text-cyan-400">${formatarMoeda(v.valorMedioHora)} /H</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor das Diárias</span><span id="recValorDiarias" class="text-xl font-black text-emerald-400">${formatarMoeda(v.valorDiarias)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor dos Auxílios</span><span id="recValorAuxilios" class="text-xl font-black text-amber-400">${formatarMoeda(v.valorAuxilios)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Desconto de IR (22%)</span><span id="recValorDescontoIR" class="text-xl font-black text-red-400">${formatarMoeda(v.valorDescontoIR)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Real de Jeton</span><span id="recValorRealJeton" class="text-xl font-black text-emerald-400">${formatarMoeda(v.valorRealJeton)}</span></div>
+          </div>
+        </section>
+      `;
+    }
+
+    // EXIBE O CAMPO "PERNOITE" APENAS NO PERÍODO QUE JÁ POSSUI UM VALOR PREENCHIDO
+    // (SIM/NÃO), OCULTANDO-O NOS DEMAIS PERÍODOS DO MODAL DE EDIÇÃO DE CICLO
+    // FECHADO — REPLICA, DE FORMA SIMPLIFICADA, A REGRA DE "SOMENTE UM PERNOITE
+    // POR ESCALA" JÁ APLICADA NO FORMULÁRIO PRINCIPAL.
+    function aplicarVisibilidadePernoiteModal() {
+      const periodos = ['modalPernoiteManha', 'modalPernoiteTarde', 'modalPernoiteNoite'];
+      const idComValor = periodos.find(id => document.getElementById(id) && document.getElementById(id).value);
+      periodos.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.toggle('hidden', !!idComValor && id !== idComValor);
+      });
+    }
+    ['modalPernoiteManha', 'modalPernoiteTarde', 'modalPernoiteNoite'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('change', aplicarVisibilidadePernoiteModal);
+    });
+
+    let edicaoCicloFechadoAtual = null; // { cicloId, index }
+
+    window.editarEscalaCicloFechado = function(cicloId, index) {
+      const ciclos = JSON.parse(localStorage.getItem(STORAGE_KEY_CICLOS_FECHADOS) || '[]');
+      const ciclo = ciclos.find(c => c.id === cicloId);
+      if (!ciclo || !ciclo.escalasData || !ciclo.escalasData[index]) return;
+      const esc = ciclo.escalasData[index];
+
+      document.getElementById('modalDataAtividade').value = esc.data || '';
+      // Restringe a data ao período do ciclo fechado E a ser posterior à última
+      // atividade já registrada nesse mesmo ciclo (exceto a própria escala em edição).
+      let maiorDataFechado = '';
+      (ciclo.escalasData || []).forEach((e, idx) => {
+        if (idx === index) return;
+        if (e.data && (!maiorDataFechado || e.data > maiorDataFechado)) maiorDataFechado = e.data;
+      });
+      let minFechado = ciclo.dataAbertura || '';
+      if (maiorDataFechado) {
+        const proximoDiaFechado = adicionarDias(maiorDataFechado, 1);
+        if (!minFechado || proximoDiaFechado > minFechado) minFechado = proximoDiaFechado;
+      }
+      if (esc.data && minFechado && esc.data < minFechado) minFechado = esc.data;
+      if (minFechado) document.getElementById('modalDataAtividade').setAttribute('min', minFechado);
+      if (ciclo.dataFechamento) document.getElementById('modalDataAtividade').setAttribute('max', ciclo.dataFechamento);
+      document.getElementById('modalHorarioSaida').value = esc.horarioSaida || '';
+      document.getElementById('modalHorarioChegada').value = esc.horarioChegada || '';
+
+      document.getElementById('modalLocalManha').value = esc.localManha || '';
+      document.getElementById('modalLocalTarde').value = esc.localTarde || '';
+      document.getElementById('modalLocalNoite').value = esc.localNoite || '';
+
+      document.getElementById('modalPernoiteManha').value = esc.pernoiteManha || '';
+      document.getElementById('modalPernoiteTarde').value = esc.pernoiteTarde || '';
+      document.getElementById('modalPernoiteNoite').value = esc.pernoiteNoite || '';
+      aplicarVisibilidadePernoiteModal();
+
+      document.getElementById('modalJetonManha').value = esc.jetonManha ? Number(esc.jetonManha).toFixed(2) : '';
+      document.getElementById('modalJetonTarde').value = esc.jetonTarde ? Number(esc.jetonTarde).toFixed(2) : '';
+      document.getElementById('modalJetonNoite').value = esc.jetonNoite ? Number(esc.jetonNoite).toFixed(2) : '';
+      document.getElementById('modalPercepcaoQuartoJeton').value = esc.percepcaoQuartoJeton || '';
+
+      document.querySelectorAll('input[name="modalFuncaoManha"]').forEach(cb => { cb.checked = esc.funcaoManha?.includes(cb.value); });
+      document.querySelectorAll('input[name="modalFuncaoTarde"]').forEach(cb => { cb.checked = esc.funcaoTarde?.includes(cb.value); });
+      document.querySelectorAll('input[name="modalFuncaoNoite"]').forEach(cb => { cb.checked = esc.funcaoNoite?.includes(cb.value); });
+
+      document.getElementById('modalNotaVtr').value = esc.anotacoes?.notaVtr || '';
+      document.getElementById('modalNotaLocalManha').value = esc.anotacoes?.notaLocalManha || '';
+      document.getElementById('modalNotaLocalTarde').value = esc.anotacoes?.notaLocalTarde || '';
+      document.getElementById('modalNotaLocalNoite').value = esc.anotacoes?.notaLocalNoite || '';
+      document.getElementById('modalNotaOutros').value = esc.anotacoes?.notaOutros || '';
+
+      edicaoCicloFechadoAtual = { cicloId, index };
+      const modal = document.getElementById('modalEdicaoCicloFechado');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      modal.scrollTop = 0;
+      const conteudoModal = modal.querySelector(':scope > div');
+      if (conteudoModal) conteudoModal.scrollTop = 0;
+    };
+
+    window.fecharModalEdicaoCicloFechado = function() {
+      const modal = document.getElementById('modalEdicaoCicloFechado');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      edicaoCicloFechadoAtual = null;
+    };
+
+    window.salvarEdicaoCicloFechado = async function() {
+      if (!edicaoCicloFechadoAtual) return;
+      const { cicloId, index } = edicaoCicloFechadoAtual;
+      const ciclos = JSON.parse(localStorage.getItem(STORAGE_KEY_CICLOS_FECHADOS) || '[]');
+      const ciclo = ciclos.find(c => c.id === cicloId);
+      if (!ciclo || !ciclo.escalasData || !ciclo.escalasData[index]) return;
+
+      const data = document.getElementById('modalDataAtividade').value;
+      const horarioSaida = document.getElementById('modalHorarioSaida').value;
+      const horarioChegada = document.getElementById('modalHorarioChegada').value;
+
+      if (!data || !horarioSaida || !horarioChegada) {
+        await mostrarAlertaEstilizado('PREENCHA A DATA E OS HORÁRIOS DE SAÍDA E CHEGADA.');
+        return;
+      }
+      if (ciclo.dataAbertura && data < ciclo.dataAbertura) {
+        await mostrarAlertaEstilizado('A DATA DA ATIVIDADE NÃO PODE SER ANTERIOR À DATA DE ABERTURA DESTE CICLO.');
+        return;
+      }
+      if (ciclo.dataFechamento && data > ciclo.dataFechamento) {
+        await mostrarAlertaEstilizado('A DATA DA ATIVIDADE NÃO PODE SER POSTERIOR À DATA DE FECHAMENTO DESTE CICLO.');
+        return;
+      }
+      {
+        let maiorDataOutras = '';
+        (ciclo.escalasData || []).forEach((e, idx) => {
+          if (idx === index) return;
+          if (e.data && (!maiorDataOutras || e.data > maiorDataOutras)) maiorDataOutras = e.data;
+        });
+        if (maiorDataOutras && data <= maiorDataOutras) {
+          await mostrarAlertaEstilizado('A DATA DA ATIVIDADE DEVE SER POSTERIOR À DATA DA ÚLTIMA ATIVIDADE JÁ REGISTRADA NESTE CICLO.');
+          return;
+        }
+      }
+
+      const localManha = document.getElementById('modalLocalManha').value.trim();
+      const localTarde = document.getElementById('modalLocalTarde').value.trim();
+      const localNoite = document.getElementById('modalLocalNoite').value.trim();
+      const pernoiteManha = document.getElementById('modalPernoiteManha').value;
+      const pernoiteTarde = document.getElementById('modalPernoiteTarde').value;
+      const pernoiteNoite = document.getElementById('modalPernoiteNoite').value;
+      const jManha = parseFloat(document.getElementById('modalJetonManha').value) || 0;
+      const jTarde = parseFloat(document.getElementById('modalJetonTarde').value) || 0;
+      const jNoite = parseFloat(document.getElementById('modalJetonNoite').value) || 0;
+      const percepcaoQuartoJeton = document.getElementById('modalPercepcaoQuartoJeton').value || 'NAO';
+      const funcaoManha = Array.from(document.querySelectorAll('input[name="modalFuncaoManha"]:checked')).map(cb => cb.value);
+      const funcaoTarde = Array.from(document.querySelectorAll('input[name="modalFuncaoTarde"]:checked')).map(cb => cb.value);
+      const funcaoNoite = Array.from(document.querySelectorAll('input[name="modalFuncaoNoite"]:checked')).map(cb => cb.value);
+
+      let jNoiteEfetivo = jNoite * (percepcaoQuartoJeton === 'SIM' ? 2 : 1);
+      const extras = obterValoresExtrasEscala(data, [
+        { local: localManha, pernoite: pernoiteManha },
+        { local: localTarde, pernoite: pernoiteTarde },
+        { local: localNoite, pernoite: pernoiteNoite }
+      ]);
+      const valorDiarioTotal = jManha + jTarde + jNoiteEfetivo + extras.valorDiarias + extras.valorAuxilios;
+
+      let horasTrabalhadasStr = '0H 00M';
+      let valorHoraStr = 'R$ 0,00 /H';
+      let horasTrabalhadasNum = 0;
+      const [sH, sM] = horarioSaida.split(':').map(Number);
+      const [cH, cM] = horarioChegada.split(':').map(Number);
+      let minutosSaida = sH * 60 + sM;
+      let minutosChegada = cH * 60 + cM;
+      if (minutosChegada < minutosSaida) minutosChegada += 24 * 60;
+      const diffMinutos = minutosChegada - minutosSaida;
+      horasTrabalhadasNum = diffMinutos / 60;
+      horasTrabalhadasStr = `${Math.floor(diffMinutos / 60)}H ${(diffMinutos % 60).toString().padStart(2, '0')}M`;
+      if (horasTrabalhadasNum > 0) {
+        valorHoraStr = `${formatarMoeda(valorDiarioTotal / horasTrabalhadasNum)} /H`;
+      }
+
+      const dadosEscala = {
+        numero: ciclo.escalasData[index].numero,
+        data, horarioSaida, horarioChegada,
+        localManha, localTarde, localNoite,
+        pernoiteManha, pernoiteTarde, pernoiteNoite,
+        funcaoManha, funcaoTarde, funcaoNoite,
+        jetonManha: jManha, jetonTarde: jTarde, jetonNoite: jNoite,
+        percepcaoQuartoJeton,
+        valorDiarioTotal,
+        valorDiarias: extras.valorDiarias,
+        valorAuxilios: extras.valorAuxilios,
+        horasTrabalhadasStr, valorHoraStr,
+        anotacoes: {
+          notaVtr: document.getElementById('modalNotaVtr').value,
+          notaLocalManha: document.getElementById('modalNotaLocalManha').value,
+          notaLocalTarde: document.getElementById('modalNotaLocalTarde').value,
+          notaLocalNoite: document.getElementById('modalNotaLocalNoite').value,
+          notaOutros: document.getElementById('modalNotaOutros').value
+        }
+      };
+
+      ciclo.escalasData[index] = dadosEscala;
+
+      // REGERA O SNAPSHOT HTML (LIDO PELA PÁGINA CICLOS.HTML) E OS TOTAIS DO CICLO
+      // PARA REFLETIR IMEDIATAMENTE A EDIÇÃO — É ESSA SINCRONIZAÇÃO QUE TRANSPORTA
+      // A ALTERAÇÃO PARA O CARD "CICLOS FECHADOS" DA PÁGINA CICLOS.HTML.
+      ciclo.escalas = construirSnapshotEscalasHTML(ciclo.escalasData);
+      const valoresRecalculados = calcularEstatisticasReceitasArray(ciclo.escalasData);
+      ciclo.estatisticas = construirEstatisticasHTML(valoresRecalculados);
+      ciclo.receitas = construirReceitasHTML(valoresRecalculados);
+
+      localStorage.setItem(STORAGE_KEY_CICLOS_FECHADOS, JSON.stringify(ciclos));
+
+      fecharModalEdicaoCicloFechado();
+      renderizarCiclosFechados();
+      await mostrarAlertaEstilizado('ESCALA DO CICLO FECHADO ATUALIZADA COM SUCESSO! O CICLO FOI SINCRONIZADO NA PÁGINA CICLOS.', 'SUCESSO');
+    };
 
     // Event listener para o campo único de busca em tempo real
     document.getElementById('filtroBuscaUnico').addEventListener('input', renderizarCardsEscalas);
@@ -1708,6 +2325,7 @@
       atualizarEstatisticasEReceitasCiclo();
       carregarDescricaoPeriodoEscalas();
       gerenciarCamposPernoite();
+      renderizarCiclosFechados();
     });
   </script>
 </body>
