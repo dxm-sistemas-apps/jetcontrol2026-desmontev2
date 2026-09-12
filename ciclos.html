@@ -170,10 +170,15 @@
               <h3 class="text-lg font-bold uppercase tracking-wide text-white">Descrição do Período</h3>
             </div>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="space-y-2">
               <label class="block text-xs font-bold uppercase text-slate-300">Data de Abertura do Ciclo</label>
               <input type="text" readonly disabled value="${esc(dataBR(ciclo.dataAbertura))}"
+                     class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none cursor-not-allowed">
+            </div>
+            <div class="space-y-2">
+              <label class="block text-xs font-bold uppercase text-slate-300">Data de Fechamento do Ciclo</label>
+              <input type="text" readonly disabled value="${esc(dataBR(ciclo.dataFechamento))}"
                      class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none cursor-not-allowed">
             </div>
             <div class="space-y-2">
@@ -184,6 +189,18 @@
           </div>
         </section>
       `;
+    }
+
+    // NOME PADRÃO DO CICLO: "CICLO - DATA DE ABERTURA À DATA DE FECHAMENTO".
+    // Ciclos antigos (fechados antes desta atualização) que não possuem o campo
+    // "nome" continuam exibindo o mesmo padrão, calculado a partir das datas
+    // arquivadas, ou caem no número sequencial antigo como último recurso.
+    function nomeDoCiclo(ciclo, numeroFallback) {
+      if (ciclo.nome) return ciclo.nome;
+      if (ciclo.dataAbertura && ciclo.dataFechamento) {
+        return `CICLO - ${dataBR(ciclo.dataAbertura)} À ${dataBR(ciclo.dataFechamento)}`;
+      }
+      return `CICLO ${numeroFallback}`;
     }
 
     function renderizarCiclos() {
@@ -205,9 +222,9 @@
           <div class="flex items-center gap-3">
             <i id="chevron-${idCiclo}" class="fa-solid fa-chevron-right text-blue-400 transition-transform duration-200"></i>
             <div>
-              <h2 class="text-xl font-black text-blue-400 uppercase">CICLO ${esc(numeroCiclo)}</h2>
+              <h2 class="text-xl font-black text-blue-400 uppercase">${esc(nomeDoCiclo(ciclo, numeroCiclo))}</h2>
               <p class="text-xs text-slate-400 mt-1 uppercase">
-                ABERTURA: ${esc(dataBR(ciclo.dataAbertura))} &nbsp;|&nbsp; ${esc(ciclo.recebimentoEm || '')}
+                ABERTURA: ${esc(dataBR(ciclo.dataAbertura))} &nbsp;|&nbsp; FECHAMENTO: ${esc(dataBR(ciclo.dataFechamento))} &nbsp;|&nbsp; ${esc(ciclo.recebimentoEm || '')}
               </p>
             </div>
           </div>
@@ -286,10 +303,9 @@
     }
 
     function montarNomeArquivoPdf(ciclo) {
-      const abertura = sanitizarNomeArquivo(dataBR(ciclo.dataAbertura)) || 'SEM-DATA';
-      const recebimento = sanitizarNomeArquivo(ciclo.recebimentoEm) || 'SEM-RECEBIMENTO';
+      const nome = sanitizarNomeArquivo(nomeDoCiclo(ciclo, ciclo.numero || '')) || 'CICLO SEM NOME';
       const valorTotal = sanitizarNomeArquivo(extrairValorTotalJeton(ciclo)) || 'R$ 0,00';
-      return `${abertura} - ${recebimento} - ${valorTotal}.pdf`;
+      return `${nome} - ${valorTotal}.pdf`;
     }
 
     // =====================================================================
@@ -397,7 +413,7 @@
 
       blocos.push(`
         <div style="margin-bottom:12px; padding-bottom:10px; border-bottom:2px solid #334155;">
-          <div style="font-size:16px; font-weight:900; color:#60a5fa; text-transform:uppercase;">CICLO ${esc(ciclo.numero || '')}</div>
+          <div style="font-size:16px; font-weight:900; color:#60a5fa; text-transform:uppercase;">${esc(nomeDoCiclo(ciclo, ciclo.numero || ''))}</div>
           <div style="font-size:9px; color:#94a3b8; text-transform:uppercase; margin-top:5px;">
             ABERTURA: ${esc(dataBR(ciclo.dataAbertura))} &nbsp;|&nbsp; ${esc(ciclo.recebimentoEm || '')} &nbsp;|&nbsp; FECHADO EM ${esc(fechadoEmFmt)}
           </div>
