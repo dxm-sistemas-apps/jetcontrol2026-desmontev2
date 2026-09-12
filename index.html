@@ -221,7 +221,7 @@
       </div>
 
       <form id="cicloForm" class="space-y-6" onsubmit="event.preventDefault();">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           
           <!-- Data de Abertura (Apenas Dia 26) -->
           <div class="space-y-2">
@@ -233,6 +233,15 @@
             <p id="avisoData" class="text-xs text-amber-400 hidden font-medium mt-1">
               <i class="fa-solid fa-triangle-exclamation mr-1"></i> APENAS O DIA 26 É PERMITIDO. A DATA FOI AJUSTADA AUTOMATICAMENTE.
             </p>
+          </div>
+
+          <!-- Data de Fechamento do Ciclo (Automática: Dia 25 do mês seguinte) -->
+          <div class="space-y-2">
+            <label for="dataFechamento" class="block text-xs font-bold uppercase text-slate-300">
+              Data de Fechamento do Ciclo <span class="text-brand-500 font-normal">(Dia 25 do mês seguinte)</span>
+            </label>
+            <input type="text" id="dataFechamento" name="dataFechamento" readonly disabled placeholder="Selecione o dia 26 ao lado"
+                   class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none cursor-not-allowed">
           </div>
 
           <!-- Recebimento em (Campo Automático +3 Meses) -->
@@ -276,8 +285,25 @@
     // Elementos do Formulário
     const inputDataAbertura = document.getElementById('dataAbertura');
     const inputRecebimento = document.getElementById('recebimentoEm');
+    const inputDataFechamento = document.getElementById('dataFechamento');
     const avisoData = document.getElementById('avisoData');
     const saveStatus = document.getElementById('saveStatus');
+
+    // FORMATA DATA ISO (AAAA-MM-DD) PARA O PADRÃO BR (DD/MM/AAAA)
+    function formatarDataBR(iso) {
+      if (!iso) return '';
+      const partes = iso.split('-');
+      return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : iso;
+    }
+
+    // CALCULA A DATA DE FECHAMENTO DO CICLO (DIA 25 DO MÊS IMEDIATAMENTE SEGUINTE À ABERTURA)
+    function calcularDataFechamento(ano, mes) {
+      // mes é 0-indexado (0 = Janeiro)
+      const proximoMesIndex = (mes + 1) % 12;
+      const proximoAno = mes === 11 ? ano + 1 : ano;
+      const mesFmt = String(proximoMesIndex + 1).padStart(2, '0');
+      return `${proximoAno}-${mesFmt}-25`;
+    }
 
     const meses = [
       "JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO",
@@ -335,6 +361,7 @@
 
       if (!dataVal) {
         inputRecebimento.value = "";
+        inputDataFechamento.value = "";
         avisoData.classList.add('hidden');
         return "";
       }
@@ -344,6 +371,7 @@
       let mes = parseInt(partes[1], 10) - 1;
       let dia = parseInt(partes[2], 10);
 
+      // APENAS O DIA 26 PODE SER ESCOLHIDO, INDEPENDENTE DO MÊS/ANO SELECIONADO.
       if (dia !== 26) {
         dia = 26;
         const mesFmt = String(mes + 1).padStart(2, '0');
@@ -359,14 +387,30 @@
 
       const resultado = `${meses[mesRecebimentoIndex]} / ${anoRecebimento}`;
       inputRecebimento.value = resultado;
+
+      // DATA DE FECHAMENTO DO CICLO: SEMPRE O DIA 25 DO MÊS IMEDIATAMENTE SEGUINTE À ABERTURA.
+      const dataFechamentoIso = calcularDataFechamento(ano, mes);
+      inputDataFechamento.value = formatarDataBR(dataFechamentoIso);
+
       return resultado;
     }
 
     // SALVAR CICLO NO LOCALSTORAGE
     function salvarDadosLocal() {
+      const partes = (inputDataAbertura.value || '').split('-');
+      let dataFechamentoIso = '';
+      if (partes.length === 3) {
+        dataFechamentoIso = calcularDataFechamento(parseInt(partes[0], 10), parseInt(partes[1], 10) - 1);
+      }
+      const nomeCiclo = (inputDataAbertura.value && dataFechamentoIso)
+        ? `CICLO - ${formatarDataBR(inputDataAbertura.value)} À ${formatarDataBR(dataFechamentoIso)}`
+        : '';
+
       const dados = {
         dataAbertura: inputDataAbertura.value,
+        dataFechamento: dataFechamentoIso,
         recebimentoEm: inputRecebimento.value,
+        nomeCiclo,
         atualizadoEm: new Date().toISOString()
       };
 
@@ -392,7 +436,7 @@
         if (dados.dataAbertura) inputDataAbertura.value = dados.dataAbertura;
 
         validarEProcessarData();
-        exibirStatusSalvamento();
+        salvarDadosLocal();
       } catch (err) {
         console.error("Erro ao carregar dados do LocalStorage:", err);
       }
