@@ -101,7 +101,7 @@
 
     <!-- BANNER DA PÁGINA -->
     <section class="rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-brand-dark border border-slate-800 shadow-xl p-6 sm:p-8">
-      <div class="flex items-center space-x-3 mb-2">
+      <div class="flex items-top space-x-3 mb-2">
         <i class="fa-solid fa-business-time text-brand-500 text-2xl"></i>
         <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase">
           CONTROLE DE <span class="text-brand-500">ESCALAS</span>
@@ -284,13 +284,13 @@
 
         <!-- VALOR DO DESCONTO DE IMPOSTO DE RENDA -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
-          <span class="block text-xs uppercase font-bold text-slate-400">Desconto de Imposto de Renda</span>
+          <span class="block text-xs uppercase font-bold text-slate-400">VALOR DO Desconto de Imposto de Renda</span>
           <span id="recValorDescontoIR" class="text-xl font-black text-red-400">R$ 0,00</span>
         </div>
 
         <!-- VALOR REAL DE JETON -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1 border-emerald-500/50">
-          <span class="block text-xs uppercase font-bold text-emerald-400">Valor Real de Jeton</span>
+          <span class="block text-xs uppercase font-bold text-emerald-400">Valor Real À RECEBER</span>
           <span id="recValorRealJeton" class="text-2xl font-black text-emerald-400">R$ 0,00</span>
         </div>
       </div>
@@ -468,10 +468,6 @@
             <input type="text" id="calcJetonDiario" readonly value="R$ 0,00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-brand-400 font-bold text-sm">
           </div>
           <div>
-            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Valor Diário Total</label>
-            <input type="text" id="calcValorDiario" readonly value="R$ 0,00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-emerald-400 font-bold text-sm">
-          </div>
-          <div>
             <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Qtd. de Horas Trabalhadas</label>
             <input type="text" id="calcHorasTrabalhadas" readonly value="0h 00m" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-amber-400 font-bold text-sm">
           </div>
@@ -480,6 +476,10 @@
             <input type="text" id="calcValorHoraTrabalhada" readonly value="R$ 0,00 /h" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-indigo-400 font-bold text-sm">
           </div>
         </div>
+        <div>
+            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Valor REAL Diário </label>
+            <input type="text" id="calcValorDiario" readonly value="R$ 0,00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-emerald-400 font-bold text-sm">
+          </div>
 
         <!-- HORÁRIO DE CHEGADA -->
         <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
