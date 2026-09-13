@@ -61,11 +61,12 @@
 
   <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
 
+    <!-- BANNER DA PÁGINA -->
     <section class="rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-brand-dark border border-slate-800 shadow-xl p-6 sm:p-8">
       <div class="flex items-center space-x-3 mb-2">
         <i class="fa-solid fa-money-bill-trend-up text-brand-500 text-2xl"></i>
         <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase">
-          COTAS EXTRAS <br> <span class="text-brand-500">AUXÍLIOS E DIÁRIAS</span>
+          COTAS EXTRAS <span class="text-brand-500">AUXÍLIOS E DIÁRIAS</span>
         </h1>
       </div>
       <p class="text-sm sm:text-base text-slate-400 font-medium">
@@ -83,9 +84,9 @@
 
       <div class="space-y-4">
         <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-          <strong class="text-amber-400 uppercase">MUNICÍPIOS FORA DA REGIÃO METROPOLITANA DO RIO DE JANEIRO.</strong><br>
+          <strong class="text-amber-400 uppercase">MUNICÍPIOS FORA DA REGIÃO METROPOLITANA DO RIO DE JANEIRO:</strong><br>
           DÃO DIREITO A DIÁRIA (QUANDO O TEMPO DE DESLOCAMENTO - IDA E VOLTA - FOR SUPERIOR A 4 HORAS), PERNOITE (QUANDO HOUVER HOSPEDAGEM) E TRASLADO (QUANDO O DESLOCAMENTO NÃO FOR POR VIATURA OFICIAL), 
-          CASO O DESLOCAMENTO SEJA SUPERIOR A 50 KM DO MUNICÍPIO DE SEDE (CAPITAL) E EXIJA AFASTAMENTO TEMPORÁRIO DENTRO DAS REGRAS DESCRITAS EM CADA ITEM:
+          CASO O DESLOCAMENTO SEJA SUPERIOR A 50 KM DO MUNICÍPIO DE SEDE (CAPITAL) E EXIJA AFASTAMENTO TEMPORÁRIO DENTRO DAS REGRAS DESCRITAS EM CADA ITEM.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -143,15 +144,15 @@
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full text-center text-sm text-slate-300">
+        <table class="w-full text-left text-sm text-slate-300">
           <thead class="bg-slate-900 text-xs uppercase text-slate-400 border-b border-slate-800">
             <tr>
               <th scope="col" class="px-4 py-3 text-center">Nº DA ESCALA</th>
-              <th scope="col" class="px-4 py-3 text-center">LOCAL</th>
+              <th scope="col" class="px-4 py-3">LOCAL</th>
               <th scope="col" class="px-4 py-3 text-center">DATA</th>
-              <th scope="col" class="px-4 py-3 text-center">DIÁRIA DE ALIMENTAÇÃO</th>
-              <th scope="col" class="px-4 py-3 text-center">DIÁRIA DE PERNOITE</th>
-              <th scope="col" class="px-4 py-3 text-center">TOTAL DIÁRIO</th>
+              <th scope="col" class="px-4 py-3 text-right">DIÁRIA DE ALIMENTAÇÃO</th>
+              <th scope="col" class="px-4 py-3 text-right">DIÁRIA DE PERNOITE</th>
+              <th scope="col" class="px-4 py-3 text-right">TOTAL DIÁRIO</th>
             </tr>
           </thead>
           <tbody id="tabelaDiariasBody" class="divide-y divide-slate-800">
@@ -184,8 +185,8 @@
 
       <div class="space-y-4">
         <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-          <strong class="text-amber-400 uppercase">ESCALAS COM ATIVIDADES QUE NÃO SEJAM EM DATAS ÚTEIS.</strong><br>
-          DÃO DIREITO AOS AUXÍLIOS ALIMENTAÇÃO E TRANSPORTE:
+          <strong class="text-amber-400 uppercase">ESCALAS COM ATIVIDADE QUE NÃO SEJA EM DATA ÚTIL:</strong><br>
+          DÃO DIREITO AOS AUXÍLIOS ALIMENTAÇÃO E TRANSPORTE.
         </p>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-800 space-y-1">
@@ -203,21 +204,21 @@
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <div class="flex items-center space-x-2">
           <i class="fa-solid fa-utensils text-emerald-400 text-xl"></i>
-          <i class="fa-solid fa-car text-emerald-400"></i>
+          <i class="fa-solid fa-car text-brand-500"></i>
           <h2 class="text-lg font-bold uppercase tracking-wide text-white">ORGANOGRAMA DOS AUXÍLIOS</h2>
         </div>
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full text-center text-sm text-slate-300">
+        <table class="w-full text-left text-sm text-slate-300">
           <thead class="bg-slate-900 text-xs uppercase text-slate-400 border-b border-slate-800">
             <tr>
               <th scope="col" class="px-4 py-3 text-center">Nº DA ESCALA</th>
-              <th scope="col" class="px-4 py-3 text-center">LOCAL</th>
+              <th scope="col" class="px-4 py-3">LOCAL</th>
               <th scope="col" class="px-4 py-3 text-center">DATA</th>
-              <th scope="col" class="px-4 py-3 text-center">AUXÍLIO ALIMENTAÇÃO</th>
-              <th scope="col" class="px-4 py-3 text-center">AUXÍLIO TRANSPORTE</th>
-              <th scope="col" class="px-4 py-3 text-center">TOTAL DIÁRIO</th>
+              <th scope="col" class="px-4 py-3 text-right">AUXÍLIO ALIMENTAÇÃO</th>
+              <th scope="col" class="px-4 py-3 text-right">AUXÍLIO TRANSPORTE</th>
+              <th scope="col" class="px-4 py-3 text-right">TOTAL DIÁRIO</th>
             </tr>
           </thead>
           <tbody id="tabelaAuxiliosBody" class="divide-y divide-slate-800">
