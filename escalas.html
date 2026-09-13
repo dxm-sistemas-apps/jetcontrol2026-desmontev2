@@ -216,7 +216,7 @@
         <!-- TOTAL DE HORAS TRABALHADAS -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
           <div>
-            <span class="block text-xs uppercase font-bold text-slate-400">Horas Trabalhadas</span>
+            <span class="block text-xs uppercase font-bold text-slate-400">Total de Horas Trabalhadas</span>
             <span id="statTotalHoras" class="text-xl font-black text-cyan-400">0H 00M</span>
           </div>
           <div class="bg-cyan-500/10 text-cyan-400 p-3 rounded-lg text-lg">
@@ -340,8 +340,8 @@
               <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Jeton - Manhã</label>
               <select id="jetonManha" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-brand-500">
                 <option value="" disabled selected>Escolha o valor</option>
-                <option value="100.00">100,00</option>
-                <option value="220.00">220,00</option>
+                <option value="100.00">R$ 100,00</option>
+                <option value="220.00">R$ 220,00</option>
               </select>
             </div>
           </div>
@@ -381,8 +381,8 @@
               <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Jeton - Tarde</label>
               <select id="jetonTarde" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-brand-500">
                 <option value="" disabled selected>Escolha o valor</option>
-                <option value="100.00">100,00</option>
-                <option value="220.00">220,00</option>
+                <option value="100.00">R$ 100,00</option>
+                <option value="220.00">R$ 220,00</option>
               </select>
             </div>
           </div>
@@ -422,8 +422,8 @@
               <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Jeton - Noite</label>
               <select id="jetonNoite" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-brand-500" oninput="gerenciarCamposPernoite()" onchange="gerenciarCamposPernoite()">
                 <option value="" disabled selected>Escolha o valor</option>
-                <option value="100.00">100,00</option>
-                <option value="220.00">220,00</option>
+                <option value="100.00">R$ 100,00</option>
+                <option value="220.00">R$ 220,00</option>
               </select>
             </div>
           </div>
@@ -465,11 +465,11 @@
             <input type="text" id="calcValorDiario" readonly value="R$ 0,00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-emerald-400 font-bold text-sm">
           </div>
           <div>
-            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Horas Trabalhadas</label>
+            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Qtd. de Horas Trabalhadas</label>
             <input type="text" id="calcHorasTrabalhadas" readonly value="0h 00m" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-amber-400 font-bold text-sm">
           </div>
           <div>
-            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Valor das Horas Trab.</label>
+            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Valor por Hora Trabalhada</label>
             <input type="text" id="calcValorHoraTrabalhada" readonly value="R$ 0,00 /h" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-indigo-400 font-bold text-sm">
           </div>
         </div>
@@ -537,7 +537,7 @@
           <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-500">
             <i class="fa-solid fa-search"></i>
           </span>
-          <input type="text" id="filtroBuscaUnico" placeholder="Pesquise por dia (ex: 15), local (ex: Cabo Frio) ou função (ex: Apoio, Motorista)..." class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-11 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500">
+          <input type="text" id="filtroBuscaUnico" placeholder="Pesquise por dia, local ou função..." class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-11 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500">
         </div>
       </div>
 
@@ -550,13 +550,13 @@
 
     <!-- CICLOS FECHADOS (SINCRONIZADO COM A PÁGINA CICLOS) -->
     <section class="space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div class="flex items-center space-x-2">
-          <i class="fa-solid fa-box-archive text-blue-400 text-xl"></i>
-          <h2 class="text-lg font-bold uppercase tracking-wide text-white">Ciclos Fechados</h2>
-        </div>
-        <span class="text-xs text-slate-400">As escalas destes ciclos podem ser editadas aqui e permanecem sincronizadas com a página Ciclos.</span>
-      </div>
+      <div class="flex flex-col border-b border-slate-800 pb-3 gap-1">
+  <div class="flex items-center space-x-2">
+    <i class="fa-solid fa-box-archive text-blue-400 text-xl"></i>
+    <h2 class="text-lg font-bold uppercase tracking-wide text-white">Ciclos Fechados</h2>
+  </div>
+  <span class="text-xs text-slate-400">As escalas destes ciclos podem ser editadas aqui e sincronizadas com a página Ciclos.</span>
+</div>
       <div id="containerCiclosFechados" class="space-y-4">
         <div class="bg-brand-card rounded-2xl border border-slate-800 p-8 text-center text-slate-500 italic">
           Nenhum ciclo fechado até o momento.
@@ -598,7 +598,7 @@
               <option value="">Pernoite: N/A</option><option value="SIM">Pernoite: SIM</option><option value="NAO">Pernoite: NÃO</option>
             </select>
             <select id="modalJetonManha" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
-              <option value="">Jeton</option><option value="100.00">100,00</option><option value="220.00">220,00</option>
+              <option value="">Jeton</option><option value="100.00">R$ 100,00</option><option value="220.00">R$ 220,00</option>
             </select>
             <div class="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-300">
               <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoManha" value="APOIO">APOIO</label>
@@ -615,7 +615,7 @@
               <option value="">Pernoite: N/A</option><option value="SIM">Pernoite: SIM</option><option value="NAO">Pernoite: NÃO</option>
             </select>
             <select id="modalJetonTarde" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
-              <option value="">Jeton</option><option value="100.00">100,00</option><option value="220.00">220,00</option>
+              <option value="">Jeton</option><option value="100.00">R$ 100,00</option><option value="220.00">R$ 220,00</option>
             </select>
             <div class="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-300">
               <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoTarde" value="APOIO">APOIO</label>
@@ -632,7 +632,7 @@
               <option value="">Pernoite: N/A</option><option value="SIM">Pernoite: SIM</option><option value="NAO">Pernoite: NÃO</option>
             </select>
             <select id="modalJetonNoite" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
-              <option value="">Jeton</option><option value="100.00">100,00</option><option value="220.00">220,00</option>
+              <option value="">Jeton</option><option value="100.00">R$ 100,00</option><option value="220.00">R$ 220,00</option>
             </select>
             <div class="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-300">
               <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoNoite" value="APOIO">APOIO</label>
@@ -1802,7 +1802,7 @@
       if (escalasFiltradas.length === 0) {
         container.innerHTML = `
           <div class="bg-brand-card rounded-2xl border border-slate-800 p-8 text-center text-slate-500 italic uppercase">
-            Nenhuma escala encontrada com o termo informado.
+            Nenhuma escala encontrada com o dado informado.
           </div>
         `;
         return;
@@ -1903,10 +1903,10 @@
                 </div>
                 <div class="space-y-2">
                   <div><strong>VALOR DIÁRIO DO JETON:</strong> <span class="text-brand-400 font-bold">${formatarMoeda(jetonCard)}</span></div>
-                  <div><strong>TOTAL DIÁRIO DAS DIÁRIAS:</strong> <span class="text-emerald-400 font-bold">${formatarMoeda(extrasCard.valorDiarias)}</span></div>
-                  <div><strong>TOTAL DIÁRIO DOS AUXÍLIOS:</strong> <span class="text-amber-400 font-bold">${formatarMoeda(extrasCard.valorAuxilios)}</span></div>
-                  <div><strong>HORAS TRABALHADAS:</strong> <span class="text-amber-400 font-bold">${esc.horasTrabalhadasStr || '0H 00M'}</span></div>
-                  <div><strong>VALOR DA HORA TRABALHADA:</strong> <span class="text-indigo-400 font-bold">${esc.valorHoraStr || 'R$ 0,00 /H'}</span></div>
+                  <div><strong>VALOR TOTAL DIÁRIO DAS DIÁRIAS:</strong> <span class="text-emerald-400 font-bold">${formatarMoeda(extrasCard.valorDiarias)}</span></div>
+                  <div><strong>VALOR TOTAL DIÁRIO DOS AUXÍLIOS:</strong> <span class="text-amber-400 font-bold">${formatarMoeda(extrasCard.valorAuxilios)}</span></div>
+                  <div><strong>QTD. DE HORAS TRABALHADAS:</strong> <span class="text-amber-400 font-bold">${esc.horasTrabalhadasStr || '0H 00M'}</span></div>
+                  <div><strong>VALOR POR HORA TRABALHADA:</strong> <span class="text-indigo-400 font-bold">${esc.valorHoraStr || 'R$ 0,00 /H'}</span></div>
                   <div class="pt-2 mt-2 border-t border-slate-800"><strong>VALOR DIÁRIO TOTAL:</strong> <span class="text-emerald-400 font-black text-sm">${formatarMoeda(valorDiarioTotal)}</span></div>
                   <div><strong>VALOR DIÁRIO REAL APÓS IR:</strong> <span class="text-cyan-400 font-black text-sm">${formatarMoeda(jetonCard * 0.78 + extrasCard.valorDiarias + extrasCard.valorAuxilios)}</span></div>
                 </div>
