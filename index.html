@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JETCONTROL 2026®™ DESMONTE</title>
+  <script src="jetcontrol-sync.js"></script>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -90,13 +91,13 @@
     <section class="relative rounded-2xl overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-brand-dark border border-slate-800 shadow-2xl p-6 sm:p-8 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-6">
       <div class="space-y-3 max-w-lg">
         <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-500 border border-brand-500/20">
-          SISTEMA OFICIAL DE OPERAÇÕES
+          DXM - SISTEMAS E APPS®™ 
         </span>
         <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase">
           JETCONTROL 2026®™ <span class="text-brand-500">DESMONTE</span>
         </h1>
         <p class="text-sm sm:text-base text-slate-400 font-medium">
-          CRIADO PARA CONTROLE DE JETON EM OPERAÇÕES DE DESMONTAGEM
+          CRIADO PARA CONTROLE DE JETON <br> EM OPERAÇÕES DE DESMONTAGEM
         </p>
       </div>
 
@@ -168,10 +169,10 @@
           <span id="val-jetonDobrado" class="text-xl font-black text-brand-500">R$ 220,00</span>
         </div>
 
-        <!-- Diária Alimentação -->
+        <!-- Diária de Alimentação -->
         <div class="bg-brand-card p-4 rounded-xl border border-slate-800 shadow-sm flex flex-col justify-between space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-400 uppercase">Diária Alimentação</span>
+            <span class="text-xs font-bold text-slate-400 uppercase">Diária de Alimentação</span>
             <button onclick="editarValor('diariaAlimentacao', 'Diária Alimentação')" 
                     class="p-1.5 text-slate-400 hover:text-brand-500 hover:bg-slate-800 rounded transition" title="Atualizar valor">
               <i class="fa-solid fa-pen-to-square text-xs"></i>
@@ -180,10 +181,10 @@
           <span id="val-diariaAlimentacao" class="text-xl font-black text-amber-400">R$ 52,00</span>
         </div>
 
-        <!-- Diária Hospedagem -->
+        <!-- Diária de Pernoite -->
         <div class="bg-brand-card p-4 rounded-xl border border-slate-800 shadow-sm flex flex-col justify-between space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-400 uppercase">Diária Hospedagem</span>
+            <span class="text-xs font-bold text-slate-400 uppercase">Diária de Pernoite</span>
             <button onclick="editarValor('diariaHospedagem', 'Diária Hospedagem')" 
                     class="p-1.5 text-slate-400 hover:text-brand-500 hover:bg-slate-800 rounded transition" title="Atualizar valor">
               <i class="fa-solid fa-pen-to-square text-xs"></i>
@@ -192,10 +193,10 @@
           <span id="val-diariaHospedagem" class="text-xl font-black text-amber-400">R$ 274,10</span>
         </div>
 
-        <!-- Diária Traslado -->
+        <!-- Diária de Traslado -->
         <div class="bg-brand-card p-4 rounded-xl border border-slate-800 shadow-sm flex flex-col justify-between space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-400 uppercase">Diária Traslado</span>
+            <span class="text-xs font-bold text-slate-400 uppercase">Diária de Traslado</span>
             <button onclick="editarValor('diariaTraslado', 'Diária Traslado')" 
                     class="p-1.5 text-slate-400 hover:text-brand-500 hover:bg-slate-800 rounded transition" title="Atualizar valor">
               <i class="fa-solid fa-pen-to-square text-xs"></i>
@@ -226,7 +227,7 @@
           <!-- Data de Abertura (Apenas Dia 26 - Calendário Customizado) -->
           <div class="space-y-2 relative">
             <label class="block text-xs font-bold uppercase text-slate-300">
-              Data de Abertura do Ciclo <span class="text-brand-500 font-normal">(Apenas Dia 26)</span>
+              Data de Abertura do Ciclo <span class="text-brand-500 font-normal"> <br> (Todo Dia 26)</span>
             </label>
 
             <!-- Campo Visível: abre o calendário customizado ao ser clicado -->
@@ -264,7 +265,7 @@
           <!-- Data de Fechamento do Ciclo (Automática: Dia 25 do mês seguinte) -->
           <div class="space-y-2">
             <label for="dataFechamento" class="block text-xs font-bold uppercase text-slate-300">
-              Data de Fechamento do Ciclo <span class="text-brand-500 font-normal">(Dia 25 do mês seguinte)</span>
+              Data de Fechamento do Ciclo <span class="text-brand-500 font-normal"> <br> (Todo Dia 25 do mês seguinte)</span>
             </label>
             <input type="text" id="dataFechamento" name="dataFechamento" readonly disabled placeholder="Selecione o dia 26 ao lado"
                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none cursor-not-allowed">
@@ -273,7 +274,7 @@
           <!-- Recebimento em (Campo Automático +3 Meses) -->
           <div class="space-y-2">
             <label for="recebimentoEm" class="block text-xs font-bold uppercase text-slate-300">
-              Recebimento em <span class="text-brand-500 font-normal">(3 meses após a abertura)</span>
+              Mês de Recebimento do Jeton <span class="text-brand-500 font-normal"> <br> (Todo 3º mê após o mês de abertura)</span>
             </label>
             <input type="text" id="recebimentoEm" name="recebimentoEm" readonly placeholder="Selecione o dia 26 acima"
                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none cursor-not-allowed">
@@ -587,7 +588,19 @@
     }
 
     // Inicialização
-    window.addEventListener('DOMContentLoaded', carregarDadosLocal);
+    window.addEventListener('DOMContentLoaded', function () {
+      var prosseguir = function () { carregarDadosLocal(); };
+      if (window.JetSyncReady && typeof window.JetSyncReady.finally === 'function') {
+        window.JetSyncReady.finally(prosseguir);
+      } else {
+        prosseguir();
+      }
+    });
+
+    // Atualiza a tela sozinha quando outro navegador/aparelho salvar algo novo.
+    if (window.JetSyncOnChange) {
+      window.JetSyncOnChange(function () { carregarDadosLocal(); });
+    }
   </script>
 </body>
 </html>
