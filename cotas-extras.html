@@ -65,11 +65,11 @@
       <div class="flex items-center space-x-3 mb-2">
         <i class="fa-solid fa-money-bill-trend-up text-brand-500 text-2xl"></i>
         <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase">
-          COTAS EXTRAS E <span class="text-brand-500">DIÁRIAS</span>
+          COTAS EXTRAS <br> <span class="text-brand-500">AUXÍLIOS E DIÁRIAS</span>
         </h1>
       </div>
       <p class="text-sm sm:text-base text-slate-400 font-medium">
-        CONSOLIDADO AUTOMÁTICO DE DIÁRIAS DE VIAGEM E AUXÍLIOS DE ESCALA DE ACORDO COM LOCAIS E DATAS ELEGÍVEIS.
+        CONTROLE AUTOMÁTICO DE AUXÍLIOS E DIÁRIAS EM ESCALA DE ACORDO COM LOCAIS E DATAS ELEGÍVEIS.
       </p>
     </section>
 
@@ -77,14 +77,15 @@
       <div class="flex items-center space-x-2 border-b border-slate-800 pb-3">
         <i class="fa-solid fa-map-location-dot text-amber-400 text-xl"></i>
         <h2 class="text-lg font-bold uppercase tracking-wide text-white">
-          QUADRO INFORMATIVO DOS LOCAIS ELEGÍVEIS À DIÁRIAS
+          LOCAIS ELEGÍVEIS À DIÁRIAS
         </h2>
       </div>
 
       <div class="space-y-4">
         <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <strong class="text-amber-400 uppercase">MUNICÍPIOS FORA DA REGIÃO METROPOLITANA DO RIO DE JANEIRO:</strong><br>
-          DÃO DIREITO A DIÁRIA E TRASLADO CASO O DESLOCAMENTO SEJA SUPERIOR A 50 KM DO MUNICÍPIO DE SEDE (CAPITAL) E EXIJA AFASTAMENTO TEMPORÁRIO.
+          DÃO DIREITO A DIÁRIA (QUANDO O TEMPO DE DESLOCAMENTO - IDA E VOLTA - FOR SUPERIOR A 4 HORAS), PERNOITE (QUANDO HOUVER HOSPEDAGEM) E TRASLADO (QUANDO O DESLOCAMENTO NÃO FOR POR VIATURA OFICIAL), 
+          CASO O DESLOCAMENTO SEJA SUPERIOR A 50 KM DO MUNICÍPIO DE SEDE (CAPITAL) E EXIJA AFASTAMENTO TEMPORÁRIO DENTRO DAS REGRAS DESCRITAS EM CADA ITEM.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -139,7 +140,6 @@
           <i class="fa-solid fa-hotel text-amber-400 text-xl"></i>
           <h2 class="text-lg font-bold uppercase tracking-wide text-white">ORGANOGRAMA DAS DIÁRIAS</h2>
         </div>
-        <span class="text-xs font-medium text-slate-400">LOCAIS ELEGÍVEIS FORA DA RMRJ</span>
       </div>
 
       <div class="overflow-x-auto">
@@ -149,8 +149,8 @@
               <th scope="col" class="px-4 py-3 text-center">Nº DA ESCALA</th>
               <th scope="col" class="px-4 py-3">LOCAL</th>
               <th scope="col" class="px-4 py-3 text-center">DATA</th>
-              <th scope="col" class="px-4 py-3 text-right">ALIMENTAÇÃO</th>
-              <th scope="col" class="px-4 py-3 text-right">HOSPEDAGEM</th>
+              <th scope="col" class="px-4 py-3 text-right">DIÁRIA DE ALIMENTAÇÃO</th>
+              <th scope="col" class="px-4 py-3 text-right">DIÁRIA DE PERNOITE</th>
               <th scope="col" class="px-4 py-3 text-right">TOTAL DIÁRIO</th>
             </tr>
           </thead>
@@ -172,6 +172,25 @@
       </div>
     </section>
 
+    </section>
+
+    <section class="bg-brand-card rounded-2xl border border-slate-800 p-6 sm:p-8 shadow-xl space-y-6">
+      <div class="flex items-center space-x-2 border-b border-slate-800 pb-3">
+        <i class="fa-solid fa-map-location-dot text-amber-400 text-xl"></i>
+        <h2 class="text-lg font-bold uppercase tracking-wide text-white">
+          ESCALAS ELEGÍVEIS AOS AUXÍLIOS
+        </h2>
+      </div>
+
+      <div class="space-y-4">
+        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+          <strong class="text-amber-400 uppercase">DATA DE ATIVIDADE QUE SEJA EM SÁBADO, DOMINGO OU FERIADO</strong><br>
+          DÃO DIREITO AOS AUXÍLIOS ALIMENTAÇÃO E TRANSPORTE.
+        </p>
+        </div>
+      </div>
+    </section>
+    
     <section class="bg-brand-card rounded-2xl border border-slate-800 p-6 sm:p-8 shadow-xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <div class="flex items-center space-x-2">
@@ -179,7 +198,6 @@
           <i class="fa-solid fa-car text-brand-500"></i>
           <h2 class="text-lg font-bold uppercase tracking-wide text-white">ORGANOGRAMA DOS AUXÍLIOS</h2>
         </div>
-        <span class="text-xs font-medium text-slate-400">FINAIS DE SEMANA E FERIADOS</span>
       </div>
 
       <div class="overflow-x-auto">
@@ -189,15 +207,15 @@
               <th scope="col" class="px-4 py-3 text-center">Nº DA ESCALA</th>
               <th scope="col" class="px-4 py-3">LOCAL</th>
               <th scope="col" class="px-4 py-3 text-center">DATA</th>
-              <th scope="col" class="px-4 py-3 text-right">AUX. ALIMENTAÇÃO</th>
-              <th scope="col" class="px-4 py-3 text-right">AUX. TRANSPORTE</th>
+              <th scope="col" class="px-4 py-3 text-right">AUXÍLIO ALIMENTAÇÃO</th>
+              <th scope="col" class="px-4 py-3 text-right">AUXÍLIO TRANSPORTE</th>
               <th scope="col" class="px-4 py-3 text-right">TOTAL DIÁRIO</th>
             </tr>
           </thead>
           <tbody id="tabelaAuxiliosBody" class="divide-y divide-slate-800">
             <tr>
               <td colspan="6" class="px-4 py-8 text-center text-slate-500 italic">
-                NENHUMA ESCALA EM FINAL DE SEMANA OU FERIADO CADASTRADA ATÉ O MOMENTO.
+                NENHUMA ESCALA COM DATA ELEGÍVEL AO AUXÍLIOS CADASTRADA ATÉ O MOMENTO.
               </td>
             </tr>
           </tbody>
