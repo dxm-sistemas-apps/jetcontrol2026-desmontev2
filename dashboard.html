@@ -34,6 +34,7 @@
   </script>
 
   <style>
+    body { text-transform: uppercase; }
     :root {
       --bg-primary: #0f172a;
       --bg-secondary: #1e293b;
@@ -318,6 +319,11 @@
         <div class="kpi-value" id="kpi-rendimento-hora">R$ 0,00/h</div>
         <div class="kpi-subtext" id="kpi-total-horas">Total de 0h Trabalhadas</div>
       </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total de Descontos de IR</div>
+        <div class="kpi-value" id="kpi-total-desconto-ir">R$ 0,00</div>
+        <div class="kpi-subtext" id="kpi-total-desconto-ir-sub">Alíquota de 22% Sobre o Jeton Bruto</div>
+      </div>
     </section>
 
     <!-- PAINEL DE GRÁFICOS - LINHA 1 -->
@@ -336,6 +342,10 @@
         </div>
         <div class="chart-container">
           <canvas id="chartComposicaoReceita"></canvas>
+        </div>
+        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">VALOR FINAL</span>
+          <span id="composicaoValorFinal" style="font-size: 1.25rem; font-weight: 900; color: var(--accent-success);">R$ 0,00</span>
         </div>
       </div>
     </section>
@@ -430,6 +440,84 @@
       </div>
     </section>
 
+    <!-- PAINEL DE GRÁFICOS - LINHA 6 (TOP 10 ESCALAS INDIVIDUAIS) -->
+    <section class="dashboard-grid">
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title">Top 10 Escalas com Maior Qtd. de Horas Trabalhadas</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop10Horas"></canvas>
+        </div>
+      </div>
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title">Top 10 Escalas com Maior Valor por Hora Trabalhada</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop10ValorHora"></canvas>
+        </div>
+      </div>
+    </section>
+    <section class="dashboard-grid">
+      <div class="chart-card col-12">
+        <div class="chart-card-header">
+          <div class="chart-card-title">Top 10 Escalas com Maior Valor Real de Jeton</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop10ValorRealJetonEscala"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAINEL DE GRÁFICOS - LINHA 7 (RANKINGS DE CICLOS) -->
+    <section class="dashboard-grid">
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title">6 Ciclos com Maior Valor Real de Jeton</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop6ValorRealJetonCiclo"></canvas>
+        </div>
+      </div>
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title">6 Ciclos com Maior Valor Médio por Escala</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop6ValorMedioEscala"></canvas>
+        </div>
+      </div>
+    </section>
+    <section class="dashboard-grid">
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title">6 Ciclos com Maior Valor Médio por Atividade</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop6ValorMedioAtividade"></canvas>
+        </div>
+      </div>
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title">6 Ciclos com Maior Valor Médio por Hora Trabalhada</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop6ValorMedioHora"></canvas>
+        </div>
+      </div>
+    </section>
+    <section class="dashboard-grid">
+      <div class="chart-card col-12">
+        <div class="chart-card-header">
+          <div class="chart-card-title">6 Ciclos com Maior Desconto de Imposto de Renda</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop6DescontoIR"></canvas>
+        </div>
+      </div>
+    </section>
+
     <!-- PAINEL DE TABELAS E HISTÓRICOS -->
     <section class="dashboard-grid">
       <div class="chart-card col-12">
@@ -487,7 +575,15 @@
       simples: null,
       dobradas: null,
       triplas: null,
-      quadruplas: null
+      quadruplas: null,
+      top10Horas: null,
+      top10ValorHora: null,
+      top10ValorRealJetonEscala: null,
+      top6ValorRealJetonCiclo: null,
+      top6ValorMedioEscala: null,
+      top6ValorMedioAtividade: null,
+      top6ValorMedioHora: null,
+      top6DescontoIR: null
     };
 
     // Helper: Converte valores numéricos ou formatados (R$) para Float
@@ -678,6 +774,70 @@
       return metricas;
     }
 
+    // EXTRAI O VALOR (TEXTO) DE UM CAMPO "RÓTULO: VALOR" DENTRO DO PAINEL
+    // "JORNADA" DE UM CARD DE ESCALA ARQUIVADO (ESTRUTURA: <div><strong>RÓTULO:
+    // </strong> <span>VALOR</span></div>). USADO PARA MONTAR OS RANKINGS DE
+    // "TOP 10 ESCALAS" A PARTIR DO HTML ARQUIVADO NOS CICLOS FECHADOS.
+    function extrairCampoPorRotulo(card, rotulo) {
+      let valor = null;
+      card.querySelectorAll('div > strong').forEach(forte => {
+        if (forte.textContent.trim() === rotulo) {
+          const span = forte.nextElementSibling;
+          valor = span ? span.textContent.trim() : forte.parentElement.textContent.replace(rotulo, '').trim();
+        }
+      });
+      return valor;
+    }
+
+    // EXTRAI, DE UM SNAPSHOT HTML DE ESCALAS ARQUIVADO, UMA LISTA COM OS DADOS
+    // INDIVIDUAIS DE CADA ESCALA (DATA, HORAS TRABALHADAS, VALOR/HORA E VALOR
+    // REAL DE JETON), USADA PARA OS RANKINGS "TOP 10 ESCALAS". OS VALORES SÃO
+    // SEMPRE RECALCULADOS A PARTIR DOS CAMPOS BRUTOS (JETON/DIÁRIAS/AUXÍLIOS/
+    // HORAS) — NUNCA A PARTIR DE "VALOR POR HORA" JÁ PRONTO NO CARD ARQUIVADO —
+    // PARA QUE OS RESULTADOS FIQUEM CORRETOS MESMO EM CICLOS FECHADOS ANTES DE
+    // UM AJUSTE NA FÓRMULA DE CÁLCULO.
+    function extrairEscalasDetalhadasDeHtml(htmlEscalas, nomeCiclo) {
+      const lista = [];
+      if (!htmlEscalas) return lista;
+
+      const temp = document.createElement('div');
+      temp.innerHTML = htmlEscalas;
+      const cards = temp.querySelectorAll('#containerCardsEscalas > div, .pdf-card');
+
+      cards.forEach(card => {
+        const spanData = card.querySelector('i.fa-calendar');
+        const dataTexto = spanData && spanData.closest('span') ? spanData.closest('span').textContent.trim() : '-';
+
+        const jetonTxt = extrairCampoPorRotulo(card, 'VALOR DIÁRIO DO JETON:');
+        const diariasTxt = extrairCampoPorRotulo(card, 'VALOR TOTAL DIÁRIO DAS DIÁRIAS:');
+        const auxiliosTxt = extrairCampoPorRotulo(card, 'VALOR TOTAL DIÁRIO DOS AUXÍLIOS:');
+        const horasTxt = extrairCampoPorRotulo(card, 'QTD. DE HORAS TRABALHADAS:');
+
+        const jetonBruto = jetonTxt !== null ? parseMoeda(jetonTxt) : 0;
+        const diarias = diariasTxt !== null ? parseMoeda(diariasTxt) : 0;
+        const auxilios = auxiliosTxt !== null ? parseMoeda(auxiliosTxt) : 0;
+
+        let horas = 0;
+        if (horasTxt) {
+          const m = horasTxt.match(/(\d+)\s*H\s*(\d+)\s*M/i);
+          if (m) horas = parseInt(m[1], 10) + (parseInt(m[2], 10) / 60);
+        }
+
+        const valorRealAposIR = (jetonBruto * 0.78) + diarias + auxilios;
+        const valorHora = horas > 0 ? (valorRealAposIR / horas) : 0;
+
+        lista.push({
+          data: dataTexto,
+          cicloNome: nomeCiclo,
+          horas,
+          valorHora,
+          valorRealJeton: jetonBruto * 0.78
+        });
+      });
+
+      return lista;
+    }
+
     // SOMA OS VALORES DE UMA COLUNA ESPECÍFICA (ÍNDICE 0-BASEADO) DE UMA TABELA
     // ARQUIVADA DE "ORGANOGRAMA DAS DIÁRIAS" OU "ORGANOGRAMA DOS AUXÍLIOS", USADO
     // PARA OBTER O DETALHAMENTO POR TIPO DE DIÁRIA/AUXÍLIO (ALIMENTAÇÃO, HOSPEDAGEM,
@@ -746,6 +906,10 @@
       // ---------------------------------------------------------------------
       const ciclosFechados = JSON.parse(localStorage.getItem('jetcontrol_ciclos_fechados')) || [];
       const listaCiclosProcessados = [];
+
+      // LISTA "ACHATADA" COM OS DADOS INDIVIDUAIS DE CADA ESCALA (DE TODOS OS
+      // CICLOS, FECHADOS + VIGENTE), USADA NOS RANKINGS "TOP 10 ESCALAS".
+      const listaEscalasDetalhadas = [];
 
       // Mapa global de fiscalizações por local (fechados + vigente)
       const contagemLocais = {};
@@ -843,6 +1007,17 @@
             ? `CICLO - ${dataBR(ciclo.dataAbertura)} À ${dataBR(ciclo.dataFechamento)}`
             : `CICLO ${ciclo.numero || (idx + 1)}`);
 
+        // NOVOS CAMPOS (RANKINGS): Desconto de IR, Valores Médios (por Escala/
+        // Atividade/Hora) e Valor Real de Jeton do ciclo — todos já calculados
+        // corretamente na página de Escalas (não são afetados pelo ajuste feito
+        // no valor/hora de cada escala individual), então são apenas extraídos
+        // da seção "Receitas do Ciclo" arquivada.
+        const valorDescontoIRCiclo = parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorDescontoIR')) || (jetonBrutoCiclo * aliquotaIR);
+        const valorMedioEscalaCiclo = parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorMedioEscala'));
+        const valorMedioAtividadeCiclo = parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorMedioAtividade'));
+        const valorMedioHoraCiclo = parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorMedioHora'));
+        const valorRealDeJetonCiclo = jetonBrutoCiclo * (1 - aliquotaIR);
+
         listaCiclosProcessados.push({
           num: ciclo.numero || (idx + 1),
           nome: nomeCicloProcessado,
@@ -858,14 +1033,32 @@
           dobrada: metricasEscalas.dobrada,
           tripla: metricasEscalas.tripla,
           quadrupla: metricasEscalas.quadrupla,
+          valorDescontoIR: valorDescontoIRCiclo,
+          valorMedioEscala: valorMedioEscalaCiclo,
+          valorMedioAtividade: valorMedioAtividadeCiclo,
+          valorMedioHora: valorMedioHoraCiclo,
+          valorRealDeJeton: valorRealDeJetonCiclo,
           status: 'FECHADO'
         });
+
+        // Coleta os dados individuais de cada escala deste ciclo para os
+        // rankings "TOP 10 ESCALAS".
+        listaEscalasDetalhadas.push(...extrairEscalasDetalhadasDeHtml(ciclo.escalas, nomeCicloProcessado));
       });
 
       // ---------------------------------------------------------------------
       // 2. PROCESSAR CICLO VIGENTE (ABERTO / ATUAL)
       // ---------------------------------------------------------------------
       const escalasVigentes = JSON.parse(localStorage.getItem('jetcontrol_escalas_dados')) || [];
+
+      // NOME DO CICLO VIGENTE (calculado aqui, antes do loop de escalas, para
+      // já poder ser usado ao coletar os dados individuais de cada escala
+      // para os rankings "TOP 10 ESCALAS").
+      const cicloVigenteDadosPrevia = JSON.parse(localStorage.getItem('jetcontrol_ciclo_dados') || '{}');
+      const nomeCicloVigente = cicloVigenteDadosPrevia.nomeCiclo ||
+        (cicloVigenteDadosPrevia.dataAbertura && cicloVigenteDadosPrevia.dataFechamento
+          ? `CICLO - ${dataBR(cicloVigenteDadosPrevia.dataAbertura)} À ${dataBR(cicloVigenteDadosPrevia.dataFechamento)} (ABERTO)`
+          : `CICLO ${ciclosFechados.length + 1} (ABERTO)`);
 
       let jetonBrutoVigente = 0;
       let diariasVigente = 0;
@@ -879,6 +1072,36 @@
       let quadruplaVigente = 0;
 
       escalasVigentes.forEach(escala => {
+        // NOVO: coleta os dados desta escala individual para os rankings
+        // "TOP 10 ESCALAS", recalculando o valor/hora e o valor real de jeton
+        // a partir dos campos brutos (jeton/diárias/auxílios/horário), para
+        // garantir que o resultado esteja sempre correto.
+        const jManhaDetalhe = parseMoeda(escala.jetonManha || 0);
+        const jTardeDetalhe = parseMoeda(escala.jetonTarde || 0);
+        const jNoiteDetalhe = parseMoeda(escala.jetonNoite || 0) * (escala.percepcaoQuartoJeton === 'SIM' ? 2 : 1);
+        const jetonBrutoDetalhe = jManhaDetalhe + jTardeDetalhe + jNoiteDetalhe;
+        const diariasDetalhe = parseFloat(escala.valorDiarias) || 0;
+        const auxiliosDetalhe = parseFloat(escala.valorAuxilios) || 0;
+
+        let horasDetalhe = 0;
+        if (escala.horarioSaida && escala.horarioChegada) {
+          const [dsH, dsM] = escala.horarioSaida.split(':').map(Number);
+          const [dcH, dcM] = escala.horarioChegada.split(':').map(Number);
+          let dMinSaida = dsH * 60 + dsM;
+          let dMinChegada = dcH * 60 + dcM;
+          if (dMinChegada < dMinSaida) dMinChegada += 24 * 60;
+          horasDetalhe = (dMinChegada - dMinSaida) / 60;
+        }
+
+        const valorRealAposIRDetalhe = (jetonBrutoDetalhe * 0.78) + diariasDetalhe + auxiliosDetalhe;
+        listaEscalasDetalhadas.push({
+          data: escala.data ? dataBR(escala.data) : '-',
+          cicloNome: nomeCicloVigente,
+          horas: horasDetalhe,
+          valorHora: horasDetalhe > 0 ? (valorRealAposIRDetalhe / horasDetalhe) : 0,
+          valorRealJeton: jetonBrutoDetalhe * 0.78
+        });
+
         // Cálculo de Horas
         if (escala.saida && escala.chegada) {
           const [h1, m1] = escala.saida.split(':').map(Number);
@@ -1030,6 +1253,8 @@
       document.getElementById('kpi-rendimento-hora').textContent = `${formatMoeda(rendimentoHoraGeral)}/h`;
       document.getElementById('kpi-total-horas').textContent = `Total de ${acumuladoGeral.horas.toFixed(1)}h Trabalhadas`;
 
+      document.getElementById('kpi-total-desconto-ir').textContent = formatMoeda(acumuladoGeral.jetonBruto * aliquotaIR);
+
       // Atualizar timestamp
       const agora = new Date();
       document.getElementById('last-updated').textContent = `Sincronizado: ${agora.toLocaleTimeString('pt-BR')}`;
@@ -1041,13 +1266,13 @@
       const receitaLiquidaVigente = (jetonBrutoVigente * (1 - aliquotaIR)) + diariasVigente + auxiliosVigente;
       const rendimentoHoraVigente = horasVigente > 0 ? (receitaLiquidaVigente / horasVigente) : 0;
 
-      // NOME DO CICLO VIGENTE: usa o mesmo padrão "CICLO - ABERTURA À FECHAMENTO"
-      // definido na Página Inicial e replicado em Escalas, quando já preenchido.
-      const cicloVigenteDados = JSON.parse(localStorage.getItem('jetcontrol_ciclo_dados') || '{}');
-      const nomeCicloVigente = cicloVigenteDados.nomeCiclo ||
-        (cicloVigenteDados.dataAbertura && cicloVigenteDados.dataFechamento
-          ? `CICLO - ${dataBR(cicloVigenteDados.dataAbertura)} À ${dataBR(cicloVigenteDados.dataFechamento)} (ABERTO)`
-          : `CICLO ${ciclosFechados.length + 1} (ABERTO)`);
+      // NOVOS CAMPOS (RANKINGS) DO CICLO VIGENTE
+      const somaAtividadesVigente = simplesVigente + dobradaVigente + triplaVigente + quadruplaVigente;
+      const valorDescontoIRVigente = jetonBrutoVigente * aliquotaIR;
+      const valorMedioEscalaVigente = escalasVigentes.length > 0 ? (receitaLiquidaVigente / escalasVigentes.length) : 0;
+      const valorMedioAtividadeVigente = somaAtividadesVigente > 0 ? (receitaLiquidaVigente / somaAtividadesVigente) : 0;
+      const valorMedioHoraVigente = rendimentoHoraVigente;
+      const valorRealDeJetonVigente = jetonBrutoVigente * (1 - aliquotaIR);
 
       listaCiclosProcessados.push({
         num: (ciclosFechados.length + 1) + ' (Aberto)',
@@ -1064,6 +1289,11 @@
         dobrada: dobradaVigente,
         tripla: triplaVigente,
         quadrupla: quadruplaVigente,
+        valorDescontoIR: valorDescontoIRVigente,
+        valorMedioEscala: valorMedioEscalaVigente,
+        valorMedioAtividade: valorMedioAtividadeVigente,
+        valorMedioHora: valorMedioHoraVigente,
+        valorRealDeJeton: valorRealDeJetonVigente,
         status: 'VIGENTE'
       });
 
@@ -1090,11 +1320,23 @@
       const top6Triplas = top6PorTipologia('tripla');
       const top6Quadruplas = top6PorTipologia('quadrupla');
 
+      // NOVOS RANKINGS: TOP 10 ESCALAS INDIVIDUAIS
+      const top10Horas = [...listaEscalasDetalhadas].sort((a, b) => b.horas - a.horas).slice(0, 10);
+      const top10ValorHora = [...listaEscalasDetalhadas].sort((a, b) => b.valorHora - a.valorHora).slice(0, 10);
+      const top10ValorRealJetonEscala = [...listaEscalasDetalhadas].sort((a, b) => b.valorRealJeton - a.valorRealJeton).slice(0, 10);
+
+      // NOVOS RANKINGS: 6 CICLOS
+      const top6ValorRealJetonCiclo = top6PorTipologia('valorRealDeJeton');
+      const top6ValorMedioEscala = top6PorTipologia('valorMedioEscala');
+      const top6ValorMedioAtividade = top6PorTipologia('valorMedioAtividade');
+      const top6ValorMedioHora = top6PorTipologia('valorMedioHora');
+      const top6DescontoIR = top6PorTipologia('valorDescontoIR');
+
       // ---------------------------------------------------------------------
       // 5. RENDERIZAÇÃO DOS GRÁFICOS E TABELA
       // ---------------------------------------------------------------------
       renderizarGraficoEvolucao(listaCiclosProcessados);
-      renderizarGraficoComposicao(acumuladoGeral.jetonBruto, acumuladoGeral.diarias, acumuladoGeral.auxilios);
+      renderizarGraficoComposicao(acumuladoGeral.jetonBruto, acumuladoGeral.diarias, acumuladoGeral.auxilios, receitaLiquidaGeral);
       renderizarGraficoTipologia(acumuladoGeral.simples, acumuladoGeral.dobrada, acumuladoGeral.tripla, acumuladoGeral.quadrupla);
       renderizarGraficoTurnos(acumuladoGeral.turnos);
       renderizarGraficoFuncoes(acumuladoGeral.funcoes);
@@ -1106,6 +1348,18 @@
       renderizarGraficoAtividadePorCiclo('chartAtividadeDobradas', 'dobradas', top6Dobradas, 'dobrada', '#06b6d4', 'Atividades Dobradas');
       renderizarGraficoAtividadePorCiclo('chartAtividadeTriplas', 'triplas', top6Triplas, 'tripla', '#8b5cf6', 'Atividades Triplas');
       renderizarGraficoAtividadePorCiclo('chartAtividadeQuadruplas', 'quadruplas', top6Quadruplas, 'quadrupla', '#ef4444', 'Atividades Quádruplas');
+
+      // NOVOS GRÁFICOS: TOP 10 ESCALAS INDIVIDUAIS
+      renderizarGraficoTopEscalas('chartTop10Horas', 'top10Horas', top10Horas, 'horas', '#f59e0b', 'HORAS TRABALHADAS', false);
+      renderizarGraficoTopEscalas('chartTop10ValorHora', 'top10ValorHora', top10ValorHora, 'valorHora', '#06b6d4', 'VALOR POR HORA (R$)', true);
+      renderizarGraficoTopEscalas('chartTop10ValorRealJetonEscala', 'top10ValorRealJetonEscala', top10ValorRealJetonEscala, 'valorRealJeton', '#10b981', 'VALOR REAL DE JETON (R$)', true);
+
+      // NOVOS GRÁFICOS: 6 CICLOS
+      renderizarGraficoAtividadePorCiclo('chartTop6ValorRealJetonCiclo', 'top6ValorRealJetonCiclo', top6ValorRealJetonCiclo, 'valorRealDeJeton', '#10b981', 'VALOR REAL DE JETON (R$)');
+      renderizarGraficoAtividadePorCiclo('chartTop6ValorMedioEscala', 'top6ValorMedioEscala', top6ValorMedioEscala, 'valorMedioEscala', '#3b82f6', 'VALOR MÉDIO POR ESCALA (R$)');
+      renderizarGraficoAtividadePorCiclo('chartTop6ValorMedioAtividade', 'top6ValorMedioAtividade', top6ValorMedioAtividade, 'valorMedioAtividade', '#8b5cf6', 'VALOR MÉDIO POR ATIVIDADE (R$)');
+      renderizarGraficoAtividadePorCiclo('chartTop6ValorMedioHora', 'top6ValorMedioHora', top6ValorMedioHora, 'valorMedioHora', '#06b6d4', 'VALOR MÉDIO POR HORA (R$)');
+      renderizarGraficoAtividadePorCiclo('chartTop6DescontoIR', 'top6DescontoIR', top6DescontoIR, 'valorDescontoIR', '#ef4444', 'DESCONTO DE IR (R$)');
     }
 
     // --- RENDERIZADORES DE GRÁFICOS (Chart.js) ---
@@ -1114,25 +1368,18 @@
       const ctx = document.getElementById('chartEvolucaoCiclos').getContext('2d');
       if (chartEvolucaoInstance) chartEvolucaoInstance.destroy();
 
-      const labels = listaCiclos.map(c => c.nome || `Ciclo ${c.num}`);
+      const labels = listaCiclos.map(c => (c.nome || `CICLO ${c.num}`).toUpperCase());
 
-      // Soma acumulada (todos os ciclos já gerados) da Receita Líquida
-      // Estimada de cada ciclo — o último ponto da linha corresponde ao
-      // total já recebido/acumulado, igual ao card "Receita Líquida
-      // Estimada".
-      let acumulado = 0;
-      const dataReceitaAcumulada = listaCiclos.map(c => {
-        acumulado += (c.receitaLiquida || 0);
-        return acumulado;
-      });
+      // Valor de CADA ciclo isoladamente (não somado/acumulado com os anteriores).
+      const dataReceitaPorCiclo = listaCiclos.map(c => c.receitaLiquida || 0);
 
       chartEvolucaoInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: labels,
           datasets: [{
-            label: 'Receita Líquida Acumulada (R$)',
-            data: dataReceitaAcumulada,
+            label: 'RECEITA LÍQUIDA DO CICLO (R$)',
+            data: dataReceitaPorCiclo,
             borderColor: '#3b82f6',
             backgroundColor: 'rgba(59, 130, 246, 0.15)',
             borderWidth: 3,
@@ -1157,16 +1404,19 @@
       });
     }
 
-    function renderizarGraficoComposicao(jeton, diarias, auxilios) {
+    function renderizarGraficoComposicao(jeton, diarias, auxilios, valorFinal) {
       const ctx = document.getElementById('chartComposicaoReceita').getContext('2d');
       if (chartComposicaoInstance) chartComposicaoInstance.destroy();
+
+      const elValorFinal = document.getElementById('composicaoValorFinal');
+      if (elValorFinal) elValorFinal.textContent = formatMoeda(valorFinal);
 
       chartComposicaoInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['Jeton Bruto', 'Diárias', 'Auxílios'],
+          labels: ['JETON BRUTO', 'DIÁRIAS', 'AUXÍLIOS'],
           datasets: [{
-            label: 'Valor (R$)',
+            label: 'VALOR (R$)',
             data: [jeton, diarias, auxilios],
             backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
             borderRadius: 6
@@ -1194,9 +1444,9 @@
       chartTipologiaInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['Simples', 'Dobrada', 'Tripla', 'Quádrupla'],
+          labels: ['SIMPLES', 'DOBRADA', 'TRIPLA', 'QUÁDRUPLA'],
           datasets: [{
-            label: 'Qtd Escalas',
+            label: 'QTD. ESCALAS',
             data: [simples, dobrada, tripla, quadrupla],
             backgroundColor: ['#3b82f6', '#06b6d4', '#8b5cf6', '#ef4444'],
             borderRadius: 6
@@ -1221,9 +1471,9 @@
       chartTurnosInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['Manhã', 'Tarde', 'Noite'],
+          labels: ['MANHÃ', 'TARDE', 'NOITE'],
           datasets: [{
-            label: 'Escalas',
+            label: 'ESCALAS',
             data: [turnos.Manhã, turnos.Tarde, turnos.Noite],
             backgroundColor: ['#f59e0b', '#3b82f6', '#8b5cf6'],
             borderRadius: 6
@@ -1248,9 +1498,9 @@
       chartFuncoesInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['Apoio', 'Coordenador', 'Motorista', 'Relator'],
+          labels: ['APOIO', 'COORDENADOR', 'MOTORISTA', 'RELATOR'],
           datasets: [{
-            label: 'Atuações',
+            label: 'ATUAÇÕES',
             data: [funcoes.Apoio, funcoes.Coordenador, funcoes.Motorista, funcoes.Relator],
             backgroundColor: '#10b981',
             borderRadius: 6
@@ -1282,7 +1532,7 @@
         data: {
           labels,
           datasets: [{
-            label: 'Fiscalizações',
+            label: 'FISCALIZAÇÕES',
             data: dados,
             backgroundColor: '#3b82f6',
             borderRadius: 6
@@ -1304,7 +1554,7 @@
       const ctx = document.getElementById('chartGanhoCiclos').getContext('2d');
       if (graficosExtras.ganho) graficosExtras.ganho.destroy();
 
-      const labels = topGanho.map(c => c.nome || `Ciclo ${c.num}`);
+      const labels = topGanho.map(c => (c.nome || `CICLO ${c.num}`).toUpperCase());
       const bruta = topGanho.map(c => c.receitaBruta);
       const liquida = topGanho.map(c => c.receitaLiquida);
 
@@ -1313,8 +1563,8 @@
         data: {
           labels,
           datasets: [
-            { label: 'Receita Bruta', data: bruta, backgroundColor: '#3b82f6', borderRadius: 6 },
-            { label: 'Receita Líquida', data: liquida, backgroundColor: '#10b981', borderRadius: 6 }
+            { label: 'RECEITA BRUTA', data: bruta, backgroundColor: '#3b82f6', borderRadius: 6 },
+            { label: 'RECEITA LÍQUIDA', data: liquida, backgroundColor: '#10b981', borderRadius: 6 }
           ]
         },
         options: {
@@ -1337,7 +1587,7 @@
       const ctx = document.getElementById(canvasId).getContext('2d');
       if (graficosExtras[chaveInstancia]) graficosExtras[chaveInstancia].destroy();
 
-      const labels = listaCiclosTop.map(c => c.nome || `Ciclo ${c.num}`);
+      const labels = listaCiclosTop.map(c => (c.nome || `CICLO ${c.num}`).toUpperCase());
       const dados = listaCiclosTop.map(c => c[campo] || 0);
 
       graficosExtras[chaveInstancia] = new Chart(ctx, {
@@ -1358,6 +1608,43 @@
           scales: {
             y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
             x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    // Renderizador genérico de "Top 10 Escalas Individuais" (por Horas / Valor
+    // por Hora / Valor Real de Jeton). "ehMoeda" controla se o eixo/tooltip
+    // formatam o valor como R$ (moeda) ou como número simples (horas).
+    function renderizarGraficoTopEscalas(canvasId, chaveInstancia, listaTop, campo, cor, labelDataset, ehMoeda) {
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      if (graficosExtras[chaveInstancia]) graficosExtras[chaveInstancia].destroy();
+
+      const labels = listaTop.map(e => `${e.data} — ${(e.cicloNome || '').toUpperCase()}`);
+      const dados = listaTop.map(e => e[campo] || 0);
+
+      graficosExtras[chaveInstancia] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: labelDataset,
+            data: dados,
+            backgroundColor: cor,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: (item) => ehMoeda ? formatMoeda(item.parsed.x) : `${item.parsed.x.toFixed(1)}H` } }
+          },
+          scales: {
+            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: (v) => ehMoeda ? formatMoeda(v) : `${v}H` } },
+            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
       });
