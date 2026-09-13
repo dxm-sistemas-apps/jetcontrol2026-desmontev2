@@ -69,7 +69,7 @@
         </h1>
       </div>
       <p class="text-sm sm:text-base text-slate-400 font-medium">
-        CONTROLE AUTOMÁTICO DE AUXÍLIOS E DIÁRIAS EM ESCALA DE ACORDO COM LOCAIS E DATAS ELEGÍVEIS.
+        CONTROLE AUTOMÁTICO DE AUXÍLIOS E DIÁRIAS NAS ESCALAS DE ACORDO COM LOCAIS E DATAS ELEGÍVEIS.
       </p>
     </section>
 
@@ -184,7 +184,7 @@
 
       <div class="space-y-4">
         <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-          <strong class="text-amber-400 uppercase">DATA DE ATIVIDADE QUE SEJA EM SÁBADO, DOMINGO OU FERIADO</strong><br>
+          <strong class="text-amber-400 uppercase">DATA DE ATIVIDADE QUE SEJA EM SÁBADO, DOMINGO OU FERIADO:</strong><br>
           DÃO DIREITO AOS AUXÍLIOS ALIMENTAÇÃO E TRANSPORTE.
         </p>
         </div>
@@ -379,14 +379,14 @@
       if (htmlDiarias !== '') {
         tbodyDiarias.innerHTML = htmlDiarias;
       } else {
-        tbodyDiarias.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Nenhuma diária elegível encontrada.</td></tr>`;
+        tbodyDiarias.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">NENHUMA ESCALA COM LOCAL ELEGÍVEL A DIÁRIAS CADASTRADA ATÉ O MOMENTO.</td></tr>`;
       }
       document.getElementById('totalDiarias').innerText = formatarMoeda(somaTotalDiarias);
 
       if (htmlAuxilios !== '') {
         tbodyAuxilios.innerHTML = htmlAuxilios;
       } else {
-        tbodyAuxilios.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Nenhum auxílio elegível encontrado.</td></tr>`;
+        tbodyAuxilios.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">NENHUMA ESCALA COM DATA ELEGÍVEL AO AUXÍLIOS CADASTRADA ATÉ O MOMENTO.</td></tr>`;
       }
       document.getElementById('totalAuxilios').innerText = formatarMoeda(somaTotalAuxilios);
 
