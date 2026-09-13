@@ -223,16 +223,42 @@
       <form id="cicloForm" class="space-y-6" onsubmit="event.preventDefault();">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          <!-- Data de Abertura (Apenas Dia 26) -->
-          <div class="space-y-2">
-            <label for="dataAbertura" class="block text-xs font-bold uppercase text-slate-300">
+          <!-- Data de Abertura (Apenas Dia 26 - Calendário Customizado) -->
+          <div class="space-y-2 relative">
+            <label class="block text-xs font-bold uppercase text-slate-300">
               Data de Abertura do Ciclo <span class="text-brand-500 font-normal">(Apenas Dia 26)</span>
             </label>
-            <input type="date" id="dataAbertura" name="dataAbertura" required
-                   class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-brand-500 transition">
-            <p id="avisoData" class="text-xs text-amber-400 hidden font-medium mt-1">
-              <i class="fa-solid fa-triangle-exclamation mr-1"></i> APENAS O DIA 26 É PERMITIDO. A DATA FOI AJUSTADA AUTOMATICAMENTE.
+
+            <!-- Campo Visível: abre o calendário customizado ao ser clicado -->
+            <button type="button" id="btnAbrirCalendarioAbertura"
+                    class="w-full flex items-center justify-between bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-brand-500 transition text-left">
+              <span id="dataAberturaDisplay" class="text-slate-500">SELECIONE O DIA 26 NO CALENDÁRIO</span>
+              <i class="fa-solid fa-calendar-day text-brand-500"></i>
+            </button>
+            <input type="hidden" id="dataAbertura" name="dataAbertura" required>
+
+            <p class="text-xs text-slate-500 font-medium mt-1">
+              <i class="fa-solid fa-circle-info mr-1"></i> NAVEGUE ENTRE QUALQUER MÊS/ANO — SOMENTE O DIA 26 FICA HABILITADO PARA ESCOLHA.
             </p>
+
+            <!-- CALENDÁRIO CUSTOMIZADO (POPUP): TODOS OS MESES SÃO NAVEGÁVEIS,
+                 MAS SOMENTE O DIA 26 APARECE HABILITADO PARA SELEÇÃO EM
+                 QUALQUER MÊS/ANO EXIBIDO. -->
+            <div id="calendarioAbertura" class="hidden absolute z-40 mt-2 w-full sm:w-72 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-4">
+              <div class="flex items-center justify-between mb-3">
+                <button type="button" id="btnMesAnterior" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition">
+                  <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <span id="calendarioMesAno" class="text-sm font-bold uppercase text-white"></span>
+                <button type="button" id="btnMesProximo" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+              <div class="grid grid-cols-7 gap-1 mb-1 text-[10px] font-bold text-slate-500 uppercase text-center">
+                <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
+              </div>
+              <div id="calendarioDias" class="grid grid-cols-7 gap-1 text-xs"></div>
+            </div>
           </div>
 
           <!-- Data de Fechamento do Ciclo (Automática: Dia 25 do mês seguinte) -->
@@ -286,8 +312,19 @@
     const inputDataAbertura = document.getElementById('dataAbertura');
     const inputRecebimento = document.getElementById('recebimentoEm');
     const inputDataFechamento = document.getElementById('dataFechamento');
-    const avisoData = document.getElementById('avisoData');
     const saveStatus = document.getElementById('saveStatus');
+
+    // Elementos do Calendário Customizado (Data de Abertura)
+    const btnAbrirCalendarioAbertura = document.getElementById('btnAbrirCalendarioAbertura');
+    const calendarioAbertura = document.getElementById('calendarioAbertura');
+    const calendarioMesAno = document.getElementById('calendarioMesAno');
+    const calendarioDias = document.getElementById('calendarioDias');
+    const btnMesAnterior = document.getElementById('btnMesAnterior');
+    const btnMesProximo = document.getElementById('btnMesProximo');
+    const dataAberturaDisplay = document.getElementById('dataAberturaDisplay');
+
+    // Mês/ano atualmente exibido no calendário (objeto Date, dia irrelevante)
+    let calendarioMesExibido = new Date();
 
     // FORMATA DATA ISO (AAAA-MM-DD) PARA O PADRÃO BR (DD/MM/AAAA)
     function formatarDataBR(iso) {
@@ -356,30 +393,22 @@
     }
 
     // VALIDAÇÃO E CÁLCULO DE DATA (+3 meses no dia 26)
+    // A DATA DE ABERTURA (campo oculto #dataAbertura) só é preenchida pelo
+    // calendário customizado abaixo, que exibe apenas o dia 26 como
+    // habilitado em qualquer mês/ano — não há mais como o valor chegar aqui
+    // com um dia diferente de 26.
     function validarEProcessarData() {
       const dataVal = inputDataAbertura.value;
 
       if (!dataVal) {
         inputRecebimento.value = "";
         inputDataFechamento.value = "";
-        avisoData.classList.add('hidden');
         return "";
       }
 
       const partes = dataVal.split('-');
       let ano = parseInt(partes[0], 10);
       let mes = parseInt(partes[1], 10) - 1;
-      let dia = parseInt(partes[2], 10);
-
-      // APENAS O DIA 26 PODE SER ESCOLHIDO, INDEPENDENTE DO MÊS/ANO SELECIONADO.
-      if (dia !== 26) {
-        dia = 26;
-        const mesFmt = String(mes + 1).padStart(2, '0');
-        inputDataAbertura.value = `${ano}-${mesFmt}-26`;
-        avisoData.classList.remove('hidden');
-      } else {
-        avisoData.classList.add('hidden');
-      }
 
       const mesRecebimentoIndex = (mes + 3) % 12;
       const anosAdicionais = Math.floor((mes + 3) / 12);
@@ -394,6 +423,102 @@
 
       return resultado;
     }
+
+    // =====================================================================
+    // CALENDÁRIO CUSTOMIZADO DA DATA DE ABERTURA — TODOS OS MESES/ANOS SÃO
+    // NAVEGÁVEIS LIVREMENTE, MAS SOMENTE O DIA 26 É EXIBIDO HABILITADO PARA
+    // SELEÇÃO EM QUALQUER MÊS EXIBIDO; OS DEMAIS DIAS FICAM DESABILITADOS
+    // (SEM CLIQUE) NO PRÓPRIO GRID DO CALENDÁRIO.
+    // =====================================================================
+
+    function renderizarCalendarioAbertura() {
+      const ano = calendarioMesExibido.getFullYear();
+      const mes = calendarioMesExibido.getMonth(); // 0-indexado
+
+      calendarioMesAno.innerText = `${meses[mes]} / ${ano}`;
+
+      const primeiroDiaSemana = new Date(ano, mes, 1).getDay(); // 0=Dom
+      const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+
+      const dataSelecionadaIso = inputDataAbertura.value || '';
+
+      let html = '';
+      for (let i = 0; i < primeiroDiaSemana; i++) {
+        html += `<span></span>`;
+      }
+
+      for (let dia = 1; dia <= diasNoMes; dia++) {
+        const diaFmt = String(dia).padStart(2, '0');
+        const mesFmt = String(mes + 1).padStart(2, '0');
+        const dataIso = `${ano}-${mesFmt}-${diaFmt}`;
+
+        if (dia === 26) {
+          const selecionado = dataIso === dataSelecionadaIso;
+          html += `<button type="button" onclick="selecionarDataAberturaCalendario('${dataIso}')"
+                      class="h-8 w-8 flex items-center justify-center rounded-lg font-bold transition ${selecionado ? 'bg-brand-600 text-white' : 'bg-brand-500/10 text-brand-400 hover:bg-brand-600 hover:text-white'}">
+                      ${dia}
+                    </button>`;
+        } else {
+          html += `<span class="h-8 w-8 flex items-center justify-center rounded-lg text-slate-700 cursor-not-allowed select-none">${dia}</span>`;
+        }
+      }
+
+      calendarioDias.innerHTML = html;
+    }
+
+    function atualizarDisplayDataAbertura() {
+      if (inputDataAbertura.value) {
+        dataAberturaDisplay.innerText = formatarDataBR(inputDataAbertura.value);
+        dataAberturaDisplay.classList.remove('text-slate-500');
+        dataAberturaDisplay.classList.add('text-slate-100');
+      } else {
+        dataAberturaDisplay.innerText = 'SELECIONE O DIA 26 NO CALENDÁRIO';
+        dataAberturaDisplay.classList.add('text-slate-500');
+        dataAberturaDisplay.classList.remove('text-slate-100');
+      }
+    }
+
+    window.selecionarDataAberturaCalendario = function(dataIso) {
+      inputDataAbertura.value = dataIso;
+      atualizarDisplayDataAbertura();
+      calendarioAbertura.classList.add('hidden');
+      validarEProcessarData();
+      salvarDadosLocal();
+    };
+
+    btnAbrirCalendarioAbertura.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const estavaAberto = !calendarioAbertura.classList.contains('hidden');
+      if (estavaAberto) {
+        calendarioAbertura.classList.add('hidden');
+        return;
+      }
+      // Ao abrir, posiciona o calendário no mês da data já selecionada (se houver).
+      if (inputDataAbertura.value) {
+        const partes = inputDataAbertura.value.split('-');
+        calendarioMesExibido = new Date(parseInt(partes[0], 10), parseInt(partes[1], 10) - 1, 1);
+      }
+      renderizarCalendarioAbertura();
+      calendarioAbertura.classList.remove('hidden');
+    });
+
+    btnMesAnterior.addEventListener('click', (event) => {
+      event.stopPropagation();
+      calendarioMesExibido = new Date(calendarioMesExibido.getFullYear(), calendarioMesExibido.getMonth() - 1, 1);
+      renderizarCalendarioAbertura();
+    });
+
+    btnMesProximo.addEventListener('click', (event) => {
+      event.stopPropagation();
+      calendarioMesExibido = new Date(calendarioMesExibido.getFullYear(), calendarioMesExibido.getMonth() + 1, 1);
+      renderizarCalendarioAbertura();
+    });
+
+    calendarioAbertura.addEventListener('click', (event) => event.stopPropagation());
+
+    document.addEventListener('click', () => {
+      calendarioAbertura.classList.add('hidden');
+    });
 
     // SALVAR CICLO NO LOCALSTORAGE
     function salvarDadosLocal() {
@@ -429,17 +554,29 @@
       carregarValores();
 
       const json = localStorage.getItem(STORAGE_KEY_CICLO);
-      if (!json) return;
+      if (!json) {
+        renderizarCalendarioAbertura();
+        return;
+      }
 
       try {
         const dados = JSON.parse(json);
-        if (dados.dataAbertura) inputDataAbertura.value = dados.dataAbertura;
+        if (dados.dataAbertura) {
+          inputDataAbertura.value = dados.dataAbertura;
+          const partesData = dados.dataAbertura.split('-');
+          if (partesData.length === 3) {
+            calendarioMesExibido = new Date(parseInt(partesData[0], 10), parseInt(partesData[1], 10) - 1, 1);
+          }
+          atualizarDisplayDataAbertura();
+        }
 
         validarEProcessarData();
         salvarDadosLocal();
       } catch (err) {
         console.error("Erro ao carregar dados do LocalStorage:", err);
       }
+
+      renderizarCalendarioAbertura();
     }
 
     function exibirStatusSalvamento() {
@@ -448,12 +585,6 @@
         saveStatus.classList.add('hidden');
       }, 3000);
     }
-
-    // Eventos
-    inputDataAbertura.addEventListener('change', () => {
-      validarEProcessarData();
-      salvarDadosLocal();
-    });
 
     // Inicialização
     window.addEventListener('DOMContentLoaded', carregarDadosLocal);
