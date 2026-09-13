@@ -28,6 +28,12 @@
 <style>
     /* Jeton fica visualmente bloqueado quando o local correspondente estiver vazio */
     select.jeton-sem-local:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    /* TODO o texto exibido na página (rótulos, cards, campos, placeholders)
+       aparece em maiúsculas. O que o usuário digita também é convertido para
+       maiúsculas de fato (ver script no fim da página), garantindo que os
+       dados salvos/sincronizados fiquem em maiúsculas, e não só a exibição. */
+    body, input, textarea, select, button { text-transform: uppercase; }
   </style>
 </head>
 <body class="bg-brand-dark text-slate-100 font-sans min-h-screen flex flex-col antialiased relative">
@@ -305,9 +311,10 @@
         
         <!-- Linha 1: Data e Horários Principais -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
+          <div class="relative">
             <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Data da Atividade *</label>
-            <input type="date" id="dataAtividade" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500">
+            <input type="hidden" id="dataAtividade">
+            <input type="text" id="dataAtividadeDisplay" readonly placeholder="SELECIONE A DATA" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500 cursor-pointer uppercase">
           </div>
           <div>
             <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Horário de Saída *</label>
@@ -573,9 +580,10 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
+          <div class="relative">
             <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Data da Atividade *</label>
-            <input type="date" id="modalDataAtividade" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm">
+            <input type="hidden" id="modalDataAtividade">
+            <input type="text" id="modalDataAtividadeDisplay" readonly placeholder="SELECIONE A DATA" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm cursor-pointer uppercase">
           </div>
           <div>
             <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Horário de Saída *</label>
@@ -1152,7 +1160,8 @@
       }
 
       if (horasTrabalhadasNum > 0) {
-        const valorPorHora = valorDiarioTotal / horasTrabalhadasNum;
+        const valorDiarioRealAposIRAtual = totalJeton * 0.78 + extrasAtual.valorDiarias + extrasAtual.valorAuxilios;
+        const valorPorHora = valorDiarioRealAposIRAtual / horasTrabalhadasNum;
         document.getElementById('calcValorHoraTrabalhada').value = `${formatarMoeda(valorPorHora)} /H`;
       } else {
         document.getElementById('calcValorHoraTrabalhada').value = `R$ 0,00 /H`;
@@ -1417,7 +1426,8 @@
       horasTrabalhadasStr = `${horas}H ${minutos.toString().padStart(2, '0')}M`;
 
       if (horasTrabalhadasNum > 0) {
-        const valorPorHora = valorDiarioTotal / horasTrabalhadasNum;
+        const valorDiarioRealAposIR = totalJeton * 0.78 + extrasEscala.valorDiarias + extrasEscala.valorAuxilios;
+        const valorPorHora = valorDiarioRealAposIR / horasTrabalhadasNum;
         valorHoraStr = `${formatarMoeda(valorPorHora)} /H`;
       }
 
@@ -1507,6 +1517,169 @@
       const partes = iso.split('-');
       return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : iso;
     }
+
+    // =========================================================================
+    // CALENDÁRIO PERSONALIZADO PARA "DATA DA ATIVIDADE"
+    // -------------------------------------------------------------------------
+    // O seletor de data NATIVO do navegador (input type="date") apresenta um
+    // bug em alguns celulares Android: ao restringir o mês por "min"/"max",
+    // o rótulo do mês exibido no topo do calendário não acompanha a troca de
+    // mês feita pelo usuário (mostra "Setembro" mas já exibe os dias de
+    // Agosto habilitados). Como esse comportamento é do próprio sistema
+    // operacional/navegador, a única forma confiável de corrigir é substituir
+    // o calendário nativo por um calendário próprio, desenhado por nós.
+    //
+    // Os campos originais (#dataAtividade e #modalDataAtividade) viram campos
+    // ocultos (mantendo o valor em AAAA-MM-DD, exatamente como antes), então
+    // NENHUMA outra função do sistema precisa ser alterada: todo o restante
+    // do código continua lendo/gravando ".value" normalmente.
+    // =========================================================================
+    const NOMES_MESES_CALENDARIO = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
+    const NOMES_DIAS_SEMANA_CALENDARIO = ['D','S','T','Q','Q','S','S'];
+    let painelCalendarioAberto = null;
+
+    function paraISO(ano, mes, dia) {
+      return `${ano}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+    }
+
+    function fecharPainelCalendario() {
+      if (painelCalendarioAberto) {
+        painelCalendarioAberto.remove();
+        painelCalendarioAberto = null;
+        document.removeEventListener('mousedown', aoClicarForaDoPainel, true);
+      }
+    }
+
+    function aoClicarForaDoPainel(ev) {
+      if (painelCalendarioAberto && !painelCalendarioAberto.contains(ev.target)) {
+        fecharPainelCalendario();
+      }
+    }
+
+    function renderizarPainelCalendario(painel, hidden, display, anoExibido, mesExibido) {
+      const minStr = hidden.getAttribute('min') || '';
+      const maxStr = hidden.getAttribute('max') || '';
+      const valorAtual = hidden.value || '';
+
+      const primeiroDiaSemana = new Date(anoExibido, mesExibido, 1).getDay();
+      const totalDiasNoMes = new Date(anoExibido, mesExibido + 1, 0).getDate();
+
+      let celulas = '';
+      for (let i = 0; i < primeiroDiaSemana; i++) {
+        celulas += `<div></div>`;
+      }
+      for (let dia = 1; dia <= totalDiasNoMes; dia++) {
+        const iso = paraISO(anoExibido, mesExibido, dia);
+        const desabilitado = (minStr && iso < minStr) || (maxStr && iso > maxStr);
+        const selecionado = iso === valorAtual;
+        celulas += `
+          <button type="button" data-iso="${iso}" ${desabilitado ? 'disabled' : ''}
+            class="h-8 w-8 text-xs rounded-lg flex items-center justify-center transition
+              ${desabilitado ? 'text-slate-700 cursor-not-allowed' : 'text-slate-200 hover:bg-brand-600 hover:text-white cursor-pointer'}
+              ${selecionado ? 'bg-brand-600 text-white font-bold' : ''}">${dia}</button>`;
+      }
+
+      painel.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <button type="button" id="btnMesAnteriorCal" class="text-slate-300 hover:text-white p-1.5 rounded-lg hover:bg-slate-800"><i class="fa-solid fa-chevron-left"></i></button>
+          <span class="text-xs font-bold text-white uppercase">${NOMES_MESES_CALENDARIO[mesExibido]} / ${anoExibido}</span>
+          <button type="button" id="btnMesSeguinteCal" class="text-slate-300 hover:text-white p-1.5 rounded-lg hover:bg-slate-800"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div class="grid grid-cols-7 gap-1 mb-1">
+          ${NOMES_DIAS_SEMANA_CALENDARIO.map(d => `<div class="h-6 w-8 flex items-center justify-center text-[10px] font-bold text-slate-500">${d}</div>`).join('')}
+        </div>
+        <div class="grid grid-cols-7 gap-1">${celulas}</div>
+      `;
+
+      painel.querySelector('#btnMesAnteriorCal').addEventListener('click', () => {
+        let novoMes = mesExibido - 1, novoAno = anoExibido;
+        if (novoMes < 0) { novoMes = 11; novoAno--; }
+        renderizarPainelCalendario(painel, hidden, display, novoAno, novoMes);
+      });
+      painel.querySelector('#btnMesSeguinteCal').addEventListener('click', () => {
+        let novoMes = mesExibido + 1, novoAno = anoExibido;
+        if (novoMes > 11) { novoMes = 0; novoAno++; }
+        renderizarPainelCalendario(painel, hidden, display, novoAno, novoMes);
+      });
+      painel.querySelectorAll('button[data-iso]:not([disabled])').forEach(botao => {
+        botao.addEventListener('click', () => {
+          hidden.value = botao.getAttribute('data-iso');
+          hidden.dispatchEvent(new Event('change', { bubbles: true }));
+          fecharPainelCalendario();
+        });
+      });
+    }
+
+    function abrirPainelCalendario(hidden, display) {
+      fecharPainelCalendario();
+
+      const painel = document.createElement('div');
+      painel.className = 'absolute z-50 mt-1 bg-slate-900 border border-slate-700 rounded-xl p-3 shadow-2xl';
+      painel.style.width = '244px';
+      display.parentElement.appendChild(painel);
+      painelCalendarioAberto = painel;
+
+      // Mês inicial exibido: o da data já selecionada, senão o da data
+      // mínima permitida (evita abrir sempre no mês "de hoje", que foi
+      // justamente o comportamento que causava o bug no celular).
+      let baseISO = hidden.value || hidden.getAttribute('min') || '';
+      let anoInicial, mesInicial;
+      if (baseISO) {
+        const [a, m] = baseISO.split('-').map(Number);
+        anoInicial = a; mesInicial = m - 1;
+      } else {
+        const hoje = new Date();
+        anoInicial = hoje.getFullYear(); mesInicial = hoje.getMonth();
+      }
+
+      renderizarPainelCalendario(painel, hidden, display, anoInicial, mesInicial);
+
+      setTimeout(() => document.addEventListener('mousedown', aoClicarForaDoPainel, true), 0);
+    }
+
+    // LIGA UM CAMPO OCULTO (VALOR EM AAAA-MM-DD) A UM CAMPO DE TEXTO VISÍVEL
+    // (SOMENTE LEITURA), MANTENDO OS DOIS SEMPRE SINCRONIZADOS - INCLUSIVE
+    // QUANDO O CÓDIGO EXISTENTE ALTERA ".value" DO CAMPO OCULTO DIRETAMENTE.
+    function inicializarCalendarioPersonalizado(idHidden, idDisplay) {
+      const hidden = document.getElementById(idHidden);
+      const display = document.getElementById(idDisplay);
+      if (!hidden || !display) return;
+
+      const descritorNativo = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+      Object.defineProperty(hidden, 'value', {
+        get() { return descritorNativo.get.call(hidden); },
+        set(v) {
+          descritorNativo.set.call(hidden, v);
+          display.value = v ? formatarDataBRPeriodo(v) : '';
+        },
+        configurable: true
+      });
+
+      display.addEventListener('click', () => abrirPainelCalendario(hidden, display));
+    }
+
+    inicializarCalendarioPersonalizado('dataAtividade', 'dataAtividadeDisplay');
+    inicializarCalendarioPersonalizado('modalDataAtividade', 'modalDataAtividadeDisplay');
+
+    // GARANTE QUE O TEXTO DIGITADO PELO USUÁRIO SEJA REALMENTE GRAVADO EM
+    // MAIÚSCULAS (E NÃO SÓ EXIBIDO EM MAIÚSCULAS VIA CSS), PARA QUE OS DADOS
+    // SALVOS/SINCRONIZADOS FIQUEM CONSISTENTES.
+    function converterParaMaiusculasAoDigitar(el) {
+      el.addEventListener('input', function () {
+        const posicaoCursor = this.selectionStart;
+        const valorConvertido = this.value.toUpperCase();
+        if (valorConvertido !== this.value) {
+          this.value = valorConvertido;
+          if (typeof this.setSelectionRange === 'function' && posicaoCursor !== null) {
+            this.setSelectionRange(posicaoCursor, posicaoCursor);
+          }
+        }
+      });
+    }
+    document.querySelectorAll('input[type="text"], input[type="search"], textarea').forEach(el => {
+      if (el.readOnly || el.disabled) return;
+      converterParaMaiusculasAoDigitar(el);
+    });
 
     // CARREGA (OU LIMPA) O CARD "DESCRIÇÃO DO PERÍODO" - CLONE SOMENTE LEITURA DA PÁGINA INICIAL
     function carregarDescricaoPeriodoEscalas() {
@@ -1827,6 +2000,24 @@
       ]);
       const jetonCard = (parseFloat(esc.jetonManha) || 0) + (parseFloat(esc.jetonTarde) || 0) + ((parseFloat(esc.jetonNoite) || 0) * (esc.percepcaoQuartoJeton === 'SIM' ? 2 : 1));
       const valorDiarioTotal = jetonCard + extrasCard.valorDiarias + extrasCard.valorAuxilios;
+      const valorDiarioRealAposIR = jetonCard * 0.78 + extrasCard.valorDiarias + extrasCard.valorAuxilios;
+      const valorDescontoIR = valorDiarioTotal - valorDiarioRealAposIR;
+
+      // RECALCULA AS HORAS TRABALHADAS E O VALOR/HORA A PARTIR DOS HORÁRIOS
+      // BRUTOS DA ESCALA, GARANTINDO QUE O VALOR/HORA SEMPRE USE O VALOR
+      // DIÁRIO REAL APÓS IR (E NÃO UM VALOR ANTIGO/DESATUALIZADO GRAVADO).
+      let horasTrabalhadasNumCard = 0;
+      if (esc.horarioSaida && esc.horarioChegada) {
+        const [hsH, hsM] = esc.horarioSaida.split(':').map(Number);
+        const [hcH, hcM] = esc.horarioChegada.split(':').map(Number);
+        let minSaida = hsH * 60 + hsM;
+        let minChegada = hcH * 60 + hcM;
+        if (minChegada < minSaida) minChegada += 24 * 60;
+        horasTrabalhadasNumCard = (minChegada - minSaida) / 60;
+      }
+      const valorHoraStrCorrigido = horasTrabalhadasNumCard > 0
+        ? `${formatarMoeda(valorDiarioRealAposIR / horasTrabalhadasNumCard)} /H`
+        : 'R$ 0,00 /H';
 
       let jetonNoiteEfetivoCard = esc.jetonNoite || 0;
       if (esc.percepcaoQuartoJeton === 'SIM') {
@@ -1906,9 +2097,10 @@
                   <div><strong>VALOR TOTAL DIÁRIO DAS DIÁRIAS:</strong> <span class="text-emerald-400 font-bold">${formatarMoeda(extrasCard.valorDiarias)}</span></div>
                   <div><strong>VALOR TOTAL DIÁRIO DOS AUXÍLIOS:</strong> <span class="text-amber-400 font-bold">${formatarMoeda(extrasCard.valorAuxilios)}</span></div>
                   <div><strong>QTD. DE HORAS TRABALHADAS:</strong> <span class="text-amber-400 font-bold">${esc.horasTrabalhadasStr || '0H 00M'}</span></div>
-                  <div><strong>VALOR POR HORA TRABALHADA:</strong> <span class="text-indigo-400 font-bold">${esc.valorHoraStr || 'R$ 0,00 /H'}</span></div>
+                  <div><strong>VALOR POR HORA TRABALHADA:</strong> <span class="text-indigo-400 font-bold">${valorHoraStrCorrigido}</span></div>
                   <div class="pt-2 mt-2 border-t border-slate-800"><strong>VALOR DIÁRIO TOTAL:</strong> <span class="text-emerald-400 font-black text-sm">${formatarMoeda(valorDiarioTotal)}</span></div>
-                  <div><strong>VALOR DIÁRIO REAL APÓS IR:</strong> <span class="text-cyan-400 font-black text-sm">${formatarMoeda(jetonCard * 0.78 + extrasCard.valorDiarias + extrasCard.valorAuxilios)}</span></div>
+                  <div><strong>VALOR DIÁRIO DO DESCONTO DE IR:</strong> <span class="text-red-400 font-black text-sm">${formatarMoeda(valorDescontoIR)}</span></div>
+                  <div><strong>VALOR DIÁRIO REAL APÓS IR:</strong> <span class="text-cyan-400 font-black text-sm">${formatarMoeda(valorDiarioRealAposIR)}</span></div>
                 </div>
               </div>
 
@@ -1964,6 +2156,7 @@
                 <i id="chevronEsc-${idCiclo}" class="fa-solid fa-chevron-right text-blue-400 transition-transform duration-200"></i>
                 <div>
                   <h3 class="text-lg font-black text-blue-400 uppercase">${nomeDoCicloFechado(ciclo)}</h3>
+                  <p class="text-xs text-slate-300 mt-1 uppercase font-semibold">MÊS DE RECEBIMENTO: ${ciclo.recebimentoEm || '-'}</p>
                   <p class="text-xs text-slate-400 mt-1 uppercase">${escalasArr.length} ESCALA(S) REGISTRADA(S) &nbsp;|&nbsp; FECHADO EM ${ciclo.fechadoEm ? new Date(ciclo.fechadoEm).toLocaleString('pt-BR') : '-'}</p>
                 </div>
               </div>
@@ -2255,7 +2448,8 @@
       horasTrabalhadasNum = diffMinutos / 60;
       horasTrabalhadasStr = `${Math.floor(diffMinutos / 60)}H ${(diffMinutos % 60).toString().padStart(2, '0')}M`;
       if (horasTrabalhadasNum > 0) {
-        valorHoraStr = `${formatarMoeda(valorDiarioTotal / horasTrabalhadasNum)} /H`;
+        const valorDiarioRealAposIR = (jManha + jTarde + jNoiteEfetivo) * 0.78 + extras.valorDiarias + extras.valorAuxilios;
+        valorHoraStr = `${formatarMoeda(valorDiarioRealAposIR / horasTrabalhadasNum)} /H`;
       }
 
       const dadosEscala = {
