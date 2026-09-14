@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JETCONTROL 2026®™ - RESETAR DADOS</title>
+
+  <!-- Tailwind CSS CDN & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Fontes Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              dark: '#0f172a',
+              card: '#1e293b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { text-transform: uppercase; font-family: 'Inter', sans-serif; }
+    .ok { color: #34d399 !important; }
+    .erro { color: #f87171 !important; }
+  </style>
+</head>
+
+<body class="bg-brand-dark text-slate-100 font-sans min-h-screen flex flex-col antialiased">
+
+  <!-- HEADER / MENU SUPERIOR RESPONSIVO -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+          <i class="fa-solid fa-sack-dollar text-brand-500 text-2xl"></i>
+          <span class="font-bold text-lg tracking-wider text-white">JETCONTROL <span class="text-brand-500">2026®™</span></span>
+        </div>
+
+        <!-- Navigation Desktop -->
+        <nav class="hidden md:flex space-x-1">
+          <a href="index.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">PÁGINA INICIAL</a>
+          <a href="cotas-extras.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">COTAS EXTRAS</a>
+          <a href="escalas.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">ESCALAS</a>
+          <a href="ciclos.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">CICLOS</a>
+          <a href="dashboard.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">DASHBOARD</a>
+        </nav>
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden">
+          <button id="mobile-menu-btn" class="p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none">
+            <i class="fa-solid fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Navigation -->
+    <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-1">
+      <a href="index.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">PÁGINA INICIAL</a>
+      <a href="cotas-extras.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">COTAS EXTRAS</a>
+      <a href="escalas.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">ESCALAS</a>
+      <a href="ciclos.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">CICLOS</a>
+      <a href="dashboard.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">DASHBOARD</a>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-grow max-w-2xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- BANNER DA PÁGINA -->
+    <section class="rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-brand-dark border border-slate-800 shadow-xl p-6 sm:p-8 mb-8">
+      <div class="flex items-center space-x-3">
+        <i class="fa-solid fa-trash-can text-red-500 text-2xl"></i>
+        <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase">Resetar Todos os Dados</h1>
+      </div>
+    </section>
+
+    <section class="bg-brand-card rounded-2xl border border-slate-800 shadow-xl p-6 sm:p-8 space-y-5">
+      <div>
+        <p class="text-sm font-bold text-red-400 uppercase mb-2">Isso apaga permanentemente, sem volta:</p>
+        <ul class="text-xs text-slate-400 uppercase list-disc pl-5 space-y-1.5">
+          <li>Todos os dados salvos neste navegador (ciclos, escalas, cotas extras, valores etc.)</li>
+          <li>Todos os dados salvos na nuvem (Firestore), usados para sincronizar entre aparelhos</li>
+        </ul>
+      </div>
+
+      <div class="bg-slate-900/60 border border-emerald-900 rounded-xl p-4">
+        <p class="text-xs text-emerald-400 uppercase leading-relaxed">
+          <i class="fa-solid fa-circle-check mr-1"></i>
+          <strong>Reset a partir da origem:</strong> você só precisa rodar isto UMA VEZ, em UM aparelho. Todos os outros navegadores/aparelhos que já usaram o sistema vão se limpar sozinhos automaticamente na próxima vez que abrirem qualquer página (não é preciso clicar em "resetar" em cada um).
+        </p>
+      </div>
+
+      <div class="bg-slate-900/60 border border-amber-900 rounded-xl p-4">
+        <p class="text-xs text-amber-400 uppercase leading-relaxed">
+          <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+          Isso só funciona em aparelhos que abrirem o sistema DEPOIS do reset (com internet no momento em que abrirem). Um aparelho que nunca mais for aberto, obviamente, continua com os dados antigos salvos nele até que seja aberto de novo.
+        </p>
+      </div>
+
+      <div>
+        <label for="confirmacao" class="block text-xs font-bold uppercase text-slate-300 mb-1.5">Para confirmar, digite <span class="text-red-400">APAGAR</span> no campo abaixo:</label>
+        <input type="text" id="confirmacao" placeholder="Digite APAGAR"
+          class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-red-500 uppercase">
+      </div>
+
+      <button id="btnResetar" disabled
+        class="w-full bg-red-600 hover:bg-red-500 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-red-600 text-white font-black text-sm uppercase rounded-xl py-3 transition">
+        <i class="fa-solid fa-trash-can mr-2"></i>Resetar Tudo Agora
+      </button>
+
+      <div id="status" class="text-xs space-y-1.5 normal-case"></div>
+    </section>
+
+  </main>
+
+<script>
+  // Menu Mobile
+  const mobileBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  if (mobileBtn && mobileMenu) {
+    mobileBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+  }
+
+  const campoConfirmacao = document.getElementById('confirmacao');
+  const botao = document.getElementById('btnResetar');
+  const status = document.getElementById('status');
+
+  campoConfirmacao.addEventListener('input', () => {
+    botao.disabled = campoConfirmacao.value.trim().toUpperCase() !== 'APAGAR';
+  });
+
+  function log(msg, classe) {
+    const linha = document.createElement('div');
+    linha.className = classe || '';
+    linha.textContent = msg;
+    status.appendChild(linha);
+  }
+
+  async function obterConfigDoSync() {
+    try {
+      const resp = await fetch('jetcontrol-sync.js');
+      const texto = await resp.text();
+      const idMatch = texto.match(/FIREBASE_PROJECT_ID\s*=\s*'([^']*)'/);
+      const secretMatch = texto.match(/SYNC_SECRET\s*=\s*'([^']*)'/);
+      const projectId = idMatch ? idMatch[1] : '';
+      const secret = secretMatch ? secretMatch[1] : '';
+      const configurado = projectId && secret &&
+        projectId.indexOf('COLOQUE-AQUI') === -1 && secret.indexOf('COLOQUE-AQUI') === -1;
+      return configurado ? { projectId, secret } : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function limparLocalStorage() {
+    const chaves = [];
+    for (let i = 0; i < localStorage.length; i++) chaves.push(localStorage.key(i));
+    let removidas = 0;
+    chaves.forEach(chave => {
+      if (chave && (chave.indexOf('jetcontrol') === 0 || chave === 'valores')) {
+        localStorage.removeItem(chave);
+        removidas++;
+      }
+    });
+    return removidas;
+  }
+
+  async function limparNuvem(config) {
+    const base = 'https://firestore.googleapis.com/v1/projects/' + encodeURIComponent(config.projectId) +
+      '/databases/(default)/documents/jetcontrol_sync/' + encodeURIComponent(config.secret) + '/dados';
+
+    const resp = await fetch(base + '?pageSize=300');
+    if (!resp.ok) throw new Error('Não foi possível listar os dados da nuvem (HTTP ' + resp.status + ').');
+    const dados = await resp.json();
+    const documentos = (dados && dados.documents) || [];
+
+    let apagados = 0;
+    for (const doc of documentos) {
+      const partes = doc.name.split('/');
+      const chave = partes[partes.length - 1];
+      const del = await fetch(base + '/' + encodeURIComponent(chave), { method: 'DELETE' });
+      if (del.ok) apagados++;
+    }
+    return apagados;
+  }
+
+  // GRAVA O "MARCADOR DE RESET" NA NUVEM: um registro especial com o horário
+  // deste reset. O jetcontrol-sync.js, em TODAS as páginas, verifica esse
+  // marcador a cada sincronização — se encontrar um horário mais novo do que
+  // o último reset que aquele aparelho já aplicou, ele apaga sozinho todos os
+  // dados locais daquele navegador antes de continuar. É assim que o reset se
+  // propaga para todos os aparelhos automaticamente, a partir da origem.
+  async function gravarMarcadorDeReset(config) {
+    const base = 'https://firestore.googleapis.com/v1/projects/' + encodeURIComponent(config.projectId) +
+      '/databases/(default)/documents/jetcontrol_sync/' + encodeURIComponent(config.secret) + '/dados';
+
+    const agora = Date.now();
+    const resp = await fetch(base + '/__reset_marker__' +
+      '?updateMask.fieldPaths=value&updateMask.fieldPaths=atualizadoEm&updateMask.fieldPaths=deleted', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fields: {
+          value: { stringValue: 'reset' },
+          atualizadoEm: { integerValue: String(agora) },
+          deleted: { booleanValue: false }
+        }
+      })
+    });
+    if (!resp.ok) throw new Error('Não foi possível gravar o marcador de reset (HTTP ' + resp.status + ').');
+
+    // Este aparelho já aplicou o reset agora mesmo, então marca esse mesmo
+    // horário como "já aplicado" localmente, para não tentar apagar a si
+    // mesmo de novo no próximo ciclo de sincronização.
+    localStorage.setItem('jetcontrol_reset_aplicado_em', String(agora));
+  }
+
+  botao.addEventListener('click', async () => {
+    botao.disabled = true;
+    status.innerHTML = '';
+    log('Resetando, aguarde...');
+
+    const removidasLocal = limparLocalStorage();
+    log('Dados locais deste navegador apagados (' + removidasLocal + ' itens).', 'ok');
+
+    const config = await obterConfigDoSync();
+    if (!config) {
+      log('Sincronização em nuvem não está configurada neste arquivo — nada a apagar na nuvem.', 'ok');
+      log('Reset concluído.', 'ok');
+      return;
+    }
+
+    try {
+      const apagadosNuvem = await limparNuvem(config);
+      log('Dados na nuvem apagados (' + apagadosNuvem + ' itens).', 'ok');
+
+      await gravarMarcadorDeReset(config);
+      log('Marcador de reset enviado — os outros aparelhos vão se limpar sozinhos ao abrir o sistema.', 'ok');
+      log('Reset concluído.', 'ok');
+    } catch (e) {
+      log('Dados locais apagados, mas houve um erro ao concluir na nuvem: ' + e.message, 'erro');
+      log('Verifique sua internet e tente novamente (os dados locais já foram limpos, então é seguro rodar de novo).', 'erro');
+      botao.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
