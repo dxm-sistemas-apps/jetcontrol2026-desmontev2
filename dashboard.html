@@ -322,12 +322,12 @@
       <div class="kpi-card warning">
         <div class="kpi-label">Volume de Escalas</div>
         <div class="kpi-value" id="kpi-total-escalas">0</div>
-        <div class="kpi-subtext" id="kpi-escalas-sub">0 Simples | 0 Dobradas | 0 Triplas | 0 Quádruplas teste de edição</div>
+        <div class="kpi-subtext" id="kpi-escalas-sub">0 Simples | 0 Dobradas | 0 Triplas | 0 Quádruplas</div>
       </div>
       <div class="kpi-card purple">
         <div class="kpi-label">Diárias & Auxílios</div>
         <div class="kpi-value" id="kpi-diarias-auxilios">R$ 0,00</div>
-        <div class="kpi-subtext" id="kpi-pernoites-count">R$ 0,00 Aux. Alimentação | R$ 0,00 Aux. Transporte | R$ 0,00 Diária Alimentação | R$ 0,00 Diária Pernoite</div>
+        <div class="kpi-subtext" id="kpi-pernoites-count">R$ 0,00 Aux. Alimentação | R$ 0,00 Aux. Transporte | R$ 0,00 Diária Alimentação | R$ 0,00 Diária Hospedagem</div>
       </div>
       <div class="kpi-card cyan">
         <div class="kpi-label">Rendimento Médio / Hora</div>
@@ -655,6 +655,11 @@
     function definirTextoRotulo(id, textoPadrao) {
       const el = document.getElementById(id);
       if (!el) return;
+
+      // IMPORTANTE: os KPI-subtexts devem permanecer exatamente com o texto
+      // definido no HTML. Esta função não pode mais sobrescrevê-los.
+      if (el.classList.contains('kpi-subtext')) return;
+
       const rotulos = obterRotulosCustom();
       el.textContent = (rotulos[id] !== undefined) ? rotulos[id] : textoPadrao;
     }
@@ -682,12 +687,13 @@
         el.addEventListener('blur', () => salvarRotuloCustom(chave, el.textContent.trim()));
       });
 
-      // As legendas dos KPIs (kpi-subtext) já têm id fixo e são regravadas a
-      // cada atualização — a persistência delas é feita via definirTextoRotulo,
-      // então aqui só precisam se tornar editáveis.
+      // As legendas dos KPIs (kpi-subtext) têm texto definido no HTML e não
+      // são mais substituídas pelo processamento dos dados. Continuam editáveis.
       document.querySelectorAll('.kpi-subtext').forEach(el => {
         if (!el.id) return;
-        if (rotulos[el.id] !== undefined) el.textContent = rotulos[el.id];
+        // Os KPI-subtexts têm texto fixo definido no HTML. Não aplicar valores
+        // antigos do localStorage aqui, pois isso fazia o texto do código
+        // aparecer no carregamento e ser substituído logo depois.
         el.setAttribute('contenteditable', 'true');
         el.setAttribute('spellcheck', 'false');
         el.classList.add('rotulo-editavel');
@@ -1332,21 +1338,10 @@
       // 3. ATUALIZAÇÃO DOS CARDS (KPIs) NA TELA
       // ---------------------------------------------------------------------
       document.getElementById('kpi-receita-bruta').textContent = formatMoeda(receitaBrutaGeral);
-      definirTextoRotulo('kpi-receita-bruta-sub', `${ciclosFechados.length} Ciclo(s) Fechado(s) + Vigente`);
-
       document.getElementById('kpi-receita-liquida').textContent = formatMoeda(receitaLiquidaGeral);
-      definirTextoRotulo('kpi-ir-desc', `Jeton Líquido (${(100 - aliquotaIR * 100)}%) + Diárias/Aux.`);
-
       document.getElementById('kpi-total-escalas').textContent = acumuladoGeral.escalas;
-      definirTextoRotulo('kpi-escalas-sub', `${acumuladoGeral.simples} Simples | ${acumuladoGeral.dobrada} Dobradas | ${acumuladoGeral.tripla} Triplas | ${acumuladoGeral.quadrupla} Quádruplas`);
-
       document.getElementById('kpi-diarias-auxilios').textContent = formatMoeda(totalDiariasEAuxiliosGeral);
-      definirTextoRotulo('kpi-pernoites-count',
-        `${formatMoeda(acumuladoGeral.auxAlimentacao)} Aux. Alimentação | ${formatMoeda(acumuladoGeral.auxTransporte)} Aux. Transporte | ${formatMoeda(acumuladoGeral.diariaAlimentacao)} Diária Alimentação | ${formatMoeda(acumuladoGeral.diariaHospedagem)} Diária Hospedagem`);
-
       document.getElementById('kpi-rendimento-hora').textContent = `${formatMoeda(rendimentoHoraGeral)}/h`;
-      definirTextoRotulo('kpi-total-horas', `Total de ${acumuladoGeral.horas.toFixed(1)}h Trabalhadas`);
-
       document.getElementById('kpi-total-desconto-ir').textContent = formatMoeda(acumuladoGeral.jetonBruto * aliquotaIR);
 
       // Atualizar timestamp
@@ -1788,12 +1783,12 @@
       }
     });
 
-    // Inicialização e Loop de Atualização Automática a cada 5 segundos (500000 ms)
+    // Inicialização e Loop de Atualização Automática a cada 1 segundo (100000 ms)
     document.addEventListener('DOMContentLoaded', () => {
       var iniciar = function () {
         carregarEProcessarDados();
         inicializarRotulosEditaveis();
-        setInterval(carregarEProcessarDados, 500000);
+        setInterval(carregarEProcessarDados, 100000);
       };
       if (window.JetSyncReady && typeof window.JetSyncReady.finally === 'function') {
         window.JetSyncReady.finally(iniciar);
