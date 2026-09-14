@@ -1788,12 +1788,12 @@
       }
     });
 
-    // Inicialização e Loop de Atualização Automática a cada 1 segundo (100000 ms)
+    // Inicialização e Loop de Atualização Automática a cada 5 segundos (500000 ms)
     document.addEventListener('DOMContentLoaded', () => {
       var iniciar = function () {
         carregarEProcessarDados();
         inicializarRotulosEditaveis();
-        setInterval(carregarEProcessarDados, 100000);
+        setInterval(carregarEProcessarDados, 500000);
       };
       if (window.JetSyncReady && typeof window.JetSyncReady.finally === 'function') {
         window.JetSyncReady.finally(iniciar);
