@@ -212,7 +212,7 @@
       '/databases/(default)/documents/jetcontrol_sync/' + encodeURIComponent(config.secret) + '/dados';
 
     const agora = Date.now();
-    const resp = await fetch(base + '/__reset_marker__' +
+    const resp = await fetch(base + '/sistema_reset_marker' +
       '?updateMask.fieldPaths=value&updateMask.fieldPaths=atualizadoEm&updateMask.fieldPaths=deleted', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
