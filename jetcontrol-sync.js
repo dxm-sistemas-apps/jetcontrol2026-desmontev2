@@ -43,7 +43,7 @@
 
   var PREFIXO_SINCRONIZADO = 'jetcontrol_';
   var CHAVE_META = '__jetcontrol_sync_meta__';
-  var CHAVE_MARCADOR_RESET = '__reset_marker__';
+  var CHAVE_MARCADOR_RESET = 'sistema_reset_marker';
   var CHAVE_RESET_APLICADO = 'jetcontrol_reset_aplicado_em';
   var ATRASO_ENVIO_MS = 700;   // agrupa gravações rápidas (ex.: digitação) antes de enviar
   var TEMPO_LIMITE_MS = 4000;  // se a nuvem não responder nesse tempo, segue só com dados locais
