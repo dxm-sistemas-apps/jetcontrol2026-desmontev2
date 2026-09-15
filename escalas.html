@@ -152,21 +152,6 @@
         </div>
 
       </div>
-
-      <!-- COMPUTAR DIÁRIAS E AUXÍLIOS NESTE CICLO -->
-      <div class="pt-4 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <p class="text-sm font-bold uppercase text-white">Computar Diárias e Auxílios Neste Ciclo</p>
-          <p class="text-xs text-slate-400 uppercase">Se desativado, as diárias e auxílios digitados continuam sendo registrados, mas NÃO entram no valor diário total, no valor real após IR nem nos totais do ciclo.</p>
-        </div>
-        <label class="inline-flex items-center gap-3 shrink-0 cursor-pointer">
-          <span class="text-xs font-bold uppercase text-slate-300" id="labelComputarDiariasAuxilios">NÃO</span>
-          <input type="checkbox" id="chkComputarDiariasAuxilios" class="sr-only peer">
-          <span class="w-12 h-6 flex items-center bg-slate-700 rounded-full p-1 peer-checked:bg-emerald-600 transition-colors">
-            <span class="bg-white w-4 h-4 rounded-full shadow transform transition-transform peer-checked:translate-x-6"></span>
-          </span>
-        </label>
-      </div>
     </section>
     <datalist id="locais-historico"></datalist>
 
@@ -288,6 +273,30 @@
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
           <span class="block text-xs uppercase font-bold text-slate-400">Valor dos Auxílios</span>
           <span id="recValorAuxilios" class="text-xl font-black text-amber-400">R$ 0,00</span>
+        </div>
+
+        <!-- VALOR RECEBÍVEL DAS DIÁRIAS -->
+        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
+          <span class="block text-xs uppercase font-bold text-slate-400">Valor Recebível das Diárias</span>
+          <span id="recValorRecebivelDiarias" class="text-xl font-black text-emerald-300">R$ 0,00</span>
+        </div>
+
+        <!-- VALOR RECEBÍVEL DOS AUXÍLIOS -->
+        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
+          <span class="block text-xs uppercase font-bold text-slate-400">Valor Recebível dos Auxílios</span>
+          <span id="recValorRecebivelAuxilios" class="text-xl font-black text-amber-300">R$ 0,00</span>
+        </div>
+
+        <!-- BALANÇO DAS DIÁRIAS -->
+        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
+          <span class="block text-xs uppercase font-bold text-slate-400">Balanço das Diárias</span>
+          <span id="recBalancoDiarias" class="text-xl font-black text-emerald-400">R$ 0,00</span>
+        </div>
+
+        <!-- BALANÇO DOS AUXÍLIOS -->
+        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
+          <span class="block text-xs uppercase font-bold text-slate-400">Balanço dos Auxílios</span>
+          <span id="recBalancoAuxilios" class="text-xl font-black text-emerald-400">R$ 0,00</span>
         </div>
 
         <!-- ALÍQUOTA DE IMPOSTO DE RENDA (VALOR FIXO) -->
@@ -469,6 +478,49 @@
                 <option value="SIM">Sim</option>
                 <option value="NAO">Não</option>
               </select>
+            </div>
+          </div>
+
+          <!-- RECEBIMENTO DE CADA DIÁRIA/AUXÍLIO NESTA ESCALA (TODOS DESMARCADOS POR PADRÃO) -->
+          <div class="pt-2">
+            <p class="text-xs font-bold uppercase text-white mb-1">Itens Recebíveis Nesta Escala</p>
+            <p class="text-[11px] text-slate-500 uppercase leading-snug mb-3">Marque somente os itens que realmente serão pagos nesta escala. Os valores continuam sendo calculados e exibidos normalmente, mesmo desmarcados.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              <label class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-2 cursor-pointer">
+                <span class="text-[11px] font-bold uppercase text-slate-300 leading-tight">Diária<br>Alimentação</span>
+                <input type="checkbox" id="chkDiariaAlimentacaoRecebivel" class="sr-only peer">
+                <span class="w-10 h-6 flex items-center bg-slate-700 rounded-full p-1 peer-checked:bg-emerald-600 transition-colors shrink-0">
+                  <span class="bg-white w-4 h-4 rounded-full shadow transform transition-transform peer-checked:translate-x-4"></span>
+                </span>
+              </label>
+              <label class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-2 cursor-pointer">
+                <span class="text-[11px] font-bold uppercase text-slate-300 leading-tight">Diária<br>Pernoite</span>
+                <input type="checkbox" id="chkDiariaPernoiteRecebivel" class="sr-only peer">
+                <span class="w-10 h-6 flex items-center bg-slate-700 rounded-full p-1 peer-checked:bg-emerald-600 transition-colors shrink-0">
+                  <span class="bg-white w-4 h-4 rounded-full shadow transform transition-transform peer-checked:translate-x-4"></span>
+                </span>
+              </label>
+              <label class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-2 cursor-pointer">
+                <span class="text-[11px] font-bold uppercase text-slate-300 leading-tight">Diária<br>Traslado</span>
+                <input type="checkbox" id="chkDiariaTrasladoRecebivel" class="sr-only peer">
+                <span class="w-10 h-6 flex items-center bg-slate-700 rounded-full p-1 peer-checked:bg-emerald-600 transition-colors shrink-0">
+                  <span class="bg-white w-4 h-4 rounded-full shadow transform transition-transform peer-checked:translate-x-4"></span>
+                </span>
+              </label>
+              <label class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-2 cursor-pointer">
+                <span class="text-[11px] font-bold uppercase text-slate-300 leading-tight">Auxílio<br>Alimentação</span>
+                <input type="checkbox" id="chkAuxAlimentacaoRecebivel" class="sr-only peer">
+                <span class="w-10 h-6 flex items-center bg-slate-700 rounded-full p-1 peer-checked:bg-emerald-600 transition-colors shrink-0">
+                  <span class="bg-white w-4 h-4 rounded-full shadow transform transition-transform peer-checked:translate-x-4"></span>
+                </span>
+              </label>
+              <label class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 flex items-center justify-between gap-2 cursor-pointer">
+                <span class="text-[11px] font-bold uppercase text-slate-300 leading-tight">Auxílio<br>Transporte</span>
+                <input type="checkbox" id="chkAuxTransporteRecebivel" class="sr-only peer">
+                <span class="w-10 h-6 flex items-center bg-slate-700 rounded-full p-1 peer-checked:bg-emerald-600 transition-colors shrink-0">
+                  <span class="bg-white w-4 h-4 rounded-full shadow transform transition-transform peer-checked:translate-x-4"></span>
+                </span>
+              </label>
             </div>
           </div>
         </div>
@@ -665,6 +717,34 @@
             <select id="modalPercepcaoQuartoJeton" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
               <option value="">4º Jeton: N/A</option><option value="SIM">4º Jeton: SIM</option><option value="NAO">4º Jeton: NÃO</option>
             </select>
+          </div>
+        </div>
+
+        <hr class="border-slate-800">
+
+        <div>
+          <p class="text-[11px] font-bold uppercase text-white mb-2">Itens Recebíveis Nesta Escala</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
+            <label class="flex items-center justify-between gap-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-[11px] text-slate-300 cursor-pointer">
+              <span class="uppercase font-bold">Diária Alimentação</span>
+              <input type="checkbox" id="modalChkDiariaAlimentacaoRecebivel" class="rounded bg-slate-900 border-slate-700 text-brand-600">
+            </label>
+            <label class="flex items-center justify-between gap-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-[11px] text-slate-300 cursor-pointer">
+              <span class="uppercase font-bold">Diária Pernoite</span>
+              <input type="checkbox" id="modalChkDiariaPernoiteRecebivel" class="rounded bg-slate-900 border-slate-700 text-brand-600">
+            </label>
+            <label class="flex items-center justify-between gap-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-[11px] text-slate-300 cursor-pointer">
+              <span class="uppercase font-bold">Diária Traslado</span>
+              <input type="checkbox" id="modalChkDiariaTrasladoRecebivel" class="rounded bg-slate-900 border-slate-700 text-brand-600">
+            </label>
+            <label class="flex items-center justify-between gap-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-[11px] text-slate-300 cursor-pointer">
+              <span class="uppercase font-bold">Auxílio Alimentação</span>
+              <input type="checkbox" id="modalChkAuxAlimentacaoRecebivel" class="rounded bg-slate-900 border-slate-700 text-brand-600">
+            </label>
+            <label class="flex items-center justify-between gap-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-[11px] text-slate-300 cursor-pointer">
+              <span class="uppercase font-bold">Auxílio Transporte</span>
+              <input type="checkbox" id="modalChkAuxTransporteRecebivel" class="rounded bg-slate-900 border-slate-700 text-brand-600">
+            </label>
           </div>
         </div>
 
@@ -875,56 +955,46 @@
 
       totalDiariasCalculadas = 0;
       totalPernoitesCalculadas = 0;
+      let totalDiariasRecebivelCalculadas = 0;
+      let totalAuxiliosCalculadasNovo = 0;
+      let totalAuxiliosRecebivelCalculadas = 0;
 
       escalasSalvas.forEach(esc => {
-        const locais = [
+        const extrasEsc = obterValoresExtrasEscala(esc.data, [
           { local: esc.localManha || esc.local, pernoite: esc.pernoiteManha },
           { local: esc.localTarde, pernoite: esc.pernoiteTarde },
           { local: esc.localNoite, pernoite: esc.pernoiteNoite }
-        ];
+        ]);
 
-        let elegivel = false;
-        let possuiPernoite = false;
+        totalDiariasCalculadas += extrasEsc.valorDiarias;
+        totalAuxiliosCalculadasNovo += extrasEsc.valorAuxilios;
 
-        locais.forEach(item => {
-          if (verificarElegibilidade(item.local)) {
-            elegivel = true;
-            if ((item.pernoite || '').toUpperCase() === 'SIM') {
-              possuiPernoite = true;
-            }
-          }
-        });
-
-        if (elegivel) {
-          totalDiariasCalculadas += valorDiariaAlimentacao;
-          if (possuiPernoite) {
-            totalDiariasCalculadas += valorDiariaHospedagem;
-          }
+        // Recebível é calculado item a item. Escalas antigas (gravadas antes
+        // deste recurso, sem os 5 campos individuais) usam o valor bruto
+        // total como respaldo, preservando o comportamento anterior.
+        const temCamposIndividuais = esc.diariaAlimentacaoRecebivel !== undefined || esc.auxAlimentacaoRecebivel !== undefined;
+        if (temCamposIndividuais) {
+          if (esc.diariaAlimentacaoRecebivel === true) totalDiariasRecebivelCalculadas += extrasEsc.diariaAlimentacao;
+          if (esc.diariaPernoiteRecebivel === true) totalDiariasRecebivelCalculadas += extrasEsc.diariaPernoite;
+          if (esc.diariaTrasladoRecebivel === true) totalDiariasRecebivelCalculadas += extrasEsc.diariaTraslado;
+          if (esc.auxAlimentacaoRecebivel === true) totalAuxiliosRecebivelCalculadas += extrasEsc.auxAlimentacao;
+          if (esc.auxTransporteRecebivel === true) totalAuxiliosRecebivelCalculadas += extrasEsc.auxTransporte;
+        } else {
+          if (esc.diariasRecebivel !== false) totalDiariasRecebivelCalculadas += extrasEsc.valorDiarias;
+          if (esc.auxiliosRecebivel !== false) totalAuxiliosRecebivelCalculadas += extrasEsc.valorAuxilios;
         }
       });
 
       // Sincroniza e salva no storage de cotas extras
       let dadosExtras = JSON.parse(localStorage.getItem(STORAGE_KEY_COTAS_EXTRAS)) || {};
       dadosExtras.totalDiarias = totalDiariasCalculadas;
+      dadosExtras.totalDiariasRecebivel = totalDiariasRecebivelCalculadas;
       dadosExtras.totalPernoites = totalPernoitesCalculadas;
       dadosExtras.quantidadeDiarias = diasDiariasSet.size;
       dadosExtras.quantidadePernoites = diasPernoitesSet.size;
-      
-      // Mantém auxílios existentes ou calcula
-      const auxAlimentacao = parseFloat((valoresSalvos.alimentacao || '57,70').replace(',', '.')) || 57.70;
-      const auxTransporte = parseFloat((valoresSalvos.transporte || '31,08').replace(',', '.')) || 31.08;
-      
-      let qtdFinsSemanaFeriados = 0;
-      escalasSalvas.forEach(esc => {
-        if (esc.data) {
-          const dObj = new Date(esc.data + 'T00:00:00');
-          const day = dObj.getDay();
-          if (day === 0 || day === 6) {
-            qtdFinsSemanaFeriados++;
-          }
-        }
-      });
-      dadosExtras.totalAuxilios = qtdFinsSemanaFeriados * (auxAlimentacao + auxTransporte);
+
+      dadosExtras.totalAuxilios = totalAuxiliosCalculadasNovo;
+      dadosExtras.totalAuxiliosRecebivel = totalAuxiliosRecebivelCalculadas;
 
       localStorage.setItem(STORAGE_KEY_COTAS_EXTRAS, JSON.stringify(dadosExtras));
       localStorage.setItem('jetcontrol_auxilios_dados', JSON.stringify(dadosExtras));
@@ -1100,19 +1170,48 @@
         if (!valor) return padrao;
         return parseFloat(String(valor).replace('R$', '').replace(/\./g, '').replace(',', '.')) || padrao;
       };
-      const diariaAlimentacao = converterValor(valoresSalvos.diariaAlimentacao, 52.00);
-      const diariaHospedagem = converterValor(valoresSalvos.diariaHospedagem, 274.10);
-      const auxAlimentacao = converterValor(valoresSalvos.alimentacao, 57.70);
-      const auxTransporte = converterValor(valoresSalvos.transporte, 31.08);
+      const diariaAlimentacaoValor = converterValor(valoresSalvos.diariaAlimentacao, 52.00);
+      const diariaHospedagemValor = converterValor(valoresSalvos.diariaHospedagem, 274.10);
+      const diariaTrasladoValor = converterValor(valoresSalvos.diariaTraslado, 0.00);
+      const auxAlimentacaoValor = converterValor(valoresSalvos.alimentacao, 57.70);
+      const auxTransporteValor = converterValor(valoresSalvos.transporte, 31.08);
       const lista = locais || [];
       const elegivel = lista.some(item => verificarElegibilidade(item.local));
       const possuiPernoite = lista.some(item => verificarElegibilidade(item.local) && String(item.pernoite || '').toUpperCase() === 'SIM');
       const d = data ? new Date(data + 'T00:00:00') : null;
       const fimDeSemana = d ? (d.getDay() === 0 || d.getDay() === 6) : false;
+
+      // VALORES POTENCIAIS (BRUTOS) DE CADA UM DOS 5 ITENS — independem de
+      // estarem marcados como recebíveis ou não; servem apenas para saber
+      // QUANTO cada item vale, caso a escala seja elegível a ele.
+      const diariaAlimentacao = elegivel ? diariaAlimentacaoValor : 0;
+      const diariaPernoite = possuiPernoite ? diariaHospedagemValor : 0;
+      const diariaTraslado = elegivel ? diariaTrasladoValor : 0;
+      const auxAlimentacao = fimDeSemana ? auxAlimentacaoValor : 0;
+      const auxTransporte = fimDeSemana ? auxTransporteValor : 0;
+
       return {
-        valorDiarias: elegivel ? diariaAlimentacao + (possuiPernoite ? diariaHospedagem : 0) : 0,
-        valorAuxilios: fimDeSemana ? auxAlimentacao + auxTransporte : 0
+        diariaAlimentacao, diariaPernoite, diariaTraslado,
+        auxAlimentacao, auxTransporte,
+        // Totais brutos combinados (somam os 3/2 itens acima), mantidos para
+        // exibição informativa e compatibilidade com o restante do sistema.
+        valorDiarias: diariaAlimentacao + diariaPernoite + diariaTraslado,
+        valorAuxilios: auxAlimentacao + auxTransporte
       };
+    }
+
+    // SOMA APENAS OS COMPONENTES (DENTRE OS 5) QUE ESTIVEREM MARCADOS COMO
+    // RECEBÍVEIS NOS "FLAGS" INFORMADOS, RETORNANDO { diarias, auxilios }.
+    function somarComponentesRecebiveis(extras, flags) {
+      flags = flags || {};
+      const diarias =
+        (flags.diariaAlimentacaoRecebivel ? extras.diariaAlimentacao : 0) +
+        (flags.diariaPernoiteRecebivel ? extras.diariaPernoite : 0) +
+        (flags.diariaTrasladoRecebivel ? extras.diariaTraslado : 0);
+      const auxilios =
+        (flags.auxAlimentacaoRecebivel ? extras.auxAlimentacao : 0) +
+        (flags.auxTransporteRecebivel ? extras.auxTransporte : 0);
+      return { diarias, auxilios };
     }
 
     function calcularValoresEscala() {
@@ -1146,9 +1245,16 @@
         { local: document.getElementById('localTarde').value.trim(), pernoite: document.getElementById('pernoiteTarde').value },
         { local: document.getElementById('localNoite').value.trim(), pernoite: document.getElementById('pernoiteNoite').value }
       ]);
-      const computarDiariasEAuxiliosAtual = obterComputarDiariasEAuxilios();
-      const diariasComputadasAtual = computarDiariasEAuxiliosAtual ? extrasAtual.valorDiarias : 0;
-      const auxiliosComputadosAtual = computarDiariasEAuxiliosAtual ? extrasAtual.valorAuxilios : 0;
+      const flagsAtual = {
+        diariaAlimentacaoRecebivel: document.getElementById('chkDiariaAlimentacaoRecebivel')?.checked === true,
+        diariaPernoiteRecebivel: document.getElementById('chkDiariaPernoiteRecebivel')?.checked === true,
+        diariaTrasladoRecebivel: document.getElementById('chkDiariaTrasladoRecebivel')?.checked === true,
+        auxAlimentacaoRecebivel: document.getElementById('chkAuxAlimentacaoRecebivel')?.checked === true,
+        auxTransporteRecebivel: document.getElementById('chkAuxTransporteRecebivel')?.checked === true
+      };
+      const recebivelAtual = somarComponentesRecebiveis(extrasAtual, flagsAtual);
+      const diariasComputadasAtual = recebivelAtual.diarias;
+      const auxiliosComputadosAtual = recebivelAtual.auxilios;
       const valorDiarioTotal = totalJeton + diariasComputadasAtual + auxiliosComputadosAtual;
 
       document.getElementById('calcValorDiario').value = formatarMoeda(valorDiarioTotal);
@@ -1185,7 +1291,7 @@
       }
     }
 
-    document.querySelectorAll('#dataAtividade, #horarioSaida, #horarioChegada, #localManha, #localTarde, #localNoite, #jetonManha, #jetonTarde, #jetonNoite, #percepcaoQuartoJeton').forEach(el => {
+    document.querySelectorAll('#dataAtividade, #horarioSaida, #horarioChegada, #localManha, #localTarde, #localNoite, #jetonManha, #jetonTarde, #jetonNoite, #percepcaoQuartoJeton, #chkDiariaAlimentacaoRecebivel, #chkDiariaPernoiteRecebivel, #chkDiariaTrasladoRecebivel, #chkAuxAlimentacaoRecebivel, #chkAuxTransporteRecebivel').forEach(el => {
       el.addEventListener('change', calcularValoresEscala);
     });
 
@@ -1265,19 +1371,32 @@
 
       const valorDiarias = parseFloat(dadosExtras.totalDiarias || 0);
       const valorAuxilios = parseFloat(dadosExtras.totalAuxilios || 0);
-      const computarDiariasEAuxilios = obterComputarDiariasEAuxilios();
+      const valorDiariasRecebivel = parseFloat(dadosExtras.totalDiariasRecebivel || 0);
+      const valorAuxiliosRecebivel = parseFloat(dadosExtras.totalAuxiliosRecebivel || 0);
+      const balancoDiarias = valorDiariasRecebivel - valorDiarias;
+      const balancoAuxilios = valorAuxiliosRecebivel - valorAuxilios;
 
       document.getElementById('recValorDiarias').innerText = formatarMoeda(valorDiarias);
       document.getElementById('recValorAuxilios').innerText = formatarMoeda(valorAuxilios);
+      document.getElementById('recValorRecebivelDiarias').innerText = formatarMoeda(valorDiariasRecebivel);
+      document.getElementById('recValorRecebivelAuxilios').innerText = formatarMoeda(valorAuxiliosRecebivel);
+      const elBalancoDiarias = document.getElementById('recBalancoDiarias');
+      elBalancoDiarias.innerText = formatarMoeda(balancoDiarias);
+      elBalancoDiarias.classList.toggle('text-red-400', balancoDiarias < 0);
+      elBalancoDiarias.classList.toggle('text-emerald-400', balancoDiarias >= 0);
+      const elBalancoAuxilios = document.getElementById('recBalancoAuxilios');
+      elBalancoAuxilios.innerText = formatarMoeda(balancoAuxilios);
+      elBalancoAuxilios.classList.toggle('text-red-400', balancoAuxilios < 0);
+      elBalancoAuxilios.classList.toggle('text-emerald-400', balancoAuxilios >= 0);
 
       // Alíquota fixa de Imposto de Renda (22%)
       const aliqIR = 22;
       const valorDescontoIR = valorTotalJeton * (aliqIR / 100);
       document.getElementById('recValorDescontoIR').innerText = formatarMoeda(valorDescontoIR);
 
-      const valorRealJeton = computarDiariasEAuxilios
-        ? (valorTotalJeton + valorDiarias + valorAuxilios) - valorDescontoIR
-        : valorTotalJeton - valorDescontoIR;
+      // O VALOR REAL DE JETON (E TUDO QUE DELE DERIVA) USA APENAS AS DIÁRIAS E
+      // AUXÍLIOS "RECEBÍVEIS" DE CADA ESCALA — NÃO OS VALORES BRUTOS TOTAIS.
+      const valorRealJeton = (valorTotalJeton + valorDiariasRecebivel + valorAuxiliosRecebivel) - valorDescontoIR;
       document.getElementById('recValorRealJeton').innerText = formatarMoeda(valorRealJeton);
 
       // Valor Médio por Escala / por Atividade / por Hora Trabalhada agora são
@@ -1428,9 +1547,16 @@
         { local: localTarde, pernoite: pernoiteTarde },
         { local: localNoite, pernoite: pernoiteNoite }
       ]);
-      const flagComputarSalvar = obterComputarDiariasEAuxilios();
-      const diariasComputadasSalvar = flagComputarSalvar ? extrasEscala.valorDiarias : 0;
-      const auxiliosComputadosSalvar = flagComputarSalvar ? extrasEscala.valorAuxilios : 0;
+      const flagsSalvar = {
+        diariaAlimentacaoRecebivel: document.getElementById('chkDiariaAlimentacaoRecebivel')?.checked === true,
+        diariaPernoiteRecebivel: document.getElementById('chkDiariaPernoiteRecebivel')?.checked === true,
+        diariaTrasladoRecebivel: document.getElementById('chkDiariaTrasladoRecebivel')?.checked === true,
+        auxAlimentacaoRecebivel: document.getElementById('chkAuxAlimentacaoRecebivel')?.checked === true,
+        auxTransporteRecebivel: document.getElementById('chkAuxTransporteRecebivel')?.checked === true
+      };
+      const recebivelSalvar = somarComponentesRecebiveis(extrasEscala, flagsSalvar);
+      const diariasComputadasSalvar = recebivelSalvar.diarias;
+      const auxiliosComputadosSalvar = recebivelSalvar.auxilios;
       const valorDiarioTotal = totalJeton + diariasComputadasSalvar + auxiliosComputadosSalvar;
 
       let horasTrabalhadasStr = '0H 00M';
@@ -1478,6 +1604,16 @@
         valorDiarioTotal,
         valorDiarias: extrasEscala.valorDiarias,
         valorAuxilios: extrasEscala.valorAuxilios,
+        valorDiariaAlimentacao: extrasEscala.diariaAlimentacao,
+        valorDiariaPernoite: extrasEscala.diariaPernoite,
+        valorDiariaTraslado: extrasEscala.diariaTraslado,
+        valorAuxAlimentacao: extrasEscala.auxAlimentacao,
+        valorAuxTransporte: extrasEscala.auxTransporte,
+        diariaAlimentacaoRecebivel: flagsSalvar.diariaAlimentacaoRecebivel,
+        diariaPernoiteRecebivel: flagsSalvar.diariaPernoiteRecebivel,
+        diariaTrasladoRecebivel: flagsSalvar.diariaTrasladoRecebivel,
+        auxAlimentacaoRecebivel: flagsSalvar.auxAlimentacaoRecebivel,
+        auxTransporteRecebivel: flagsSalvar.auxTransporteRecebivel,
         horasTrabalhadasStr,
         valorHoraStr,
         anotacoes: { notaVtr, notaLocalManha, notaLocalTarde, notaLocalNoite, notaOutros }
@@ -1705,49 +1841,6 @@
     });
 
     // CARREGA (OU LIMPA) O CARD "DESCRIÇÃO DO PERÍODO" - CLONE SOMENTE LEITURA DA PÁGINA INICIAL
-    // =========================================================================
-    // COMPUTAR (OU NÃO) DIÁRIAS E AUXÍLIOS NO CICLO VIGENTE
-    // -------------------------------------------------------------------------
-    // Quando DESATIVADO, as diárias e auxílios continuam sendo digitados e
-    // ficam gravados normalmente (nada é apagado), mas deixam de entrar no
-    // "Valor Diário Total", no "Valor Diário Real Após IR" e nos totais do
-    // ciclo (Valor Total Jeton, Valor Real de Jeton, Valores Médios etc.).
-    // =========================================================================
-    const CHAVE_COMPUTAR_DIARIAS_AUXILIOS = 'jetcontrol_computar_diarias_auxilios';
-
-    function obterComputarDiariasEAuxilios() {
-      const valor = localStorage.getItem(CHAVE_COMPUTAR_DIARIAS_AUXILIOS);
-      return valor === null ? true : valor === 'true';
-    }
-
-    function definirComputarDiariasEAuxilios(valor) {
-      localStorage.setItem(CHAVE_COMPUTAR_DIARIAS_AUXILIOS, valor ? 'true' : 'false');
-    }
-
-    function carregarToggleComputarDiariasAuxilios() {
-      const chk = document.getElementById('chkComputarDiariasAuxilios');
-      const label = document.getElementById('labelComputarDiariasAuxilios');
-      if (!chk) return;
-      const ativo = obterComputarDiariasEAuxilios();
-      chk.checked = ativo;
-      if (label) label.textContent = ativo ? 'SIM' : 'NÃO';
-    }
-
-    function inicializarToggleComputarDiariasAuxilios() {
-      const chk = document.getElementById('chkComputarDiariasAuxilios');
-      if (!chk) return;
-      carregarToggleComputarDiariasAuxilios();
-      chk.addEventListener('change', () => {
-        definirComputarDiariasEAuxilios(chk.checked);
-        const label = document.getElementById('labelComputarDiariasAuxilios');
-        if (label) label.textContent = chk.checked ? 'SIM' : 'NÃO';
-        // Recalcula tudo o que depende de diárias/auxílios imediatamente.
-        calcularValoresEscala();
-        renderizarCardsEscalas();
-        atualizarEstatisticasEReceitasCiclo();
-      });
-    }
-
     function carregarDescricaoPeriodoEscalas() {
       const campoData = document.getElementById('escalaDataAberturaView');
       const campoFechamento = document.getElementById('escalaDataFechamentoView');
@@ -1760,7 +1853,6 @@
       campoRecebimento.value = dados.recebimentoEm || '';
 
       aplicarLimitesDataAtividade(dados.dataAbertura || '', dados.dataFechamento || '');
-      carregarToggleComputarDiariasAuxilios();
     }
 
     // RESTRINGE A "DATA DA ATIVIDADE" A SOMENTE DATAS DENTRO DO PERÍODO DE ABERTURA/FECHAMENTO DO CICLO VIGENTE,
@@ -1889,11 +1981,9 @@
         receitas: secReceitas ? secReceitas.outerHTML : '<div>DADOS NÃO DISPONÍVEIS.</div>',
         escalas: gerarSnapshotEscalas(),
         // CÓPIA ESTRUTURADA (NÃO APENAS HTML) DAS ESCALAS, PARA PERMITIR EDIÇÃO
-        // POSTERIOR NO CARD "CICLOS FECHADOS" DESTA PÁGINA.
-        escalasData: escalasAtuais,
-        // REGISTRA SE ESTE CICLO COMPUTOU DIÁRIAS/AUXÍLIOS, PARA QUE UMA EDIÇÃO
-        // POSTERIOR (OU O DASHBOARD) RESPEITEM A MESMA REGRA DESTE CICLO.
-        computarDiariasEAuxilios: obterComputarDiariasEAuxilios()
+        // POSTERIOR NO CARD "CICLOS FECHADOS" DESTA PÁGINA. CADA ESCALA JÁ
+        // GUARDA SEUS PRÓPRIOS FLAGS diariasRecebivel/auxiliosRecebivel.
+        escalasData: escalasAtuais
       };
 
       ciclos.push(registro);
@@ -1907,7 +1997,6 @@
       localStorage.removeItem('jetcontrol_organograma_diarias_html');
       localStorage.removeItem('jetcontrol_organograma_auxilios_html');
       localStorage.removeItem('jetcontrol_periodo_container_html');
-      localStorage.removeItem(CHAVE_COMPUTAR_DIARIAS_AUXILIOS);
 
       document.getElementById('secaoFechamentoCiclo').classList.add('hidden');
       renderizarCardsEscalas();
@@ -1967,6 +2056,11 @@
       document.getElementById('jetonTarde').value = esc.jetonTarde ? esc.jetonTarde.toFixed(2) : '';
       document.getElementById('jetonNoite').value = esc.jetonNoite ? esc.jetonNoite.toFixed(2) : '';
       document.getElementById('percepcaoQuartoJeton').value = esc.percepcaoQuartoJeton || '';
+      document.getElementById('chkDiariaAlimentacaoRecebivel').checked = esc.diariaAlimentacaoRecebivel === true;
+      document.getElementById('chkDiariaPernoiteRecebivel').checked = esc.diariaPernoiteRecebivel === true;
+      document.getElementById('chkDiariaTrasladoRecebivel').checked = esc.diariaTrasladoRecebivel === true;
+      document.getElementById('chkAuxAlimentacaoRecebivel').checked = esc.auxAlimentacaoRecebivel === true;
+      document.getElementById('chkAuxTransporteRecebivel').checked = esc.auxTransporteRecebivel === true;
 
       document.querySelectorAll('input[name="funcaoManha"]').forEach(cb => { cb.checked = esc.funcaoManha?.includes(cb.value); });
       document.querySelectorAll('input[name="funcaoTarde"]').forEach(cb => { cb.checked = esc.funcaoTarde?.includes(cb.value); });
@@ -2054,7 +2148,7 @@
 
       container.innerHTML = escalasFiltradas.map((esc) => {
         const index = escalasSalvas.indexOf(esc);
-        return montarCardEscalaHTML(esc, index, 'ativo', undefined, obterComputarDiariasEAuxilios());
+        return montarCardEscalaHTML(esc, index, 'ativo');
       }).join('');
     }
 
@@ -2062,16 +2156,26 @@
     // com botões editar/excluir ligados às escalas correntes) ou 'fechado' (escala
     // dentro de um ciclo já fechado, com botão editar ligado ao registro arquivado
     // identificado por "cicloId").
-    function montarCardEscalaHTML(esc, index, modo, cicloId, computarDiariasEAuxilios) {
-      if (computarDiariasEAuxilios === undefined) computarDiariasEAuxilios = true;
+    function montarCardEscalaHTML(esc, index, modo, cicloId) {
+      const flagsCard = {
+        diariaAlimentacaoRecebivel: esc.diariaAlimentacaoRecebivel === true,
+        diariaPernoiteRecebivel: esc.diariaPernoiteRecebivel === true,
+        diariaTrasladoRecebivel: esc.diariaTrasladoRecebivel === true,
+        auxAlimentacaoRecebivel: esc.auxAlimentacaoRecebivel === true,
+        auxTransporteRecebivel: esc.auxTransporteRecebivel === true
+      };
       const dataFmt = esc.data ? new Date(esc.data + 'T00:00:00').toLocaleDateString('pt-BR') : '-';
       const extrasCard = obterValoresExtrasEscala(esc.data, [
         { local: esc.localManha, pernoite: esc.pernoiteManha },
         { local: esc.localTarde, pernoite: esc.pernoiteTarde },
         { local: esc.localNoite, pernoite: esc.pernoiteNoite }
       ]);
-      const diariasComputadas = computarDiariasEAuxilios ? extrasCard.valorDiarias : 0;
-      const auxiliosComputados = computarDiariasEAuxilios ? extrasCard.valorAuxilios : 0;
+      const recebivelCard = somarComponentesRecebiveis(extrasCard, flagsCard);
+      const diariasComputadas = recebivelCard.diarias;
+      const auxiliosComputados = recebivelCard.auxilios;
+      const badgeRecebivel = (flag) => flag
+        ? '<span class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-900/50 text-emerald-400 font-bold">RECEBÍVEL</span>'
+        : '<span class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-red-900/50 text-red-400 font-bold">NÃO RECEBÍVEL</span>';
       const jetonCard = (parseFloat(esc.jetonManha) || 0) + (parseFloat(esc.jetonTarde) || 0) + ((parseFloat(esc.jetonNoite) || 0) * (esc.percepcaoQuartoJeton === 'SIM' ? 2 : 1));
       const valorDiarioTotal = jetonCard + diariasComputadas + auxiliosComputados;
       const valorDiarioRealAposIR = jetonCard * 0.78 + diariasComputadas + auxiliosComputados;
@@ -2168,10 +2272,15 @@
                 </div>
                 <div class="space-y-2">
                   <div><strong>VALOR DIÁRIO DO JETON:</strong> <span class="text-brand-400 font-bold">${formatarMoeda(jetonCard)}</span></div>
-                  <div><strong>VALOR TOTAL DIÁRIO DAS DIÁRIAS:</strong> <span class="text-emerald-400 font-bold">${formatarMoeda(extrasCard.valorDiarias)}</span></div>
-                  <div><strong>VALOR TOTAL DIÁRIO DOS AUXÍLIOS:</strong> <span class="text-amber-400 font-bold">${formatarMoeda(extrasCard.valorAuxilios)}</span></div>
-                  <div><strong>QTD. DE HORAS TRABALHADAS:</strong> <span class="text-amber-400 font-bold">${esc.horasTrabalhadasStr || '0H 00M'}</span></div>
+                  <div class="pt-1"><strong>DIÁRIA ALIMENTAÇÃO:</strong> <span class="text-emerald-400 font-bold">${formatarMoeda(extrasCard.diariaAlimentacao)}</span>${badgeRecebivel(flagsCard.diariaAlimentacaoRecebivel)}</div>
+                  <div><strong>DIÁRIA PERNOITE:</strong> <span class="text-emerald-400 font-bold">${formatarMoeda(extrasCard.diariaPernoite)}</span>${badgeRecebivel(flagsCard.diariaPernoiteRecebivel)}</div>
+                  <div><strong>DIÁRIA TRASLADO:</strong> <span class="text-emerald-400 font-bold">${formatarMoeda(extrasCard.diariaTraslado)}</span>${badgeRecebivel(flagsCard.diariaTrasladoRecebivel)}</div>
+                  <div><strong>AUXÍLIO ALIMENTAÇÃO:</strong> <span class="text-amber-400 font-bold">${formatarMoeda(extrasCard.auxAlimentacao)}</span>${badgeRecebivel(flagsCard.auxAlimentacaoRecebivel)}</div>
+                  <div><strong>AUXÍLIO TRANSPORTE:</strong> <span class="text-amber-400 font-bold">${formatarMoeda(extrasCard.auxTransporte)}</span>${badgeRecebivel(flagsCard.auxTransporteRecebivel)}</div>
+                  <div class="pt-1"><strong>QTD. DE HORAS TRABALHADAS:</strong> <span class="text-amber-400 font-bold">${esc.horasTrabalhadasStr || '0H 00M'}</span></div>
                   <div><strong>VALOR POR HORA TRABALHADA:</strong> <span class="text-indigo-400 font-bold">${valorHoraStrCorrigido}</span></div>
+                  <div class="pt-2 mt-2 border-t border-slate-800"><strong>VALOR TOTAL DIÁRIO DAS DIÁRIAS:</strong> <span class="text-emerald-400 font-bold">${formatarMoeda(extrasCard.valorDiarias)}</span></div>
+                  <div><strong>VALOR TOTAL DIÁRIO DOS AUXÍLIOS:</strong> <span class="text-amber-400 font-bold">${formatarMoeda(extrasCard.valorAuxilios)}</span></div>
                   <div class="pt-2 mt-2 border-t border-slate-800"><strong>VALOR DIÁRIO TOTAL:</strong> <span class="text-emerald-400 font-black text-sm">${formatarMoeda(valorDiarioTotal)}</span></div>
                   <div><strong>VALOR DIÁRIO DO DESCONTO DE IR:</strong> <span class="text-red-400 font-black text-sm">${formatarMoeda(valorDescontoIR)}</span></div>
                   <div><strong>VALOR DIÁRIO REAL APÓS IR:</strong> <span class="text-cyan-400 font-black text-sm">${formatarMoeda(valorDiarioRealAposIR)}</span></div>
@@ -2220,7 +2329,7 @@
         const idCiclo = ciclo.id;
         const escalasArr = ciclo.escalasData || [];
         const cardsHTML = escalasArr.length
-          ? escalasArr.map((esc, idx) => montarCardEscalaHTML(esc, idx, 'fechado', idCiclo, ciclo.computarDiariasEAuxilios !== false)).join('')
+          ? escalasArr.map((esc, idx) => montarCardEscalaHTML(esc, idx, 'fechado', idCiclo)).join('')
           : '<div class="p-6 text-center text-slate-500 italic">NENHUMA ESCALA NESTE CICLO.</div>';
 
         return `
@@ -2255,8 +2364,8 @@
     // GERA O HTML DA SEÇÃO "ESCALAS CADASTRADAS" A PARTIR DE UM ARRAY DE ESCALAS,
     // NO MESMO FORMATO ARQUIVADO ORIGINALMENTE, PARA MANTER A PÁGINA CICLOS.HTML
     // (QUE LÊ ciclo.escalas COMO HTML) SEMPRE ATUALIZADA APÓS UMA EDIÇÃO.
-    function construirSnapshotEscalasHTML(escalasArr, computarDiariasEAuxilios) {
-      const cardsHTML = escalasArr.map((esc, idx) => montarCardEscalaHTML(esc, idx, 'fechado', '', computarDiariasEAuxilios)).join('');
+    function construirSnapshotEscalasHTML(escalasArr) {
+      const cardsHTML = escalasArr.map((esc, idx) => montarCardEscalaHTML(esc, idx, 'fechado', '')).join('');
       return `
         <section class="space-y-4">
           <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -2274,10 +2383,10 @@
 
     // RECALCULA AS ESTATÍSTICAS E RECEITAS DE UM ARRAY ARBITRÁRIO DE ESCALAS
     // (USADO PARA REGERAR O SNAPSHOT DE UM CICLO JÁ FECHADO APÓS UMA EDIÇÃO).
-    function calcularEstatisticasReceitasArray(escalasArr, computarDiariasEAuxilios) {
-      if (computarDiariasEAuxilios === undefined) computarDiariasEAuxilios = true;
+    function calcularEstatisticasReceitasArray(escalasArr) {
       let totalSimples = 0, totalDobradas = 0, totalTriplas = 0, totalQuadruplas = 0;
       let totalMinutosTrabalhados = 0, valorTotalJeton = 0, valorDiarias = 0, valorAuxilios = 0;
+      let valorDiariasRecebivel = 0, valorAuxiliosRecebivel = 0;
 
       escalasArr.forEach(esc => {
         const jetons = [esc.jetonManha, esc.jetonTarde, esc.jetonNoite];
@@ -2299,8 +2408,29 @@
 
         const jetonStat = (parseFloat(esc.jetonManha) || 0) + (parseFloat(esc.jetonTarde) || 0) + ((parseFloat(esc.jetonNoite) || 0) * (esc.percepcaoQuartoJeton === 'SIM' ? 2 : 1));
         valorTotalJeton += jetonStat;
-        valorDiarias += parseFloat(esc.valorDiarias) || 0;
-        valorAuxilios += parseFloat(esc.valorAuxilios) || 0;
+
+        const valorDiariasEsc = parseFloat(esc.valorDiarias) || 0;
+        const valorAuxiliosEsc = parseFloat(esc.valorAuxilios) || 0;
+        valorDiarias += valorDiariasEsc;
+        valorAuxilios += valorAuxiliosEsc;
+
+        // NOVO: recebível é calculado item a item (diária de alimentação,
+        // diária de pernoite, diária de traslado, auxílio alimentação e
+        // auxílio transporte) — cada um com seu próprio flag, gravado na
+        // própria escala. Escalas antigas (gravadas antes deste recurso, sem
+        // os 5 campos individuais) usam o valor bruto total como respaldo,
+        // preservando o comportamento anterior a esta mudança.
+        const temCamposIndividuais = esc.valorDiariaAlimentacao !== undefined || esc.valorAuxAlimentacao !== undefined;
+        if (temCamposIndividuais) {
+          if (esc.diariaAlimentacaoRecebivel === true) valorDiariasRecebivel += (parseFloat(esc.valorDiariaAlimentacao) || 0);
+          if (esc.diariaPernoiteRecebivel === true) valorDiariasRecebivel += (parseFloat(esc.valorDiariaPernoite) || 0);
+          if (esc.diariaTrasladoRecebivel === true) valorDiariasRecebivel += (parseFloat(esc.valorDiariaTraslado) || 0);
+          if (esc.auxAlimentacaoRecebivel === true) valorAuxiliosRecebivel += (parseFloat(esc.valorAuxAlimentacao) || 0);
+          if (esc.auxTransporteRecebivel === true) valorAuxiliosRecebivel += (parseFloat(esc.valorAuxTransporte) || 0);
+        } else {
+          if (esc.diariasRecebivel !== false) valorDiariasRecebivel += valorDiariasEsc;
+          if (esc.auxiliosRecebivel !== false) valorAuxiliosRecebivel += valorAuxiliosEsc;
+        }
       });
 
       const horasTotais = Math.floor(totalMinutosTrabalhados / 60);
@@ -2311,12 +2441,14 @@
 
       const aliqIR = 22;
       const valorDescontoIR = valorTotalJeton * (aliqIR / 100);
-      const valorRealJeton = computarDiariasEAuxilios
-        ? (valorTotalJeton + valorDiarias + valorAuxilios) - valorDescontoIR
-        : valorTotalJeton - valorDescontoIR;
+      // O VALOR REAL DE JETON (E TUDO QUE DELE DERIVA) USA APENAS AS DIÁRIAS E
+      // AUXÍLIOS "RECEBÍVEIS" DE CADA ESCALA — NÃO OS VALORES BRUTOS TOTAIS.
+      const valorRealJeton = (valorTotalJeton + valorDiariasRecebivel + valorAuxiliosRecebivel) - valorDescontoIR;
+      const balancoDiarias = valorDiariasRecebivel - valorDiarias;
+      const balancoAuxilios = valorAuxiliosRecebivel - valorAuxilios;
 
       // Valor Médio por Escala / por Atividade / por Hora Trabalhada calculados
-      // a partir do VALOR REAL DE JETON (líquido de IR + diárias + auxílios).
+      // a partir do VALOR REAL DE JETON (líquido de IR + diárias/auxílios recebíveis).
       const valorMedioEscala = qtdEscalas > 0 ? valorRealJeton / qtdEscalas : 0;
       const valorMedioAtividade = somaAtividades > 0 ? valorRealJeton / somaAtividades : 0;
       const valorMedioHora = totalHorasNumerico > 0 ? valorRealJeton / totalHorasNumerico : 0;
@@ -2325,7 +2457,8 @@
         totalSimples, totalDobradas, totalTriplas, totalQuadruplas,
         totalEscalas: qtdEscalas, horasTotais, minutosTotais,
         valorTotalJeton, valorMedioEscala, valorMedioAtividade, valorMedioHora,
-        valorDiarias, valorAuxilios, valorDescontoIR, valorRealJeton
+        valorDiarias, valorAuxilios, valorDiariasRecebivel, valorAuxiliosRecebivel,
+        balancoDiarias, balancoAuxilios, valorDescontoIR, valorRealJeton
       };
     }
 
@@ -2364,6 +2497,10 @@
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Médio por Hora Trabalhada</span><span id="recValorMedioHora" class="text-xl font-black text-cyan-400">${formatarMoeda(v.valorMedioHora)} /H</span></div>
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor das Diárias</span><span id="recValorDiarias" class="text-xl font-black text-emerald-400">${formatarMoeda(v.valorDiarias)}</span></div>
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor dos Auxílios</span><span id="recValorAuxilios" class="text-xl font-black text-amber-400">${formatarMoeda(v.valorAuxilios)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Recebível das Diárias</span><span id="recValorRecebivelDiarias" class="text-xl font-black text-emerald-300">${formatarMoeda(v.valorDiariasRecebivel)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Recebível dos Auxílios</span><span id="recValorRecebivelAuxilios" class="text-xl font-black text-amber-300">${formatarMoeda(v.valorAuxiliosRecebivel)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Balanço das Diárias</span><span id="recBalancoDiarias" class="text-xl font-black ${v.balancoDiarias < 0 ? 'text-red-400' : 'text-emerald-400'}">${formatarMoeda(v.balancoDiarias)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Balanço dos Auxílios</span><span id="recBalancoAuxilios" class="text-xl font-black ${v.balancoAuxilios < 0 ? 'text-red-400' : 'text-emerald-400'}">${formatarMoeda(v.balancoAuxilios)}</span></div>
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Desconto de IR (22%)</span><span id="recValorDescontoIR" class="text-xl font-black text-red-400">${formatarMoeda(v.valorDescontoIR)}</span></div>
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Real de Jeton</span><span id="recValorRealJeton" class="text-xl font-black text-emerald-400">${formatarMoeda(v.valorRealJeton)}</span></div>
           </div>
@@ -2429,6 +2566,11 @@
       document.getElementById('modalJetonTarde').value = esc.jetonTarde ? Number(esc.jetonTarde).toFixed(2) : '';
       document.getElementById('modalJetonNoite').value = esc.jetonNoite ? Number(esc.jetonNoite).toFixed(2) : '';
       document.getElementById('modalPercepcaoQuartoJeton').value = esc.percepcaoQuartoJeton || '';
+      document.getElementById('modalChkDiariaAlimentacaoRecebivel').checked = esc.diariaAlimentacaoRecebivel === true;
+      document.getElementById('modalChkDiariaPernoiteRecebivel').checked = esc.diariaPernoiteRecebivel === true;
+      document.getElementById('modalChkDiariaTrasladoRecebivel').checked = esc.diariaTrasladoRecebivel === true;
+      document.getElementById('modalChkAuxAlimentacaoRecebivel').checked = esc.auxAlimentacaoRecebivel === true;
+      document.getElementById('modalChkAuxTransporteRecebivel').checked = esc.auxTransporteRecebivel === true;
 
       document.querySelectorAll('input[name="modalFuncaoManha"]').forEach(cb => { cb.checked = esc.funcaoManha?.includes(cb.value); });
       document.querySelectorAll('input[name="modalFuncaoTarde"]').forEach(cb => { cb.checked = esc.funcaoTarde?.includes(cb.value); });
@@ -2511,9 +2653,16 @@
         { local: localTarde, pernoite: pernoiteTarde },
         { local: localNoite, pernoite: pernoiteNoite }
       ]);
-      const flagComputarModalEdicao = ciclo.computarDiariasEAuxilios !== false;
-      const diariasComputadasModal = flagComputarModalEdicao ? extras.valorDiarias : 0;
-      const auxiliosComputadosModal = flagComputarModalEdicao ? extras.valorAuxilios : 0;
+      const flagsModal = {
+        diariaAlimentacaoRecebivel: document.getElementById('modalChkDiariaAlimentacaoRecebivel').checked,
+        diariaPernoiteRecebivel: document.getElementById('modalChkDiariaPernoiteRecebivel').checked,
+        diariaTrasladoRecebivel: document.getElementById('modalChkDiariaTrasladoRecebivel').checked,
+        auxAlimentacaoRecebivel: document.getElementById('modalChkAuxAlimentacaoRecebivel').checked,
+        auxTransporteRecebivel: document.getElementById('modalChkAuxTransporteRecebivel').checked
+      };
+      const recebivelModal = somarComponentesRecebiveis(extras, flagsModal);
+      const diariasComputadasModal = recebivelModal.diarias;
+      const auxiliosComputadosModal = recebivelModal.auxilios;
       const valorDiarioTotal = jManha + jTarde + jNoiteEfetivo + diariasComputadasModal + auxiliosComputadosModal;
 
       let horasTrabalhadasStr = '0H 00M';
@@ -2543,6 +2692,16 @@
         valorDiarioTotal,
         valorDiarias: extras.valorDiarias,
         valorAuxilios: extras.valorAuxilios,
+        valorDiariaAlimentacao: extras.diariaAlimentacao,
+        valorDiariaPernoite: extras.diariaPernoite,
+        valorDiariaTraslado: extras.diariaTraslado,
+        valorAuxAlimentacao: extras.auxAlimentacao,
+        valorAuxTransporte: extras.auxTransporte,
+        diariaAlimentacaoRecebivel: flagsModal.diariaAlimentacaoRecebivel,
+        diariaPernoiteRecebivel: flagsModal.diariaPernoiteRecebivel,
+        diariaTrasladoRecebivel: flagsModal.diariaTrasladoRecebivel,
+        auxAlimentacaoRecebivel: flagsModal.auxAlimentacaoRecebivel,
+        auxTransporteRecebivel: flagsModal.auxTransporteRecebivel,
         horasTrabalhadasStr, valorHoraStr,
         anotacoes: {
           notaVtr: document.getElementById('modalNotaVtr').value,
@@ -2558,8 +2717,8 @@
       // REGERA O SNAPSHOT HTML (LIDO PELA PÁGINA CICLOS.HTML) E OS TOTAIS DO CICLO
       // PARA REFLETIR IMEDIATAMENTE A EDIÇÃO — É ESSA SINCRONIZAÇÃO QUE TRANSPORTA
       // A ALTERAÇÃO PARA O CARD "CICLOS FECHADOS" DA PÁGINA CICLOS.HTML.
-      ciclo.escalas = construirSnapshotEscalasHTML(ciclo.escalasData, ciclo.computarDiariasEAuxilios !== false);
-      const valoresRecalculados = calcularEstatisticasReceitasArray(ciclo.escalasData, ciclo.computarDiariasEAuxilios !== false);
+      ciclo.escalas = construirSnapshotEscalasHTML(ciclo.escalasData);
+      const valoresRecalculados = calcularEstatisticasReceitasArray(ciclo.escalasData);
       ciclo.estatisticas = construirEstatisticasHTML(valoresRecalculados);
       ciclo.receitas = construirReceitasHTML(valoresRecalculados);
 
@@ -2601,7 +2760,6 @@
         carregarDescricaoPeriodoEscalas();
         gerenciarCamposPernoite();
         renderizarCiclosFechados();
-        inicializarToggleComputarDiariasAuxilios();
       };
       if (window.JetSyncReady && typeof window.JetSyncReady.finally === 'function') {
         window.JetSyncReady.finally(iniciar);
