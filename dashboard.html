@@ -322,12 +322,12 @@
       <div class="kpi-card warning">
         <div class="kpi-label">Volume de Escalas</div>
         <div class="kpi-value" id="kpi-total-escalas">0</div>
-        <div class="kpi-subtext" id="kpi-escalas-sub">0 Simples <br> 0 Dobradas <br> 0 Triplas <br> 0 Quádruplas</div>
+        <div class="kpi-subtext" id="kpi-escalas-sub">0 Simples | 0 Dobradas | 0 Triplas | 0 Quádruplas</div>
       </div>
       <div class="kpi-card purple">
         <div class="kpi-label">Diárias & Auxílios</div>
         <div class="kpi-value" id="kpi-diarias-auxilios">R$ 0,00</div>
-        <div class="kpi-subtext" id="kpi-pernoites-count">R$ 0,00 Auxílio Alimentação <br> R$ 0,00 Auxílio Transporte <br> R$ 0,00 Diária de Alimentação <br> R$ 0,00 Diária de Pernoite</div>
+        <div class="kpi-subtext" id="kpi-pernoites-count">R$ 0,00 Aux. Alimentação | R$ 0,00 Aux. Transporte | R$ 0,00 Diária Alimentação | R$ 0,00 Diária Hospedagem</div>
       </div>
       <div class="kpi-card cyan">
         <div class="kpi-label">Rendimento Médio / Hora</div>
@@ -338,6 +338,16 @@
         <div class="kpi-label">Total de Descontos de IR</div>
         <div class="kpi-value" id="kpi-total-desconto-ir">R$ 0,00</div>
         <div class="kpi-subtext" id="kpi-total-desconto-ir-sub">Alíquota de 22% Sobre o Jeton Bruto</div>
+      </div>
+      <div class="kpi-card success">
+        <div class="kpi-label">Auxílios e Diárias Recebíveis</div>
+        <div class="kpi-value" id="kpi-recebiveis">R$ 0,00</div>
+        <div class="kpi-subtext" id="kpi-recebiveis-sub">R$ 0,00 Diárias | R$ 0,00 Auxílios</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Balanço dos Auxílios e Diárias</div>
+        <div class="kpi-value" id="kpi-balanco">R$ 0,00</div>
+        <div class="kpi-subtext" id="kpi-balanco-sub">Recebível Menos o Total Incorrido</div>
       </div>
     </section>
 
@@ -655,11 +665,6 @@
     function definirTextoRotulo(id, textoPadrao) {
       const el = document.getElementById(id);
       if (!el) return;
-
-      // IMPORTANTE: os KPI-subtexts devem permanecer exatamente com o texto
-      // definido no HTML. Esta função não pode mais sobrescrevê-los.
-      if (el.classList.contains('kpi-subtext')) return;
-
       const rotulos = obterRotulosCustom();
       el.textContent = (rotulos[id] !== undefined) ? rotulos[id] : textoPadrao;
     }
@@ -687,13 +692,12 @@
         el.addEventListener('blur', () => salvarRotuloCustom(chave, el.textContent.trim()));
       });
 
-      // As legendas dos KPIs (kpi-subtext) têm texto definido no HTML e não
-      // são mais substituídas pelo processamento dos dados. Continuam editáveis.
+      // As legendas dos KPIs (kpi-subtext) já têm id fixo e são regravadas a
+      // cada atualização — a persistência delas é feita via definirTextoRotulo,
+      // então aqui só precisam se tornar editáveis.
       document.querySelectorAll('.kpi-subtext').forEach(el => {
         if (!el.id) return;
-        // Os KPI-subtexts têm texto fixo definido no HTML. Não aplicar valores
-        // antigos do localStorage aqui, pois isso fazia o texto do código
-        // aparecer no carregamento e ser substituído logo depois.
+        if (rotulos[el.id] !== undefined) el.textContent = rotulos[el.id];
         el.setAttribute('contenteditable', 'true');
         el.setAttribute('spellcheck', 'false');
         el.classList.add('rotulo-editavel');
@@ -983,6 +987,8 @@
         jetonBruto: 0,
         diarias: 0,
         auxilios: 0,
+        diariasRecebivel: 0,
+        auxiliosRecebivel: 0,
         escalas: 0,
         horas: 0,
         pernoites: 0,
@@ -1027,6 +1033,18 @@
         let diariasCiclo = parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorDiarias'));
         let auxiliosCiclo = parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorAuxilios'));
         let receitaLiquidaCicloDireta = parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorRealJeton'));
+        // NOVO: valores "recebíveis" (apenas diárias/auxílios marcados como
+        // recebíveis em cada escala) — usados nos cards "Auxílios e Diárias
+        // Recebíveis" e "Balanço dos Auxílios e Diárias". Em ciclos fechados
+        // ANTES deste recurso existir, o campo simplesmente não existe no
+        // HTML arquivado — nesse caso, assume-se 100% recebível (mesmo
+        // comportamento padrão que já existia antes deste recurso).
+        let diariasRecebivelCiclo = (ciclo.receitas && ciclo.receitas.indexOf('recValorRecebivelDiarias') !== -1)
+          ? parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorRecebivelDiarias'))
+          : diariasCiclo;
+        let auxiliosRecebivelCiclo = (ciclo.receitas && ciclo.receitas.indexOf('recValorRecebivelAuxilios') !== -1)
+          ? parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorRecebivelAuxilios'))
+          : auxiliosCiclo;
 
         // Fallback (compatibilidade com ciclos antigos arquivados sem a
         // seção de receitas completa): usa o organograma legado de
@@ -1060,6 +1078,8 @@
         acumuladoGeral.jetonBruto += jetonBrutoCiclo;
         acumuladoGeral.diarias += diariasCiclo;
         acumuladoGeral.auxilios += auxiliosCiclo;
+        acumuladoGeral.diariasRecebivel += diariasRecebivelCiclo;
+        acumuladoGeral.auxiliosRecebivel += auxiliosRecebivelCiclo;
         acumuladoGeral.escalas += metricasEscalas.totalEscalas;
         acumuladoGeral.horas += metricasEscalas.horasTrabalhadas;
         acumuladoGeral.pernoites += metricasEscalas.pernoites;
@@ -1161,6 +1181,8 @@
       let jetonBrutoVigente = 0;
       let diariasVigente = 0;
       let auxiliosVigente = 0;
+      let diariasRecebivelVigente = 0;
+      let auxiliosRecebivelVigente = 0;
       let horasVigente = 0;
       let pernoitesVigente = 0;
 
@@ -1289,7 +1311,9 @@
         }
 
         if (elegivelDiaria) {
-          diariasVigente += valDiariaAlim + (comPernoite ? valDiariaHosp : 0);
+          const valorDiariaEstaEscala = valDiariaAlim + (comPernoite ? valDiariaHosp : 0);
+          diariasVigente += valorDiariaEstaEscala;
+          if (escala.diariasRecebivel !== false) diariasRecebivelVigente += valorDiariaEstaEscala;
         }
 
         // Verificação de Auxílios (Fim de semana ou feriado)
@@ -1297,7 +1321,9 @@
           const dt = new Date(escala.data + 'T00:00:00');
           const diaSemana = dt.getDay();
           if (diaSemana === 0 || diaSemana === 6 || escala.isFeriado) {
-            auxiliosVigente += (valAuxAlim + valAuxTransp);
+            const valorAuxilioEstaEscala = valAuxAlim + valAuxTransp;
+            auxiliosVigente += valorAuxilioEstaEscala;
+            if (escala.auxiliosRecebivel !== false) auxiliosRecebivelVigente += valorAuxilioEstaEscala;
           }
         }
       });
@@ -1306,6 +1332,8 @@
       acumuladoGeral.jetonBruto += jetonBrutoVigente;
       acumuladoGeral.diarias += diariasVigente;
       acumuladoGeral.auxilios += auxiliosVigente;
+      acumuladoGeral.diariasRecebivel += diariasRecebivelVigente;
+      acumuladoGeral.auxiliosRecebivel += auxiliosRecebivelVigente;
       acumuladoGeral.escalas += escalasVigentes.length;
       acumuladoGeral.horas += horasVigente;
       acumuladoGeral.pernoites += pernoitesVigente;
@@ -1338,11 +1366,40 @@
       // 3. ATUALIZAÇÃO DOS CARDS (KPIs) NA TELA
       // ---------------------------------------------------------------------
       document.getElementById('kpi-receita-bruta').textContent = formatMoeda(receitaBrutaGeral);
+      definirTextoRotulo('kpi-receita-bruta-sub', `${ciclosFechados.length} Ciclo(s) Fechado(s) + Vigente`);
+
       document.getElementById('kpi-receita-liquida').textContent = formatMoeda(receitaLiquidaGeral);
+      definirTextoRotulo('kpi-ir-desc', `Jeton Líquido (${(100 - aliquotaIR * 100)}%) + Diárias/Aux.`);
+
       document.getElementById('kpi-total-escalas').textContent = acumuladoGeral.escalas;
+      definirTextoRotulo('kpi-escalas-sub', `${acumuladoGeral.simples} Simples | ${acumuladoGeral.dobrada} Dobradas | ${acumuladoGeral.tripla} Triplas | ${acumuladoGeral.quadrupla} Quádruplas`);
+
       document.getElementById('kpi-diarias-auxilios').textContent = formatMoeda(totalDiariasEAuxiliosGeral);
+      definirTextoRotulo('kpi-pernoites-count',
+        `${formatMoeda(acumuladoGeral.auxAlimentacao)} Aux. Alimentação | ${formatMoeda(acumuladoGeral.auxTransporte)} Aux. Transporte | ${formatMoeda(acumuladoGeral.diariaAlimentacao)} Diária Alimentação | ${formatMoeda(acumuladoGeral.diariaHospedagem)} Diária Hospedagem`);
+
       document.getElementById('kpi-rendimento-hora').textContent = `${formatMoeda(rendimentoHoraGeral)}/h`;
+      definirTextoRotulo('kpi-total-horas', `Total de ${acumuladoGeral.horas.toFixed(1)}h Trabalhadas`);
+
       document.getElementById('kpi-total-desconto-ir').textContent = formatMoeda(acumuladoGeral.jetonBruto * aliquotaIR);
+
+      // NOVO: "Auxílios e Diárias Recebíveis" (soma dos valores marcados como
+      // recebíveis em cada escala, de todos os ciclos) e "Balanço dos
+      // Auxílios e Diárias" (diferença entre o recebível e o total incorrido).
+      const totalRecebivelGeral = acumuladoGeral.diariasRecebivel + acumuladoGeral.auxiliosRecebivel;
+      const balancoDiariasGeral = acumuladoGeral.diariasRecebivel - acumuladoGeral.diarias;
+      const balancoAuxiliosGeral = acumuladoGeral.auxiliosRecebivel - acumuladoGeral.auxilios;
+      const balancoGeral = balancoDiariasGeral + balancoAuxiliosGeral;
+
+      document.getElementById('kpi-recebiveis').textContent = formatMoeda(totalRecebivelGeral);
+      document.getElementById('kpi-recebiveis-sub').textContent =
+        `${formatMoeda(acumuladoGeral.diariasRecebivel)} Diárias | ${formatMoeda(acumuladoGeral.auxiliosRecebivel)} Auxílios`;
+
+      const elKpiBalanco = document.getElementById('kpi-balanco');
+      elKpiBalanco.textContent = formatMoeda(balancoGeral);
+      elKpiBalanco.style.color = balancoGeral < 0 ? 'var(--accent-danger)' : 'var(--accent-success)';
+      document.getElementById('kpi-balanco-sub').textContent =
+        `${formatMoeda(balancoDiariasGeral)} Diárias | ${formatMoeda(balancoAuxiliosGeral)} Auxílios`;
 
       // Atualizar timestamp
       const agora = new Date();
