@@ -662,7 +662,7 @@
     // números, não títulos fixos).
     function definirTextoRotulo(id, texto) {
       const el = document.getElementById(id);
-      if (el) el.textContent = texto;
+      if (el) el.innerHTML = texto;
     }
 
     // =========================================================================
@@ -681,26 +681,32 @@
     // trechos ${...} (esses colam os números calculados; não apague-os).
     // =========================================================================
     function textoReceitaBrutaSub(qtdCiclosFechados) {
-      return `${qtdCiclosFechados} Ciclo(s) Fechado(s) + Vigente`;
-    }
-    function textoReceitaLiquidaSub(percentualLiquidoIR) {
-      return `Jeton Líquido (${percentualLiquidoIR}%) + Diárias/Aux.`;
-    }
-    function textoVolumeEscalasSub(qtdSimples, qtdDobrada, qtdTripla, qtdQuadrupla) {
-      return `${qtdSimples} Simples <br> ${qtdDobrada} Dobradas <br> ${qtdTripla} Triplas <br> ${qtdQuadrupla} Quádruplas`;
-    }
-    function textoDiariasAuxiliosSub(valorAuxAlimentacao, valorAuxTransporte, valorDiariaAlimentacao, valorDiariaHospedagem) {
-      return `${formatMoeda(valorAuxAlimentacao)} Auxílio Alimentação <br> ${formatMoeda(valorAuxTransporte)} Auxílio Transporte <br> ${formatMoeda(valorDiariaAlimentacao)} Diária de Alimentação <br> ${formatMoeda(valorDiariaHospedagem)} Diária de Pernoite`;
-    }
-    function textoRendimentoHoraSub(totalHoras) {
-      return `Total de ${totalHoras.toFixed(1)}h Trabalhadas`;
-    }
-    function textoRecebiveisSub(valorDiarias, valorAuxilios) {
-      return `${formatMoeda(valorDiarias)} Diárias <br> ${formatMoeda(valorAuxilios)} Auxílios`;
-    }
-    function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
-      return `${formatMoeda(valorDiferencaDiarias)} Diárias <br> ${formatMoeda(valorDiferencaAuxilios)} Auxílios`;
-    }
+  return `${qtdCiclosFechados} Ciclo(s) Fechado(s) + Vigente`;
+}
+
+function textoReceitaLiquidaSub(percentualLiquidoIR) {
+  return `Jeton Líquido (${percentualLiquidoIR}%) + Diárias/Aux.`;
+}
+
+function textoVolumeEscalasSub(qtdSimples, qtdDobrada, qtdTripla, qtdQuadrupla) {
+  return `${qtdSimples} Simples <br> ${qtdDobrada} Dobradas <br> ${qtdTripla} Triplas <br> ${qtdQuadrupla} Quádruplas`;
+}
+
+function textoDiariasAuxiliosSub(valorAuxAlimentacao, valorAuxTransporte, valorDiariaAlimentacao, valorDiariaHospedagem) {
+  return `${formatMoeda(valorAuxAlimentacao)} Auxílio Alimentação <br> ${formatMoeda(valorAuxTransporte)} Auxílio Transporte <br> ${formatMoeda(valorDiariaAlimentacao)} Diária de Alimentação <br> ${formatMoeda(valorDiariaHospedagem)} Diária de Pernoite`;
+}
+
+function textoRendimentoHoraSub(totalHoras) {
+  return `Total de ${totalHoras.toFixed(1)}h Trabalhadas`;
+}
+
+function textoRecebiveisSub(valorDiarias, valorAuxilios) {
+  return `${formatMoeda(valorDiarias)} Diárias <br> ${formatMoeda(valorAuxilios)} Auxílios`;
+}
+
+function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
+  return `${formatMoeda(valorDiferencaDiarias)} Diárias <br> ${formatMoeda(valorDiferencaAuxilios)} Auxílios`;
+}
 
     // Helper: Extrai valor textual do HTML arquivado
     function extrairTextoHtml(htmlString, selector) {
