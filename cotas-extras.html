@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JETCONTROL 2026®™ - COTAS EXTRAS</title>
+  <script src="jetcontrol-sync.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              dark: '#0f172a',
+              card: '#1e293b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-brand-dark text-slate-100 font-sans min-h-screen flex flex-col uppercase antialiased">
+
+  <!-- HEADER / MENU SUPERIOR RESPONSIVO -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+          <i class="fa-solid fa-sack-dollar text-brand-500 text-2xl"></i>
+          <span class="font-bold text-lg tracking-wider text-white">JETCONTROL <span class="text-brand-500">2026®™</span></span>
+        </div>
+        
+        <!-- Navigation Desktop -->
+        <nav class="hidden md:flex space-x-1">
+          <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">PÁGINA INICIAL</a>
+          <a href="cotas-extras.html" class="px-3 py-2 rounded-md text-sm font-semibold bg-brand-600 text-white shadow-sm">COTAS EXTRAS</a>
+          <a href="escalas.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">ESCALAS</a>
+          <a href="ciclos.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">CICLOS</a>
+          <a href="dashboard.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">DASHBOARD</a>
+          <a href="resetar-dados.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">RESETAR DADOS</a>
+        </nav>
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden">
+          <button id="mobile-menu-btn" class="p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none">
+            <i class="fa-solid fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Navigation -->
+    <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-1">
+      <a href="index.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">PÁGINA INICIAL</a>
+      <a href="cotas-extras.html" class="block px-3 py-2 rounded-md text-base font-semibold bg-brand-600 text-white">COTAS EXTRAS</a>
+      <a href="escalas.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">ESCALAS</a>
+      <a href="ciclos.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">CICLOS</a>
+      <a href="dashboard.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">DASHBOARD</a>
+      <a href="resetar-dados.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">RESETAR DADOS</a>
+    </div>
+  </header>
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+
+    <section class="rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-brand-dark border border-slate-800 shadow-xl p-6 sm:p-8">
+      <div class="flex items-center space-x-3 mb-2">
+        <i class="fa-solid fa-money-bill-trend-up text-brand-500 text-2xl"></i>
+        <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase">
+          COTAS EXTRAS <br> <span class="text-brand-500">AUXÍLIOS E DIÁRIAS</span>
+        </h1>
+      </div>
+      <p class="text-sm sm:text-base text-slate-400 font-medium">
+        CONTROLE AUTOMÁTICO DE AUXÍLIOS E DIÁRIAS NAS ESCALAS DE ACORDO COM LOCAIS E DATAS ELEGÍVEIS.
+      </p>
+    </section>
+
+    <section class="bg-brand-card rounded-2xl border border-slate-800 p-6 sm:p-8 shadow-xl space-y-6">
+      <div class="flex items-center space-x-2 border-b border-slate-800 pb-3">
+        <i class="fa-solid fa-map-location-dot text-amber-400 text-xl"></i>
+        <h2 class="text-lg font-bold uppercase tracking-wide text-white">
+          LOCAIS ELEGÍVEIS À DIÁRIAS
+        </h2>
+      </div>
+
+      <div class="space-y-4">
+        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+          <strong class="text-amber-400 uppercase">MUNICÍPIOS FORA DA REGIÃO METROPOLITANA DO RIO DE JANEIRO:</strong><br>
+          DÃO DIREITO A DIÁRIA (QUANDO O TEMPO DE DESLOCAMENTO - IDA E VOLTA - FOR SUPERIOR A 4 HORAS), PERNOITE (QUANDO HOUVER HOSPEDAGEM) E TRASLADO (QUANDO O DESLOCAMENTO NÃO FOR POR VIATURA OFICIAL), 
+          CASO O DESLOCAMENTO SEJA SUPERIOR A 50 KM DO MUNICÍPIO DE SEDE (CAPITAL) E EXIJA AFASTAMENTO TEMPORÁRIO DENTRO DAS REGRAS DESCRITAS EM CADA ITEM.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-800 space-y-1">
+            <span class="text-xs font-bold text-brand-500 uppercase flex items-center gap-1.5">
+              <i class="fa-solid fa-umbrella-beach"></i> REGIÃO DOS LAGOS
+            </span>
+            <p class="text-xs text-slate-300">CABO FRIO, ARMAÇÃO DOS BÚZIOS, ARRAIAL DO CABO, SÃO PEDRO DA ALDEIA, ARARUAMA, SAQUAREMA, IGUABA GRANDE.</p>
+          </div>
+
+          <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-800 space-y-1">
+            <span class="text-xs font-bold text-brand-500 uppercase flex items-center gap-1.5">
+              <i class="fa-solid fa-mountain"></i> REGIÃO SERRANA
+            </span>
+            <p class="text-xs text-slate-300">PETRÓPOLIS, TERESÓPOLIS, NOVA FRIBURGO, GUAPIMIRIM, CACHOEIRAS DE MACACU, CANTAGALO, CORDEIRO, BOM JARDIM.</p>
+          </div>
+
+          <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-800 space-y-1">
+            <span class="text-xs font-bold text-brand-500 uppercase flex items-center gap-1.5">
+              <i class="fa-solid fa-industry"></i> MÉDIO PARAÍBA / SUL FLUMINENSE
+            </span>
+            <p class="text-xs text-slate-300">VOLTA REDONDA, BARRA MANSA, RESENDE, ITATIAIA, PIRAÍ, BARRA DO PIRAÍ, VALENÇA, VASSOURAS.</p>
+          </div>
+
+          <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-800 space-y-1">
+            <span class="text-xs font-bold text-brand-500 uppercase flex items-center gap-1.5">
+              <i class="fa-solid fa-compass"></i> NORTE FLUMINENSE
+            </span>
+            <p class="text-xs text-slate-300">CAMPOS DOS GOYTACAZES, MACAÉ, QUISSAMÃ, CONCEIÇÃO DE MACABU, SÃO JOÃO DA BARRA.</p>
+          </div>
+
+          <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-800 space-y-1">
+            <span class="text-xs font-bold text-brand-500 uppercase flex items-center gap-1.5">
+              <i class="fa-solid fa-location-arrow"></i> NOROESTE FLUMINENSE
+            </span>
+            <p class="text-xs text-slate-300">ITAOCARA, ITAPERUNA, SANTO ANTÔNIO DE PÁDUA, BOM JESUS DO ITABAPOANA, MIRACEMA.</p>
+          </div>
+
+          <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-800 space-y-1">
+            <span class="text-xs font-bold text-brand-500 uppercase flex items-center gap-1.5">
+              <i class="fa-solid fa-anchor"></i> COSTA VERDE
+            </span>
+            <p class="text-xs text-slate-300">ANGRA DOS REIS, PARATY, MANGARATIBA.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="secao-organograma-diarias" class="bg-brand-card rounded-2xl border border-slate-800 p-6 sm:p-8 shadow-xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-hotel text-amber-400 text-xl"></i>
+          <h2 class="text-lg font-bold uppercase tracking-wide text-white">ORGANOGRAMA DAS DIÁRIAS</h2>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-900 text-xs uppercase text-slate-400 border-b border-slate-800">
+            <tr>
+              <th scope="col" class="px-4 py-3 text-center">Nº DA ESCALA</th>
+              <th scope="col" class="px-4 py-3">LOCAL</th>
+              <th scope="col" class="px-4 py-3 text-center">DATA</th>
+              <th scope="col" class="px-4 py-3 text-right">DIÁRIA DE ALIMENTAÇÃO</th>
+              <th scope="col" class="px-4 py-3 text-right">DIÁRIA DE PERNOITE</th>
+              <th scope="col" class="px-4 py-3 text-right">TOTAL DIÁRIO</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaDiariasBody" class="divide-y divide-slate-800">
+            <tr>
+              <td colspan="6" class="px-4 py-8 text-center text-slate-500 italic">
+                NENHUMA ESCALA COM LOCAL ELEGÍVEL A DIÁRIAS CADASTRADA ATÉ O MOMENTO.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl px-5 py-3 flex items-center space-x-4 shadow-inner">
+          <span class="text-xs uppercase font-bold text-slate-400 tracking-wider">TOTAL GERAL DE DIÁRIAS:</span>
+          <span id="totalDiarias" class="text-amber-400 font-black text-lg">R$ 0,00</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-brand-card rounded-2xl border border-slate-800 p-6 sm:p-8 shadow-xl space-y-6">
+      <div class="flex items-center space-x-2 border-b border-slate-800 pb-3">
+        <i class="fa-solid fa-calendar-check text-amber-400 text-xl"></i>
+        <h2 class="text-lg font-bold uppercase tracking-wide text-white">
+          ESCALAS ELEGÍVEIS AOS AUXÍLIOS
+        </h2>
+      </div>
+
+      <div class="space-y-4">
+        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+          <strong class="text-amber-400 uppercase">DATA DE ATIVIDADE QUE SEJA EM SÁBADO, DOMINGO OU FERIADO:</strong><br>
+          DÃO DIREITO AOS AUXÍLIOS ALIMENTAÇÃO E TRANSPORTE.
+        </p>
+      </div>
+    </section>
+    
+    <section id="secao-organograma-auxilios" class="bg-brand-card rounded-2xl border border-slate-800 p-6 sm:p-8 shadow-xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-utensils text-emerald-400 text-xl"></i>
+          <i class="fa-solid fa-car text-brand-500 text-xl"></i>
+          <h2 class="text-lg font-bold uppercase tracking-wide text-white">ORGANOGRAMA DOS AUXÍLIOS</h2>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-900 text-xs uppercase text-slate-400 border-b border-slate-800">
+            <tr>
+              <th scope="col" class="px-4 py-3 text-center">Nº DA ESCALA</th>
+              <th scope="col" class="px-4 py-3">LOCAL</th>
+              <th scope="col" class="px-4 py-3 text-center">DATA</th>
+              <th scope="col" class="px-4 py-3 text-right">AUXÍLIO ALIMENTAÇÃO</th>
+              <th scope="col" class="px-4 py-3 text-right">AUXÍLIO TRANSPORTE</th>
+              <th scope="col" class="px-4 py-3 text-right">TOTAL DIÁRIO</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaAuxiliosBody" class="divide-y divide-slate-800">
+            <tr>
+              <td colspan="6" class="px-4 py-8 text-center text-slate-500 italic">
+                NENHUMA ESCALA COM DATA ELEGÍVEL AO AUXÍLIOS CADASTRADA ATÉ O MOMENTO.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl px-5 py-3 flex items-center space-x-4 shadow-inner">
+          <span class="text-xs uppercase font-bold text-slate-400 tracking-wider">TOTAL GERAL DE AUXÍLIOS:</span>
+          <span id="totalAuxilios" class="text-emerald-400 font-black text-lg">R$ 0,00</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Menu Mobile
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    const STORAGE_KEY_ESCALAS = 'jetcontrol_escalas_dados';
+    const STORAGE_KEY_VALORES = 'jetcontrol_valores_custom';
+    const STORAGE_KEY_COTAS_EXTRAS = 'jetcontrol_cotas_extras_dados';
+
+    const MUNICIPIOS_ELEGIVEIS = [
+      "CABO FRIO", "ARMAÇÃO DOS BÚZIOS", "BUZIOS", "ARRAIAL DO CABO", "SÃO PEDRO DA ALDEIA", "ARARUAMA", "SAQUAREMA", "IGUABA GRANDE",
+      "PETRÓPOLIS", "PETROPOLIS", "TERESÓPOLIS", "TERESOPOLIS", "NOVA FRIBURGO", "GUAPIMIRIM", "CACHOEIRAS DE MACACU", "CANTAGALO", "CORDEIRO", "BOM JARDIM",
+      "VOLTA REDONDA", "BARRA MANSA", "RESENDE", "ITATIAIA", "PIRAÍ", "PIRAI", "BARRA DO PIRAÍ", "BARRA DO PIRAI", "VALENÇA", "VALENCA", "VASSOURAS",
+      "CAMPOS DOS GOYTACAZES", "CAMPOS", "MACAÉ", "MACAE", "QUISSAMÃ", "QUISSAMA", "CONCEIÇÃO DE MACABU", "CONCEICAO DE MACABU", "SÃO JOÃO DA BARRA", "SAO JOAO DA BARRA", 
+      "ITAOCARA", "ITAPERUNA", "SANTO ANTÔNIO DE PÁDUA", "SANTO ANTONIO DE PADUA", "BOM JESUS DO ITABAPOANA", "MIRACEMA",
+      "ANGRA DOS REIS", "PARATY", "PARATI", "MANGARATIBA"
+    ];
+
+    function formatarMoeda(valor) {
+      return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function converterValorMonetario(val) {
+      if (typeof val === 'number') return val;
+      if (!val) return 0.00;
+      let limpo = val.toString().trim();
+      limpo = limpo.replace(/^R\$\s*/i, '').replace(/\./g, '').replace(',', '.');
+      const num = parseFloat(limpo);
+      return isNaN(num) ? 0.00 : num;
+    }
+
+    function renderizarOrganogramas() {
+      const escalasSalvas = JSON.parse(localStorage.getItem(STORAGE_KEY_ESCALAS)) || [];
+      
+      const valoresSalvos = JSON.parse(
+        localStorage.getItem(STORAGE_KEY_VALORES) || 
+        localStorage.getItem('valores') || 
+        localStorage.getItem('jetcontrol_valores') || 
+        localStorage.getItem('jetcontrol_configuracoes') || '{}'
+      );
+
+      const valAlimentacaoAux = converterValorMonetario(valoresSalvos.alimentacao || '57,70');
+      const valTransporteAux = converterValorMonetario(valoresSalvos.transporte || '31,08');
+      
+      const valDiariaAlimentacao = converterValorMonetario(
+        valoresSalvos.diariaAlimentacao || valoresSalvos.alimentacaoDiaria || valoresSalvos.diaria || valoresSalvos.valorDiaria || '52,00'
+      );
+
+      const valDiariaHospedagem = converterValorMonetario(
+        valoresSalvos.diariaHospedagem || valoresSalvos.hospedagemDiaria || valoresSalvos.hospedagem || valoresSalvos.pernoite || valoresSalvos.valorHospedagem || '274,10'
+      );
+
+      const tbodyDiarias = document.getElementById('tabelaDiariasBody');
+      const tbodyAuxilios = document.getElementById('tabelaAuxiliosBody');
+
+      let htmlDiarias = '';
+      let htmlAuxilios = '';
+      let somaTotalDiarias = 0;
+      let somaTotalAuxilios = 0;
+
+      escalasSalvas.forEach((escala, index) => {
+        const numEscala = escala.numero || `#${index + 1}`;
+        const dataObj = escala.data ? new Date(escala.data + 'T00:00:00') : null;
+        
+        const turnos = [
+          { nome: 'MANHÃ', local: escala.localManha || escala.local || '', pernoite: escala.pernoiteManha || escala.pernoite || 'NAO' },
+          { nome: 'TARDE', local: escala.localTarde || '', pernoite: escala.pernoiteTarde || 'NAO' },
+          { nome: 'NOITE', local: escala.localNoite || '', pernoite: escala.pernoiteNoite || 'NAO' }
+        ];
+
+        let temElegivelNaEscala = false;
+        let temPernoiteNaEscala = false;
+        let locaisElegiveisDescricao = [];
+
+        turnos.forEach(turno => {
+          const localUpper = (turno.local || '').toUpperCase().trim();
+          const isElegivel = MUNICIPIOS_ELEGIVEIS.some(mun => localUpper.includes(mun));
+
+          if (isElegivel) {
+            temElegivelNaEscala = true;
+            locaisElegiveisDescricao.push(turno.local);
+            const pernoiteUpper = (turno.pernoite || '').toUpperCase().trim();
+            if (pernoiteUpper === "SIM" || pernoiteUpper === "TRUE" || pernoiteUpper === "1" || pernoiteUpper === "S") {
+              temPernoiteNaEscala = true;
+            }
+          }
+        });
+
+        if (temElegivelNaEscala) {
+          const valorAlimentacaoDiaria = valDiariaAlimentacao;
+          const valorHospedagemDiaria = temPernoiteNaEscala ? valDiariaHospedagem : 0.00;
+          
+          const totalLinhaDiaria = valorAlimentacaoDiaria + valorHospedagemDiaria;
+          somaTotalDiarias += totalLinhaDiaria;
+          
+          const descricaoLocais = [...new Set(locaisElegiveisDescricao)].join(' / ');
+
+          htmlDiarias += `
+            <tr class="hover:bg-slate-800/50 transition uppercase">
+              <td class="px-4 py-3 text-center font-bold text-brand-500">${numEscala}</td>
+              <td class="px-4 py-3 font-semibold text-white">${descricaoLocais}</td>
+              <td class="px-4 py-3 text-center">${escala.data ? dataObj.toLocaleDateString('pt-BR') : '-'}</td>
+              <td class="px-4 py-3 text-right text-slate-300">${formatarMoeda(valorAlimentacaoDiaria)}</td>
+              <td class="px-4 py-3 text-right text-slate-300">${formatarMoeda(valorHospedagemDiaria)}</td>
+              <td class="px-4 py-3 text-right font-bold text-amber-400">${formatarMoeda(totalLinhaDiaria)}</td>
+            </tr>
+          `;
+        }
+
+        let isFimDeSemanaOuFeriado = false;
+        if (dataObj) {
+          const diaSemana = dataObj.getDay();
+          isFimDeSemanaOuFeriado = (diaSemana === 0 || diaSemana === 6 || escala.isFeriado === true);
+        }
+
+        if (isFimDeSemanaOuFeriado) {
+          const locaisEscala = [
+            escala.localManha || escala.local,
+            escala.localTarde,
+            escala.localNoite
+          ].filter(l => l && l.trim() !== '');
+
+          if (locaisEscala.length > 0) {
+            const totalLinhaAuxilio = valAlimentacaoAux + valTransporteAux;
+            somaTotalAuxilios += totalLinhaAuxilio;
+            const locaisFormatados = locaisEscala.join(' / ');
+
+            htmlAuxilios += `
+              <tr class="hover:bg-slate-800/50 transition uppercase">
+                <td class="px-4 py-3 text-center font-bold text-brand-500">${numEscala}</td>
+                <td class="px-4 py-3 font-semibold text-white">${locaisFormatados}</td>
+                <td class="px-4 py-3 text-center">${dataObj ? dataObj.toLocaleDateString('pt-BR') : '-'}</td>
+                <td class="px-4 py-3 text-right text-slate-300">${formatarMoeda(valAlimentacaoAux)}</td>
+                <td class="px-4 py-3 text-right text-slate-300">${formatarMoeda(valTransporteAux)}</td>
+                <td class="px-4 py-3 text-right font-bold text-emerald-400">${formatarMoeda(totalLinhaAuxilio)}</td>
+              </tr>
+            `;
+          }
+        }
+      });
+
+      if (htmlDiarias !== '') {
+        tbodyDiarias.innerHTML = htmlDiarias;
+      } else {
+        tbodyDiarias.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">NENHUMA ESCALA COM LOCAL ELEGÍVEL A DIÁRIAS CADASTRADA ATÉ O MOMENTO.</td></tr>`;
+      }
+      document.getElementById('totalDiarias').innerText = formatarMoeda(somaTotalDiarias);
+
+      if (htmlAuxilios !== '') {
+        tbodyAuxilios.innerHTML = htmlAuxilios;
+      } else {
+        tbodyAuxilios.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">NENHUMA ESCALA COM DATA ELEGÍVEL AO AUXÍLIOS CADASTRADA ATÉ O MOMENTO.</td></tr>`;
+      }
+      document.getElementById('totalAuxilios').innerText = formatarMoeda(somaTotalAuxilios);
+
+      const dadosCotasExtras = {
+        totalDiarias: somaTotalDiarias,
+        totalAuxilios: somaTotalAuxilios,
+        diarias: somaTotalDiarias,
+        auxilios: somaTotalAuxilios,
+        organogramaDiariasHTML: document.getElementById('secao-organograma-diarias')?.outerHTML || '',
+        organogramaAuxiliosHTML: document.getElementById('secao-organograma-auxilios')?.outerHTML || ''
+      };
+      localStorage.setItem(STORAGE_KEY_COTAS_EXTRAS, JSON.stringify(dadosCotasExtras));
+      localStorage.setItem('jetcontrol_organograma_diarias_html', dadosCotasExtras.organogramaDiariasHTML);
+      localStorage.setItem('jetcontrol_organograma_auxilios_html', dadosCotasExtras.organogramaAuxiliosHTML);
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+      var prosseguir = function () { renderizarOrganogramas(); };
+      if (window.JetSyncReady && typeof window.JetSyncReady.finally === 'function') {
+        window.JetSyncReady.finally(prosseguir);
+      } else {
+        prosseguir();
+      }
+    });
+
+    // Atualiza a tela sozinha quando outro navegador/aparelho salvar algo novo.
+    if (window.JetSyncOnChange) {
+      window.JetSyncOnChange(function () { renderizarOrganogramas(); });
+    }
+  </script>
+</body>
+</html>

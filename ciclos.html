@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JETCONTROL 2026®™ - CICLOS</title>
+<script src="jetcontrol-sync.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brand: {
+            500: '#3b82f6',
+            600: '#2563eb',
+            700: '#1d4ed8',
+            dark: '#0f172a',
+            card: '#1e293b'
+          }
+        }
+      }
+    }
+  }
+</script>
+  <style>
+    /* Reserva permanentemente o espaço da barra vertical para impedir que
+       o menu e o conteúdo centralizado mudem de posição horizontalmente. */
+    html {
+      overflow-y: scroll;
+    }
+    body {
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+
+<body class="bg-brand-dark text-slate-100 font-sans min-h-screen flex flex-col antialiased">
+
+  <!-- HEADER / MENU SUPERIOR RESPONSIVO -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+          <i class="fa-solid fa-sack-dollar text-brand-500 text-2xl"></i>
+          <span class="font-bold text-lg tracking-wider text-white">JETCONTROL <span class="text-brand-500">2026®™</span></span>
+        </div>
+
+        <!-- Navigation Desktop -->
+        <nav class="hidden md:flex space-x-1">
+          <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">PÁGINA INICIAL</a>
+          <a href="cotas-extras.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">COTAS EXTRAS</a>
+          <a href="escalas.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">ESCALAS</a>
+          <a href="ciclos.html" class="px-3 py-2 rounded-md text-sm font-semibold bg-brand-600 text-white shadow-sm">CICLOS</a>
+          <a href="dashboard.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">DASHBOARD</a>
+          <a href="resetar-dados.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">RESETAR DADOS</a>
+        </nav>
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden">
+          <button id="mobile-menu-btn" class="p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none">
+            <i class="fa-solid fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Navigation -->
+    <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-1">
+      <a href="index.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">PÁGINA INICIAL</a>
+      <a href="cotas-extras.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">COTAS EXTRAS</a>
+      <a href="escalas.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">ESCALAS</a>
+      <a href="ciclos.html" class="block px-3 py-2 rounded-md text-base font-semibold bg-brand-600 text-white">CICLOS</a>
+      <a href="dashboard.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">DASHBOARD</a>
+      <a href="resetar-dados.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">RESETAR DADOS</a>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+    <section class="rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-brand-dark border border-slate-800 shadow-xl p-6 sm:p-8">
+      <div class="flex items-center gap-3">
+        <i class="fa-solid fa-recycle text-brand-500 text-2xl"></i>
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase">Ciclos Fechados</h1>
+          <p class="text-sm text-slate-400 mt-1">Histórico permanente dos ciclos encerrados pelo sistema. Clique no título de um ciclo para expandir ou recolher os dados.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-slate-900 rounded-2xl border border-slate-800 shadow-xl p-4 sm:p-6">
+      <div id="listaCiclos" class="space-y-6"></div>
+    </section>
+
+  </main>
+
+  <script>
+    const STORAGE_KEY_CICLOS = 'jetcontrol_ciclos_fechados';
+
+    function esc(v) {
+      return String(v ?? '').replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function dataBR(iso) {
+      if (!iso) return '-';
+      const p = iso.split('-');
+      return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : iso;
+    }
+
+    function normalizarHTML(html) {
+      return html || '<div class="p-4 text-slate-500 italic">DADOS NÃO DISPONÍVEIS.</div>';
+    }
+
+    // REMOVE O "QUADRO INFORMATIVO DOS LOCAIS ELEGÍVEIS À DIÁRIAS" CASO ELE TENHA SIDO
+    // ARQUIVADO POR ENGANO NO LUGAR DO ORGANOGRAMA (bug já corrigido na origem em
+    // cotas-extras.html, mas ciclos fechados antes da correção ainda podem trazer esse
+    // card arquivado) — garante que ele nunca apareça na tela nem no PDF.
+    function removerQuadroInformativoLocais(html) {
+      if (!html) return html;
+      if (!/QUADRO\s+INFORMATIVO/i.test(html)) return html;
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      const titulo = Array.from(temp.querySelectorAll('h1, h2, h3')).find(el => /QUADRO\s+INFORMATIVO/i.test(el.textContent));
+      const secao = titulo ? titulo.closest('section') : temp.firstElementChild;
+      if (secao) secao.remove();
+      return temp.innerHTML || '';
+    }
+
+    // TORNA QUALQUER TRECHO DE HTML ARQUIVADO SOMENTE LEITURA (SEM CAMPOS EDITÁVEIS OU BOTÕES)
+    function desabilitarCamposEditaveis(html) {
+      if (!html) return html;
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      temp.querySelectorAll('input, select, textarea').forEach(campo => {
+        campo.setAttribute('disabled', 'disabled');
+        campo.setAttribute('readonly', 'readonly');
+        campo.classList.add('cursor-not-allowed');
+      });
+      temp.querySelectorAll('button').forEach(botao => botao.remove());
+      return temp.innerHTML;
+    }
+
+    // REMOVE O MOTOR DE BUSCA E OS BOTÕES DE EDITAR/APAGAR DO SNAPSHOT DE ESCALAS
+    function sanitizarSnapshotEscalas(html) {
+      if (!html) return html;
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      const secao = temp.firstElementChild;
+      if (secao) {
+        const filhos = Array.from(secao.children);
+        // filhos[0] = cabeçalho do título; filhos[1] = motor de busca; filhos[2] = cards das escalas
+        if (filhos[1]) filhos[1].remove();
+        secao.querySelectorAll('button').forEach(botao => botao.remove());
+        secao.querySelectorAll('input, select, textarea').forEach(campo => {
+          campo.setAttribute('disabled', 'disabled');
+          campo.setAttribute('readonly', 'readonly');
+        });
+        // Marca cada escala individual para não ser dividida entre páginas ao gerar o PDF.
+        const containerCards = secao.querySelector('#containerCardsEscalas');
+        if (containerCards) {
+          Array.from(containerCards.children).forEach(card => {
+            card.classList.add('pdf-card');
+            card.style.breakInside = 'avoid';
+            card.style.pageBreakInside = 'avoid';
+          });
+        }
+      }
+      return temp.innerHTML;
+    }
+
+    // GERA O CARD "DESCRIÇÃO DO PERÍODO" PREENCHIDO E SOMENTE LEITURA (CLONE DA PÁGINA ESCALAS)
+    function gerarCardDescricaoPeriodo(ciclo) {
+      return `
+        <section class="bg-brand-card rounded-2xl border border-slate-800 p-6 shadow-xl space-y-6">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-calendar-days text-brand-500"></i>
+              <h3 class="text-lg font-bold uppercase tracking-wide text-white">Descrição do Período</h3>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="space-y-2">
+              <label class="block text-xs font-bold uppercase text-slate-300">Data de Abertura do Ciclo</label>
+              <input type="text" readonly disabled value="${esc(dataBR(ciclo.dataAbertura))}"
+                     class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none cursor-not-allowed">
+            </div>
+            <div class="space-y-2">
+              <label class="block text-xs font-bold uppercase text-slate-300">Data de Fechamento do Ciclo</label>
+              <input type="text" readonly disabled value="${esc(dataBR(ciclo.dataFechamento))}"
+                     class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none cursor-not-allowed">
+            </div>
+            <div class="space-y-2">
+              <label class="block text-xs font-bold uppercase text-slate-300">Recebimento em</label>
+              <input type="text" readonly disabled value="${esc(ciclo.recebimentoEm || '')}"
+                     class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none cursor-not-allowed">
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    // NOME PADRÃO DO CICLO: "CICLO - DATA DE ABERTURA À DATA DE FECHAMENTO".
+    // Ciclos antigos (fechados antes desta atualização) que não possuem o campo
+    // "nome" continuam exibindo o mesmo padrão, calculado a partir das datas
+    // arquivadas, ou caem no número sequencial antigo como último recurso.
+    function nomeDoCiclo(ciclo, numeroFallback) {
+      if (ciclo.nome) return ciclo.nome;
+      if (ciclo.dataAbertura && ciclo.dataFechamento) {
+        return `CICLO - ${dataBR(ciclo.dataAbertura)} À ${dataBR(ciclo.dataFechamento)}`;
+      }
+      return `CICLO ${numeroFallback}`;
+    }
+
+    function renderizarCiclos() {
+      const container = document.getElementById('listaCiclos');
+      const ciclos = JSON.parse(localStorage.getItem(STORAGE_KEY_CICLOS) || '[]');
+
+      if (!ciclos.length) {
+        container.innerHTML = '<div class="p-10 text-center text-slate-500 italic uppercase">Nenhum ciclo fechado registrado.</div>';
+        return;
+      }
+
+      container.innerHTML = ciclos.slice().reverse().map((ciclo, ordem) => {
+        const numeroCiclo = ciclo.numero || (ciclos.length - ordem);
+        const idCiclo = ciclo.id || `ciclo-${ordem}`;
+
+        return `
+      <article class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <div class="p-5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 cursor-pointer hover:bg-slate-900/40 transition" onclick="alternarCiclo('${idCiclo}')">
+          <div class="flex items-center gap-3">
+            <i id="chevron-${idCiclo}" class="fa-solid fa-chevron-right text-blue-400 transition-transform duration-200"></i>
+            <div>
+              <h2 class="text-xl font-black text-blue-400 uppercase">${esc(nomeDoCiclo(ciclo, numeroCiclo))}</h2>
+              <p class="text-xs text-slate-400 mt-1 uppercase">
+                ABERTURA: ${esc(dataBR(ciclo.dataAbertura))} &nbsp;|&nbsp; FECHAMENTO: ${esc(dataBR(ciclo.dataFechamento))} &nbsp;|&nbsp; ${esc(ciclo.recebimentoEm || '')}
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap" onclick="event.stopPropagation()">
+            <span class="text-xs text-slate-500">FECHADO EM ${esc(ciclo.fechadoEm ? new Date(ciclo.fechadoEm).toLocaleString('pt-BR') : '-')}</span>
+            
+            <button type="button" onclick="gerarPdfCiclo('${idCiclo}')" title="Gerar PDF deste Ciclo"
+                    class="text-xs font-bold uppercase px-3 py-1.5 rounded-lg bg-brand-600/80 hover:bg-brand-500 text-white transition flex items-center gap-1.5">
+              <i class="fa-solid fa-file-pdf"></i> Gerar PDF
+            </button>
+
+            <button type="button" onclick="excluirCiclo('${idCiclo}')" title="Excluir Ciclo"
+                    class="text-xs font-bold uppercase px-3 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-500 text-white transition flex items-center gap-1.5">
+              <i class="fa-solid fa-trash-can"></i> Excluir
+            </button>
+          </div>
+        </div>
+
+        <div id="corpo-${idCiclo}" class="hidden">
+          <div class="p-5">
+            ${gerarCardDescricaoPeriodo(ciclo)}
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-900 text-xs uppercase text-slate-400">
+                <tr>
+                  <th class="px-4 py-3 w-64">CONTAINER</th>
+                  <th class="px-4 py-3">DADOS DO CICLO</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800">
+                <tr><td class="px-4 py-4 align-top font-black text-amber-400 uppercase">1. Organograma das Diárias</td><td class="p-4 align-top">${desabilitarCamposEditaveis(normalizarHTML(removerQuadroInformativoLocais(ciclo.organogramaDiarias)))}</td></tr>
+                <tr><td class="px-4 py-4 align-top font-black text-emerald-400 uppercase">2. Organograma dos Auxílios</td><td class="p-4 align-top">${desabilitarCamposEditaveis(normalizarHTML(removerQuadroInformativoLocais(ciclo.organogramaAuxilios)))}</td></tr>
+                <tr><td class="px-4 py-4 align-top font-black text-cyan-400 uppercase">3. Receitas do Ciclo</td><td class="p-4 align-top">${desabilitarCamposEditaveis(normalizarHTML(ciclo.receitas))}</td></tr>
+                <tr><td class="px-4 py-4 align-top font-black text-indigo-400 uppercase">4. Estatísticas do Ciclo</td><td class="p-4 align-top">${desabilitarCamposEditaveis(normalizarHTML(ciclo.estatisticas))}</td></tr>
+                <tr><td class="px-4 py-4 align-top font-black text-slate-200 uppercase">5. Escalas Cadastradas</td><td class="p-4 align-top">${sanitizarSnapshotEscalas(normalizarHTML(ciclo.escalas))}</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+    `;
+      }).join('');
+    }
+
+    // EXPANDE/RECOLHE OS DADOS DE UM CICLO AO CLICAR NO TÍTULO
+    function alternarCiclo(id) {
+      const corpo = document.getElementById('corpo-' + id);
+      const chevron = document.getElementById('chevron-' + id);
+      if (!corpo) return;
+      const vaiExibir = corpo.classList.contains('hidden');
+      corpo.classList.toggle('hidden');
+      if (chevron) chevron.classList.toggle('rotate-90', vaiExibir);
+    }
+
+    // EXCLUI PERMANENTEMENTE UM CICLO ARQUIVADO
+    function excluirCiclo(id) {
+      const confirmar = confirm('DESEJA REALMENTE EXCLUIR ESTE CICLO? ESTA AÇÃO NÃO PODE SER DESFEITA.');
+      if (!confirmar) return;
+      let ciclos = JSON.parse(localStorage.getItem(STORAGE_KEY_CICLOS) || '[]');
+      ciclos = ciclos.filter(c => c.id !== id);
+      localStorage.setItem(STORAGE_KEY_CICLOS, JSON.stringify(ciclos));
+      renderizarCiclos();
+    }
+
+    // EXTRAI O VALOR TOTAL DE JETON A PARTIR DO SNAPSHOT DE RECEITAS DO CICLO
+    function extrairValorTotalJeton(ciclo) {
+      if (!ciclo.receitas) return 'R$ 0,00';
+      const temp = document.createElement('div');
+      temp.innerHTML = ciclo.receitas;
+      const elemento = temp.querySelector('#recValorTotalJeton');
+      return elemento ? elemento.textContent.trim() : 'R$ 0,00';
+    }
+
+    // REMOVE CARACTERES INVÁLIDOS PARA NOMES DE ARQUIVO
+    function sanitizarNomeArquivo(texto) {
+      return String(texto || '')
+        .replace(/[\\/:*?"<>|]/g, '-')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function montarNomeArquivoPdf(ciclo) {
+      const nome = sanitizarNomeArquivo(nomeDoCiclo(ciclo, ciclo.numero || '')) || 'CICLO SEM NOME';
+      const valorTotal = sanitizarNomeArquivo(extrairValorTotalJeton(ciclo)) || 'R$ 0,00';
+      return `${nome} - ${valorTotal}.pdf`;
+    }
+
+    // =====================================================================
+    // GERAÇÃO DO PDF — LAYOUT DEDICADO E OTIMIZADO PARA IMPRESSÃO
+    // =====================================================================
+
+    const LARGURA_IMPRESSAO_PDF = 760; // px — largura fixa do conteúdo impresso (independe da tela do usuário)
+
+    // FORÇA TODAS AS GRADES (grid-cols-*) DO CONTEÚDO ARQUIVADO A EXIBIREM EM UMA ÚNICA COLUNA,
+    // já que classes responsivas do Tailwind (sm:/md:/lg:) dependem da largura real da janela do
+    // navegador e não da largura do contêiner usado na captura do PDF — por isso não podem ser
+    // usadas como estão para garantir que nada fique cortado ou fora da margem da página impressa.
+    function ajustarGradesParaImpressao(raiz) {
+      raiz.querySelectorAll('[class*="grid-cols-"]').forEach(el => {
+        el.style.display = 'grid';
+        el.style.gridTemplateColumns = '1fr';
+        if (!el.style.rowGap) el.style.rowGap = '10px';
+      });
+      raiz.querySelectorAll('[class*="col-span-"]').forEach(el => {
+        el.style.gridColumn = '1 / -1';
+      });
+    }
+
+    // AJUSTA TABELAS E BLOCOS COM ROLAGEM HORIZONTAL PARA CABEREM DENTRO DA LARGURA IMPRESSA
+    function ajustarTabelasParaImpressao(raiz) {
+      raiz.querySelectorAll('.overflow-x-auto').forEach(el => {
+        el.style.overflow = 'visible';
+      });
+      raiz.querySelectorAll('table').forEach(tabela => {
+        tabela.style.width = '100%';
+        tabela.style.tableLayout = 'auto';
+        tabela.style.fontSize = '10px';
+      });
+      raiz.querySelectorAll('th, td').forEach(celula => {
+        celula.style.whiteSpace = 'normal';
+        celula.style.wordBreak = 'break-word';
+        celula.style.padding = celula.style.padding || '6px 8px';
+      });
+    }
+
+    // REDUZ FONTES E ESPAÇAMENTOS INTERNOS DOS CARDS DAS PÁGINAS 1 A 3, PARA QUE
+    // "DESCRIÇÃO DO PERÍODO" + "ESTATÍSTICA DO CICLO" (página 1) e "ORGANOGRAMA DAS
+    // DIÁRIAS" + "ORGANOGRAMA DOS AUXÍLIOS" (página 3) caibam confortavelmente juntos
+    // em uma única página cada, sem cortar informações.
+    function compactarConteudoImpresso(raiz) {
+      raiz.style.fontSize = '10.5px';
+      raiz.style.lineHeight = '1.25';
+
+      raiz.querySelectorAll('h1, h2, h3').forEach(titulo => {
+        titulo.style.fontSize = '12px';
+        titulo.style.marginBottom = '4px';
+        titulo.style.paddingBottom = '4px';
+      });
+
+      raiz.querySelectorAll('p, span, label, td, th, div, input').forEach(el => {
+        if (!el.style.fontSize) el.style.fontSize = '10px';
+      });
+
+      // Reduz o padding interno de blocos com espaçamento generoso (p-4/p-5/p-6/p-8)
+      raiz.querySelectorAll('[class*="p-8"], [class*="p-6"], [class*="p-5"], [class*="p-4"]').forEach(el => {
+        el.style.padding = '6px';
+      });
+      raiz.querySelectorAll('[class*="px-4"], [class*="px-5"], [class*="px-6"]').forEach(el => {
+        el.style.paddingLeft = '5px';
+        el.style.paddingRight = '5px';
+      });
+      raiz.querySelectorAll('[class*="py-2"], [class*="py-3"], [class*="py-4"]').forEach(el => {
+        el.style.paddingTop = '3px';
+        el.style.paddingBottom = '3px';
+      });
+
+      // Reduz o espaçamento entre elementos empilhados (space-y-*) atuando nos filhos diretos
+      raiz.querySelectorAll('[class*="space-y-"]').forEach(container => {
+        Array.from(container.children).forEach(filho => { filho.style.marginTop = '5px'; });
+      });
+
+      // Reduz o "gap" das grades (já forçadas para coluna única) para um valor mais compacto
+      raiz.querySelectorAll('[class*="gap-"]').forEach(el => { el.style.gap = '5px'; });
+    }
+
+    // MONTA O CONTEÚDO COMPLETO DO CICLO EM UM LAYOUT PRÓPRIO PARA IMPRESSÃO, ORGANIZADO
+    // EM PÁGINAS FIXAS:
+    //   PÁGINA 1 — Descrição do Período + Estatística do Ciclo
+    //   PÁGINA 2 — Receitas do Ciclo
+    //   PÁGINA 3 — Organograma das Diárias + Organograma dos Auxílios
+    //   PÁGINA 4+ — Escalas Cadastradas, 2 por página (uma abaixo da outra)
+    // A classe "pdf-quebra-pagina" força uma quebra de página antes do elemento, e
+    // "pdf-card"/estilo break-inside:avoid garante que nenhum bloco seja dividido.
+    // Os cards das páginas 1 a 3 passam por compactarConteudoImpresso() para reduzir
+    // fontes e espaçamentos e otimizar o aproveitamento do espaço da página.
+    function montarConteudoImpressao(ciclo) {
+      const estiloCard = 'break-inside:avoid; page-break-inside:avoid; margin-bottom:10px; border:1px solid #1e293b; border-radius:10px; background:#0f172a; padding:8px;';
+      const fechadoEmFmt = ciclo.fechadoEm ? new Date(ciclo.fechadoEm).toLocaleString('pt-BR') : '-';
+
+      function cardCompacto(htmlInterno, classesExtras) {
+        const div = document.createElement('div');
+        div.className = `pdf-card${classesExtras ? ' ' + classesExtras : ''}`;
+        div.setAttribute('style', estiloCard + (classesExtras && classesExtras.includes('pdf-quebra-pagina') ? ' break-before:page; page-break-before:always;' : ''));
+        div.innerHTML = htmlInterno;
+        compactarConteudoImpresso(div);
+        return div.outerHTML;
+      }
+
+      const blocos = [];
+
+      blocos.push(`
+        <div style="margin-bottom:12px; padding-bottom:10px; border-bottom:2px solid #334155;">
+          <div style="font-size:16px; font-weight:900; color:#60a5fa; text-transform:uppercase;">${esc(nomeDoCiclo(ciclo, ciclo.numero || ''))}</div>
+          <div style="font-size:9px; color:#94a3b8; text-transform:uppercase; margin-top:5px;">
+            ABERTURA: ${esc(dataBR(ciclo.dataAbertura))} &nbsp;|&nbsp; ${esc(ciclo.recebimentoEm || '')} &nbsp;|&nbsp; FECHADO EM ${esc(fechadoEmFmt)}
+          </div>
+        </div>
+      `);
+
+      // PÁGINA 1 — Descrição do Período + Estatística do Ciclo
+      blocos.push(cardCompacto(gerarCardDescricaoPeriodo(ciclo)));
+      blocos.push(cardCompacto(desabilitarCamposEditaveis(normalizarHTML(ciclo.estatisticas))));
+
+      // PÁGINA 2 — Receitas do Ciclo
+      blocos.push(cardCompacto(desabilitarCamposEditaveis(normalizarHTML(ciclo.receitas)), 'pdf-quebra-pagina'));
+
+      // PÁGINA 3 — Organograma das Diárias + Organograma dos Auxílios
+      blocos.push(cardCompacto(desabilitarCamposEditaveis(normalizarHTML(removerQuadroInformativoLocais(ciclo.organogramaDiarias))), 'pdf-quebra-pagina'));
+      blocos.push(cardCompacto(desabilitarCamposEditaveis(normalizarHTML(removerQuadroInformativoLocais(ciclo.organogramaAuxilios)))));
+
+      // PÁGINA 4+ — Escalas Cadastradas, 2 por página
+      blocos.push(montarEscalasEmPares(ciclo));
+
+      return blocos.join('');
+    }
+
+    // DIVIDE AS ESCALAS CADASTRADAS EM PÁGINAS COM 2 ESCALAS EMPILHADAS VERTICALMENTE
+    // (UMA ABAIXO DA OUTRA), COMEÇANDO SEMPRE EM UMA NOVA PÁGINA, ATÉ QUE TODAS SEJAM EXIBIDAS.
+    function montarEscalasEmPares(ciclo) {
+      const escalasSanitizado = sanitizarSnapshotEscalas(normalizarHTML(ciclo.escalas));
+      const temp = document.createElement('div');
+      temp.innerHTML = escalasSanitizado;
+      const secao = temp.firstElementChild;
+      if (!secao) return escalasSanitizado;
+
+      const containerCards = secao.querySelector('#containerCardsEscalas');
+      const cabecalho = secao.firstElementChild;
+      const cabecalhoHTML = cabecalho ? cabecalho.outerHTML : '';
+
+      if (!containerCards || !containerCards.children.length) {
+        return `<div class="pdf-card pdf-quebra-pagina" style="break-inside:avoid; page-break-inside:avoid; break-before:page; page-break-before:always; margin-bottom:14px; border:1px solid #1e293b; border-radius:10px; background:#0f172a; padding:14px;">${secao.innerHTML}</div>`;
+      }
+
+      const cards = Array.from(containerCards.children);
+      const partes = [];
+
+      for (let i = 0; i < cards.length; i += 2) {
+        const par = cards.slice(i, i + 2);
+        const ehPrimeiraPagina = i === 0;
+        const linhas = par.map(card => `
+          <div style="border:1px solid #1e293b; border-radius:10px; background:#0f172a; padding:12px; margin-bottom:14px;">
+            ${card.outerHTML}
+          </div>
+        `).join('');
+
+        partes.push(`
+          <div class="pdf-quebra-pagina" style="break-inside:avoid; page-break-inside:avoid; break-before:page; page-break-before:always;">
+            ${ehPrimeiraPagina ? `<div style="margin-bottom:14px;">${cabecalhoHTML}</div>` : ''}
+            <div style="display:flex; flex-direction:column;">
+              ${linhas}
+            </div>
+          </div>
+        `);
+      }
+
+      return partes.join('');
+    }
+
+    // GERA O PDF (BLOB) A PARTIR DE UM CONTÊINER TEMPORÁRIO, JÁ OTIMIZADO PARA IMPRESSÃO
+    async function gerarBlobPdfCiclo(ciclo) {
+      // Em vez de posicionar o contêiner muito longe da tela (o que falha em vários
+      // navegadores móveis/WebViews, resultando em captura em branco), ele é colocado
+      // dentro de um invólucro com tamanho zero e "overflow:hidden", mantendo-se fora
+      // da visão do usuário sem sair da área normalmente renderizada pelo navegador.
+      const wrapperOculto = document.createElement('div');
+      wrapperOculto.style.position = 'fixed';
+      wrapperOculto.style.top = '0';
+      wrapperOculto.style.left = '0';
+      wrapperOculto.style.width = '0';
+      wrapperOculto.style.height = '0';
+      wrapperOculto.style.overflow = 'hidden';
+      wrapperOculto.style.zIndex = '-1';
+
+      const containerImpressao = document.createElement('div');
+      containerImpressao.style.width = LARGURA_IMPRESSAO_PDF + 'px';
+      containerImpressao.style.background = '#020617';
+      containerImpressao.style.color = '#e2e8f0';
+      containerImpressao.style.padding = '20px';
+      containerImpressao.style.boxSizing = 'border-box';
+      containerImpressao.style.fontFamily = 'Arial, Helvetica, sans-serif';
+      containerImpressao.innerHTML = montarConteudoImpressao(ciclo);
+
+      ajustarGradesParaImpressao(containerImpressao);
+      ajustarTabelasParaImpressao(containerImpressao);
+
+      wrapperOculto.appendChild(containerImpressao);
+      document.body.appendChild(wrapperOculto);
+
+      // Aguarda um instante para garantir que o Tailwind (que injeta as classes de
+      // estilo dinamicamente) já tenha processado todo o conteúdo recém-inserido
+      // antes de iniciar a captura — evita que o PDF saia sem estilo ou em branco.
+      await new Promise(resolve => setTimeout(resolve, 350));
+
+      try {
+        const worker = html2pdf()
+          .set({
+            margin: [8, 8, 8, 8],
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: {
+              scale: 2,
+              backgroundColor: '#020617',
+              useCORS: true
+            },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: ['css', 'legacy'], before: '.pdf-quebra-pagina', avoid: ['.pdf-card', '.pdf-quebra-pagina'] }
+          })
+          .from(containerImpressao);
+
+        // Encadeia explicitamente toPdf() antes de gerar o blob — chamar outputPdf()
+        // diretamente pode retornar um PDF vazio (1 página em branco), pois pula a
+        // etapa de conversão do conteúdo capturado em imagem dentro do PDF.
+        await worker.toPdf();
+        const blob = await worker.output('blob');
+
+        if (!blob || blob.size < 2000) {
+          throw new Error('O PDF gerado ficou vazio.');
+        }
+
+        return blob;
+      } finally {
+        wrapperOculto.remove();
+      }
+    }
+
+    // =====================================================================
+    // SALVAMENTO LOCAL DO PDF NA PASTA DO DISPOSITIVO
+    // =====================================================================
+    // Por restrição de segurança dos navegadores, nenhum site consegue gravar
+    // arquivos automaticamente em um caminho absoluto do dispositivo (ex.:
+    // "Armazenamento Interno/DETRAN-RJ/...") sem que o usuário autorize a pasta
+    // ao menos uma vez. Usamos a File System Access API para que, na primeira
+    // vez, o usuário selecione (ou crie) a pasta
+    // "DETRAN-RJ/DESMONTE/JETCONTROL2026/CICLOS" — a permissão fica salva e,
+    // nas próximas gerações de PDF, o arquivo é salvo automaticamente ali, sem
+    // pedir novamente. Em navegadores sem suporte a essa API (comum em
+    // dispositivos móveis), o PDF é enviado para a pasta padrão de Downloads.
+
+    const NOME_BD_HANDLES = 'jetcontrol_handles_fs';
+    const NOME_LOJA_HANDLES = 'handles';
+    const CHAVE_HANDLE_CICLOS = 'pastaCiclos';
+
+    function abrirBancoHandles() {
+      return new Promise((resolve, reject) => {
+        const requisicao = indexedDB.open(NOME_BD_HANDLES, 1);
+        requisicao.onupgradeneeded = () => {
+          requisicao.result.createObjectStore(NOME_LOJA_HANDLES);
+        };
+        requisicao.onsuccess = () => resolve(requisicao.result);
+        requisicao.onerror = () => reject(requisicao.error);
+      });
+    }
+
+    async function salvarHandleNoBanco(chave, handle) {
+      const bd = await abrirBancoHandles();
+      return new Promise((resolve, reject) => {
+        const tx = bd.transaction(NOME_LOJA_HANDLES, 'readwrite');
+        tx.objectStore(NOME_LOJA_HANDLES).put(handle, chave);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function obterHandleDoBanco(chave) {
+      const bd = await abrirBancoHandles();
+      return new Promise((resolve, reject) => {
+        const tx = bd.transaction(NOME_LOJA_HANDLES, 'readonly');
+        const requisicao = tx.objectStore(NOME_LOJA_HANDLES).get(chave);
+        requisicao.onsuccess = () => resolve(requisicao.result || null);
+        requisicao.onerror = () => reject(requisicao.error);
+      });
+    }
+
+    async function obterPastaLocalCiclos() {
+      if (!window.showDirectoryPicker) return null;
+
+      let handle = await obterHandleDoBanco(CHAVE_HANDLE_CICLOS).catch(() => null);
+
+      if (handle) {
+        const permissao = await handle.queryPermission({ mode: 'readwrite' });
+        if (permissao === 'granted') return handle;
+        const novaPermissao = await handle.requestPermission({ mode: 'readwrite' }).catch(() => 'denied');
+        if (novaPermissao === 'granted') return handle;
+        handle = null;
+      }
+
+      try {
+        alert('SELECIONE (OU CRIE) A PASTA "DETRAN-RJ/DESMONTE/JETCONTROL2026/CICLOS" NO ARMAZENAMENTO INTERNO. ESSA ESCOLHA SERÁ LEMBRADA PARA OS PRÓXIMOS PDFs.');
+        handle = await window.showDirectoryPicker({ id: 'jetcontrol-ciclos', mode: 'readwrite' });
+        await salvarHandleNoBanco(CHAVE_HANDLE_CICLOS, handle);
+        return handle;
+      } catch (erro) {
+        return null; // usuário cancelou a seleção da pasta
+      }
+    }
+
+    async function salvarPdfLocalmente(blobPdf, nomeArquivo) {
+      const pastaHandle = await obterPastaLocalCiclos();
+
+      if (pastaHandle) {
+        try {
+          const arquivoHandle = await pastaHandle.getFileHandle(nomeArquivo, { create: true });
+          const gravavel = await arquivoHandle.createWritable();
+          await gravavel.write(blobPdf);
+          await gravavel.close();
+          return true;
+        } catch (erro) {
+          console.warn('Não foi possível salvar na pasta selecionada, usando o download padrão:', erro);
+        }
+      }
+
+      // Alternativa para navegadores sem suporte à File System Access API (ex.: a maioria dos
+      // navegadores móveis): o PDF é enviado para a pasta padrão de Downloads do dispositivo.
+      const url = URL.createObjectURL(blobPdf);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = nomeArquivo;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      return false;
+    }
+
+    // =====================================================================
+    // ENVIO AUTOMÁTICO PARA O GOOGLE DRIVE
+    // =====================================================================
+    // Este envio precisa de credenciais próprias do Google Cloud (não é possível
+    // habilitá-lo sem isso — é uma exigência do próprio Google para qualquer site).
+    // Passo a passo: crie um projeto em https://console.cloud.google.com, ative a
+    // "Google Drive API", configure a tela de consentimento OAuth e crie uma
+    // credencial do tipo "ID do cliente OAuth" (aplicativo Web), adicionando o
+    // domínio onde esta página ficará hospedada em "Origens JavaScript autorizadas".
+    // Copie o Client ID gerado e cole-o abaixo:
+    const GOOGLE_CLIENT_ID = ''; // <-- COLE AQUI O SEU CLIENT ID OAUTH 2.0 DO GOOGLE CLOUD
+    const GOOGLE_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+    const CAMINHO_PASTAS_DRIVE = ['DETRAN-RJ', 'DESMONTE', 'JETCONTROL2026', 'CICLOS'];
+
+    let tokenClientGoogle = null;
+    let tokenAcessoGoogle = null;
+
+    function inicializarClienteGoogle() {
+      if (!GOOGLE_CLIENT_ID || typeof google === 'undefined' || !google.accounts) return null;
+      if (!tokenClientGoogle) {
+        tokenClientGoogle = google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_CLIENT_ID,
+          scope: GOOGLE_DRIVE_SCOPE,
+          callback: () => {}
+        });
+      }
+      return tokenClientGoogle;
+    }
+
+    function obterTokenAcessoGoogle() {
+      return new Promise((resolve, reject) => {
+        const cliente = inicializarClienteGoogle();
+        if (!cliente) {
+          reject(new Error('Biblioteca ou credencial do Google não configurada.'));
+          return;
+        }
+        cliente.callback = (resposta) => {
+          if (resposta.error) { reject(resposta); return; }
+          tokenAcessoGoogle = resposta.access_token;
+          resolve(tokenAcessoGoogle);
+        };
+        cliente.requestAccessToken({ prompt: tokenAcessoGoogle ? '' : 'consent' });
+      });
+    }
+
+    async function localizarOuCriarPastaDrive(nomePasta, idPastaPai, token) {
+      const partesConsulta = [
+        "mimeType='application/vnd.google-apps.folder'",
+        `name='${nomePasta.replace(/'/g, "\\'")}'`,
+        'trashed=false'
+      ];
+      if (idPastaPai) partesConsulta.push(`'${idPastaPai}' in parents`);
+      const consulta = encodeURIComponent(partesConsulta.join(' and '));
+
+      const respBusca = await fetch(`https://www.googleapis.com/drive/v3/files?q=${consulta}&fields=files(id,name)`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const dadosBusca = await respBusca.json();
+
+      if (dadosBusca.files && dadosBusca.files.length > 0) {
+        return dadosBusca.files[0].id;
+      }
+
+      const metadados = { name: nomePasta, mimeType: 'application/vnd.google-apps.folder' };
+      if (idPastaPai) metadados.parents = [idPastaPai];
+
+      const respCriacao = await fetch('https://www.googleapis.com/drive/v3/files', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(metadados)
+      });
+      const dadosCriacao = await respCriacao.json();
+      return dadosCriacao.id;
+    }
+
+    async function obterPastaDestinoDrive(token) {
+      let idPastaAtual = null;
+      for (const nomePasta of CAMINHO_PASTAS_DRIVE) {
+        idPastaAtual = await localizarOuCriarPastaDrive(nomePasta, idPastaAtual, token);
+      }
+      return idPastaAtual;
+    }
+
+    async function enviarPdfParaGoogleDrive(blobPdf, nomeArquivo) {
+      if (!GOOGLE_CLIENT_ID) return false;
+
+      const token = await obterTokenAcessoGoogle();
+      const idPastaDestino = await obterPastaDestinoDrive(token);
+
+      const metadados = { name: nomeArquivo, parents: [idPastaDestino] };
+      const formulario = new FormData();
+      formulario.append('metadata', new Blob([JSON.stringify(metadados)], { type: 'application/json' }));
+      formulario.append('file', blobPdf);
+
+      const resposta = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formulario
+      });
+
+      if (!resposta.ok) throw new Error('Falha ao enviar o PDF para o Google Drive.');
+      return true;
+    }
+
+    // =====================================================================
+    // AÇÃO PRINCIPAL DO BOTÃO "PDF"
+    // =====================================================================
+    async function gerarPdfCiclo(id) {
+      const ciclos = JSON.parse(localStorage.getItem(STORAGE_KEY_CICLOS) || '[]');
+      const ciclo = ciclos.find(c => c.id === id);
+      if (!ciclo) return;
+
+      const nomeArquivo = montarNomeArquivoPdf(ciclo);
+
+      try {
+        const blobPdf = await gerarBlobPdfCiclo(ciclo);
+
+        await salvarPdfLocalmente(blobPdf, nomeArquivo);
+
+        if (!GOOGLE_CLIENT_ID) {
+          alert('PDF SALVO NO DISPOSITIVO.\n\nPARA ATIVAR O ENVIO AUTOMÁTICO PARA O GOOGLE DRIVE, CONFIGURE O "GOOGLE_CLIENT_ID" NO CÓDIGO DESTA PÁGINA (VEJA O COMENTÁRIO ACIMA DA CONSTANTE GOOGLE_CLIENT_ID).');
+          return;
+        }
+
+        try {
+          await enviarPdfParaGoogleDrive(blobPdf, nomeArquivo);
+          alert('PDF SALVO NO DISPOSITIVO E ENVIADO COM SUCESSO PARA O GOOGLE DRIVE (DETRAN-RJ/DESMONTE/JETCONTROL2026/CICLOS).');
+        } catch (erroDrive) {
+          console.error('Erro ao enviar PDF para o Google Drive:', erroDrive);
+          alert('O PDF FOI SALVO NO DISPOSITIVO, MAS OCORREU UM ERRO AO ENVIÁ-LO AO GOOGLE DRIVE. VERIFIQUE SUA CONEXÃO E AS PERMISSÕES DA SUA CONTA GOOGLE.');
+        }
+      } catch (erro) {
+        console.error('Erro ao gerar o PDF do ciclo:', erro);
+        alert('OCORREU UM ERRO AO GERAR O PDF DESTE CICLO.');
+      }
+    }
+
+    // Menu Mobile
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    window.addEventListener('DOMContentLoaded', function () {
+      var prosseguir = function () { renderizarCiclos(); };
+      if (window.JetSyncReady && typeof window.JetSyncReady.finally === 'function') {
+        window.JetSyncReady.finally(prosseguir);
+      } else {
+        prosseguir();
+      }
+    });
+
+    // Atualiza a tela sozinha quando outro navegador/aparelho salvar algo novo.
+    if (window.JetSyncOnChange) {
+      window.JetSyncOnChange(function () { renderizarCiclos(); });
+    }
+  </script>
+</body>
+</html>
