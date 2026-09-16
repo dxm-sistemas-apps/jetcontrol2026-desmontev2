@@ -1368,20 +1368,20 @@
       // 3. ATUALIZAÇÃO DOS CARDS (KPIs) NA TELA
       // ---------------------------------------------------------------------
       document.getElementById('kpi-receita-bruta').textContent = formatMoeda(receitaBrutaGeral);
-      definirTextoRotulo('kpi-receita-bruta-sub', textoReceitaBrutaSub(ciclosFechados.length));
+      // definirTextoRotulo('kpi-receita-bruta-sub', textoReceitaBrutaSub(ciclosFechados.length));
 
       document.getElementById('kpi-receita-liquida').textContent = formatMoeda(receitaLiquidaGeral);
-      definirTextoRotulo('kpi-ir-desc', textoReceitaLiquidaSub(100 - aliquotaIR * 100));
+      // definirTextoRotulo('kpi-ir-desc', textoReceitaLiquidaSub(100 - aliquotaIR * 100));
 
       document.getElementById('kpi-total-escalas').textContent = acumuladoGeral.escalas;
-      definirTextoRotulo('kpi-escalas-sub', textoVolumeEscalasSub(acumuladoGeral.simples, acumuladoGeral.dobrada, acumuladoGeral.tripla, acumuladoGeral.quadrupla));
+      // definirTextoRotulo('kpi-escalas-sub', textoVolumeEscalasSub(acumuladoGeral.simples, acumuladoGeral.dobrada, acumuladoGeral.tripla, acumuladoGeral.quadrupla));
 
       document.getElementById('kpi-diarias-auxilios').textContent = formatMoeda(totalDiariasEAuxiliosGeral);
-      definirTextoRotulo('kpi-pernoites-count',
+      // definirTextoRotulo('kpi-pernoites-count',
         textoDiariasAuxiliosSub(acumuladoGeral.auxAlimentacao, acumuladoGeral.auxTransporte, acumuladoGeral.diariaAlimentacao, acumuladoGeral.diariaHospedagem));
 
       document.getElementById('kpi-rendimento-hora').textContent = `${formatMoeda(rendimentoHoraGeral)}/h`;
-      definirTextoRotulo('kpi-total-horas', textoRendimentoHoraSub(acumuladoGeral.horas));
+      // definirTextoRotulo('kpi-total-horas', textoRendimentoHoraSub(acumuladoGeral.horas));
 
       document.getElementById('kpi-total-desconto-ir').textContent = formatMoeda(acumuladoGeral.jetonBruto * aliquotaIR);
 
@@ -1394,12 +1394,12 @@
       const balancoGeral = balancoDiariasGeral + balancoAuxiliosGeral;
 
       document.getElementById('kpi-recebiveis').textContent = formatMoeda(totalRecebivelGeral);
-      definirTextoRotulo('kpi-recebiveis-sub', textoRecebiveisSub(acumuladoGeral.diariasRecebivel, acumuladoGeral.auxiliosRecebivel));
+      // definirTextoRotulo('kpi-recebiveis-sub', textoRecebiveisSub(acumuladoGeral.diariasRecebivel, acumuladoGeral.auxiliosRecebivel));
 
       const elKpiBalanco = document.getElementById('kpi-balanco');
       elKpiBalanco.textContent = formatMoeda(balancoGeral);
       elKpiBalanco.style.color = balancoGeral < 0 ? 'var(--accent-danger)' : 'var(--accent-success)';
-      definirTextoRotulo('kpi-balanco-sub', textoBalancoSub(balancoDiariasGeral, balancoAuxiliosGeral));
+      // definirTextoRotulo('kpi-balanco-sub', textoBalancoSub(balancoDiariasGeral, balancoAuxiliosGeral));
 
       // Atualizar timestamp
       const agora = new Date();
