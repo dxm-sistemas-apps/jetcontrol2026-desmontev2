@@ -71,11 +71,12 @@
         
         <!-- Navigation Desktop -->
         <nav class="hidden md:flex space-x-1">
-          <a href="index.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">PÁGINA INICIAL</a>
-          <a href="cotas-extras.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">COTAS EXTRAS</a>
+          <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">PÁGINA INICIAL</a>
+          <a href="cotas-extras.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">COTAS EXTRAS</a>
           <a href="escalas.html" class="px-3 py-2 rounded-md text-sm font-semibold bg-brand-600 text-white shadow-sm">ESCALAS</a>
-          <a href="ciclos.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">CICLOS</a>
-          <a href="dashboard.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">DASHBOARD</a>        
+          <a href="ciclos.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">CICLOS</a>
+          <a href="dashboard.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">DASHBOARD</a>
+          <a href="resetar-dados.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">RESETAR DADOS</a>
         </nav>
 
         <!-- Mobile Menu Button -->
@@ -89,14 +90,14 @@
 
     <!-- Mobile Dropdown Navigation -->
     <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-1">
-      <a href="index.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">PÁGINA INICIAL</a>
-      <a href="cotas-extras.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">COTAS EXTRAS</a>
+      <a href="index.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">PÁGINA INICIAL</a>
+      <a href="cotas-extras.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">COTAS EXTRAS</a>
       <a href="escalas.html" class="block px-3 py-2 rounded-md text-base font-semibold bg-brand-600 text-white">ESCALAS</a>
-      <a href="ciclos.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">CICLOS</a>
-      <a href="dashboard.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">DASHBOARD</a>
+      <a href="ciclos.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">CICLOS</a>
+      <a href="dashboard.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">DASHBOARD</a>
+      <a href="resetar-dados.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">RESETAR DADOS</a>
     </div>
   </header>
-
   <!-- CONTEÚDO PRINCIPAL -->
   <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
 
@@ -337,7 +338,7 @@
           <div class="relative">
             <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Data da Atividade *</label>
             <input type="hidden" id="dataAtividade">
-            <input type="text" id="dataAtividadeDisplay" readonly placeholder="SELECIONE A DATA" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500 cursor-pointer uppercase">
+            <input type="text" id="dataAtividadeDisplay" readonly placeholder="SELECIONE A DATA" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-brand-500 cursor-pointer uppercase">
           </div>
           <div>
             <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Horário de Saída *</label>
@@ -368,8 +369,8 @@
             </div>
             <div class="lg:col-span-3">
               <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Jeton - Manhã</label>
-              <select id="jetonManha" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-brand-500">
-                <option value="" disabled selected>Escolha o valor</option>
+              <select id="jetonManha" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-xs focus:outline-none focus:border-brand-500">
+                <option value="" disabled selected>ESCOLHA O VALOR</option>
                 <option value="100.00">R$ 100,00</option>
                 <option value="220.00">R$ 220,00</option>
               </select>
@@ -380,7 +381,7 @@
               <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Função - Manhã</label>
               <div class="flex flex-wrap gap-3 pt-1">
                 <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoManha" value="APOIO" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>APOIO</span></label>
-                <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoManha" value="COORDENADOR" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>COORDENADOR</span></label>
+                <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoManha" value="COORDENADOR" class="ronded bg-slate-900 border-slate-700 text-brand-600"><span>COORDENADOR</span></label>
                 <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoManha" value="MOTORISTA" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>MOTORISTA</span></label>
                 <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoManha" value="RELATOR" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>RELATOR</span></label>
               </div>
@@ -409,8 +410,8 @@
             </div>
             <div class="lg:col-span-3">
               <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Jeton - Tarde</label>
-              <select id="jetonTarde" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-brand-500">
-                <option value="" disabled selected>Escolha o valor</option>
+              <select id="jetonTarde" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-xs focus:outline-none focus:border-brand-500">
+                <option value="" disabled selected>ESCOLHA O VALOR</option>
                 <option value="100.00">R$ 100,00</option>
                 <option value="220.00">R$ 220,00</option>
               </select>
@@ -450,8 +451,8 @@
             </div>
             <div class="lg:col-span-3">
               <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Jeton - Noite</label>
-              <select id="jetonNoite" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-brand-500" oninput="gerenciarCamposPernoite()" onchange="gerenciarCamposPernoite()">
-                <option value="" disabled selected>Escolha o valor</option>
+              <select id="jetonNoite" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-xs focus:outline-none focus:border-brand-500" oninput="gerenciarCamposPernoite()" onchange="gerenciarCamposPernoite()">
+                <option value="" disabled selected>ESCOLHA O VALOR</option>
                 <option value="100.00">R$ 100,00</option>
                 <option value="220.00">R$ 220,00</option>
               </select>
@@ -649,7 +650,7 @@
           <div class="relative">
             <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Data da Atividade *</label>
             <input type="hidden" id="modalDataAtividade">
-            <input type="text" id="modalDataAtividadeDisplay" readonly placeholder="SELECIONE A DATA" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm cursor-pointer uppercase">
+            <input type="text" id="modalDataAtividadeDisplay" readonly placeholder="SELECIONE A DATA" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-xs cursor-pointer uppercase">
           </div>
           <div>
             <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Horário de Saída *</label>
@@ -1118,7 +1119,7 @@
         const valorLocal = local.value.trim();
         const elegivel = verificarElegibilidade(valorLocal);
 
-        // Sem local: jeton volta obrigatoriamente para "Escolha o valor".
+        // Sem local: jeton volta obrigatoriamente para "ESCOLHA O VALOR".
         if (!valorLocal) {
           jeton.value = '';
           jeton.disabled = true;

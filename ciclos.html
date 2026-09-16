@@ -26,6 +26,13 @@
     }
   }
 </script>
+  <style>
+    /* Reserva permanentemente o espaço da barra vertical para impedir que
+       o menu e o conteúdo centralizado mudem de posição horizontalmente. */
+    html {
+      overflow-y: scroll;
+    }
+  </style>
 </head>
 
 <body class="bg-brand-dark text-slate-100 font-sans min-h-screen flex flex-col antialiased">
@@ -41,13 +48,13 @@
 
         <!-- Navigation Desktop -->
         <nav class="hidden md:flex space-x-1">
-          <a href="index.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">PÁGINA INICIAL</a>
-          <a href="cotas-extras.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">COTAS EXTRAS</a>
-          <a href="escalas.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">ESCALAS</a>
+          <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">PÁGINA INICIAL</a>
+          <a href="cotas-extras.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">COTAS EXTRAS</a>
+          <a href="escalas.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">ESCALAS</a>
           <a href="ciclos.html" class="px-3 py-2 rounded-md text-sm font-semibold bg-brand-600 text-white shadow-sm">CICLOS</a>
-          <a href="dashboard.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">DASHBOARD</a>
-       
- </nav>
+          <a href="dashboard.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">DASHBOARD</a>
+          <a href="resetar-dados.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">RESETAR DADOS</a>
+        </nav>
 
         <!-- Mobile Menu Button -->
         <div class="md:hidden">
@@ -60,12 +67,12 @@
 
     <!-- Mobile Dropdown Navigation -->
     <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-1">
-      <a href="index.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">PÁGINA INICIAL</a>
-      <a href="cotas-extras.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">COTAS EXTRAS</a>
-      <a href="escalas.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">ESCALAS</a>
+      <a href="index.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">PÁGINA INICIAL</a>
+      <a href="cotas-extras.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">COTAS EXTRAS</a>
+      <a href="escalas.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">ESCALAS</a>
       <a href="ciclos.html" class="block px-3 py-2 rounded-md text-base font-semibold bg-brand-600 text-white">CICLOS</a>
-      <a href="dashboard.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">DASHBOARD</a>
-
+      <a href="dashboard.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">DASHBOARD</a>
+      <a href="resetar-dados.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">RESETAR DADOS</a>
     </div>
   </header>
 
