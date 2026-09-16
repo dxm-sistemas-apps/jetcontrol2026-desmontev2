@@ -16,7 +16,7 @@
   
   <!-- Tailwind CSS CDN & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https:cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Fontes Google & Chart.js -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -687,19 +687,19 @@
       return `Jeton Líquido (${percentualLiquidoIR}%) + Diárias/Aux.`;
     }
     function textoVolumeEscalasSub(qtdSimples, qtdDobrada, qtdTripla, qtdQuadrupla) {
-      return `${qtdSimples} Simples | ${qtdDobrada} Dobradas | ${qtdTripla} Triplas | ${qtdQuadrupla} Quádruplas`;
+      return `${qtdSimples} Simples <br> ${qtdDobrada} Dobradas <br> ${qtdTripla} Triplas <br> ${qtdQuadrupla} Quádruplas`;
     }
     function textoDiariasAuxiliosSub(valorAuxAlimentacao, valorAuxTransporte, valorDiariaAlimentacao, valorDiariaHospedagem) {
-      return `${formatMoeda(valorAuxAlimentacao)} Aux. Alimentação | ${formatMoeda(valorAuxTransporte)} Aux. Transporte | ${formatMoeda(valorDiariaAlimentacao)} Diária Alimentação | ${formatMoeda(valorDiariaHospedagem)} Diária Hospedagem`;
+      return `${formatMoeda(valorAuxAlimentacao)} Auxílio Alimentação <br> ${formatMoeda(valorAuxTransporte)} Auxílio Transporte <br> ${formatMoeda(valorDiariaAlimentacao)} Diária de Alimentação <br> ${formatMoeda(valorDiariaHospedagem)} Diária de Pernoite`;
     }
     function textoRendimentoHoraSub(totalHoras) {
       return `Total de ${totalHoras.toFixed(1)}h Trabalhadas`;
     }
     function textoRecebiveisSub(valorDiarias, valorAuxilios) {
-      return `${formatMoeda(valorDiarias)} Diárias | ${formatMoeda(valorAuxilios)} Auxílios`;
+      return `${formatMoeda(valorDiarias)} Diárias <br> ${formatMoeda(valorAuxilios)} Auxílios`;
     }
     function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
-      return `${formatMoeda(valorDiferencaDiarias)} Diárias | ${formatMoeda(valorDiferencaAuxilios)} Auxílios`;
+      return `${formatMoeda(valorDiferencaDiarias)} Diárias <br> ${formatMoeda(valorDiferencaAuxilios)} Auxílios`;
     }
 
     // Helper: Extrai valor textual do HTML arquivado
@@ -1368,20 +1368,20 @@
       // 3. ATUALIZAÇÃO DOS CARDS (KPIs) NA TELA
       // ---------------------------------------------------------------------
       document.getElementById('kpi-receita-bruta').textContent = formatMoeda(receitaBrutaGeral);
-      // definirTextoRotulo('kpi-receita-bruta-sub', textoReceitaBrutaSub(ciclosFechados.length));
+      definirTextoRotulo('kpi-receita-bruta-sub', textoReceitaBrutaSub(ciclosFechados.length));
 
       document.getElementById('kpi-receita-liquida').textContent = formatMoeda(receitaLiquidaGeral);
-      // definirTextoRotulo('kpi-ir-desc', textoReceitaLiquidaSub(100 - aliquotaIR * 100));
+      definirTextoRotulo('kpi-ir-desc', textoReceitaLiquidaSub(100 - aliquotaIR * 100));
 
       document.getElementById('kpi-total-escalas').textContent = acumuladoGeral.escalas;
-      // definirTextoRotulo('kpi-escalas-sub', textoVolumeEscalasSub(acumuladoGeral.simples, acumuladoGeral.dobrada, acumuladoGeral.tripla, acumuladoGeral.quadrupla));
+      definirTextoRotulo('kpi-escalas-sub', textoVolumeEscalasSub(acumuladoGeral.simples, acumuladoGeral.dobrada, acumuladoGeral.tripla, acumuladoGeral.quadrupla));
 
       document.getElementById('kpi-diarias-auxilios').textContent = formatMoeda(totalDiariasEAuxiliosGeral);
-      // definirTextoRotulo('kpi-pernoites-count',
+      definirTextoRotulo('kpi-pernoites-count',
         textoDiariasAuxiliosSub(acumuladoGeral.auxAlimentacao, acumuladoGeral.auxTransporte, acumuladoGeral.diariaAlimentacao, acumuladoGeral.diariaHospedagem));
 
       document.getElementById('kpi-rendimento-hora').textContent = `${formatMoeda(rendimentoHoraGeral)}/h`;
-      // definirTextoRotulo('kpi-total-horas', textoRendimentoHoraSub(acumuladoGeral.horas));
+      definirTextoRotulo('kpi-total-horas', textoRendimentoHoraSub(acumuladoGeral.horas));
 
       document.getElementById('kpi-total-desconto-ir').textContent = formatMoeda(acumuladoGeral.jetonBruto * aliquotaIR);
 
@@ -1394,12 +1394,12 @@
       const balancoGeral = balancoDiariasGeral + balancoAuxiliosGeral;
 
       document.getElementById('kpi-recebiveis').textContent = formatMoeda(totalRecebivelGeral);
-      // definirTextoRotulo('kpi-recebiveis-sub', textoRecebiveisSub(acumuladoGeral.diariasRecebivel, acumuladoGeral.auxiliosRecebivel));
+      definirTextoRotulo('kpi-recebiveis-sub', textoRecebiveisSub(acumuladoGeral.diariasRecebivel, acumuladoGeral.auxiliosRecebivel));
 
       const elKpiBalanco = document.getElementById('kpi-balanco');
       elKpiBalanco.textContent = formatMoeda(balancoGeral);
       elKpiBalanco.style.color = balancoGeral < 0 ? 'var(--accent-danger)' : 'var(--accent-success)';
-      // definirTextoRotulo('kpi-balanco-sub', textoBalancoSub(balancoDiariasGeral, balancoAuxiliosGeral));
+      definirTextoRotulo('kpi-balanco-sub', textoBalancoSub(balancoDiariasGeral, balancoAuxiliosGeral));
 
       // Atualizar timestamp
       const agora = new Date();
