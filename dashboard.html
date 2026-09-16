@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Impede que o navegador reutilize uma cópia antiga desta página que
+       ficou guardada em cache (é isso que fazia os nomes dos cards "voltarem"
+       ao normal depois do primeiro F5: o navegador mostrava o arquivo novo
+       na primeira vez e depois passava a servir uma versão antiga da memória/
+       disco, sem buscar o arquivo atualizado no servidor). -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>JETCONTROL 2026®™ - DASHBOARD</title>
+  <script src="jetcontrol-sync.js"></script>
+  
+  <!-- Tailwind CSS CDN & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Fontes Google & Chart.js -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              dark: '#0f172a',
+              card: '#1e293b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { text-transform: uppercase; }
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-card: #1e293b;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-primary: #3b82f6;
+      --accent-success: #10b981;
+      --accent-warning: #f59e0b;
+      --accent-danger: #ef4444;
+      --accent-purple: #8b5cf6;
+      --accent-cyan: #06b6d4;
+      --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    }
+
+    .badge-live {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: var(--accent-success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .badge-live::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-success);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-success);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Container de Cards KPIs */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .kpi-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      box-shadow: var(--card-shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background-color: var(--accent-primary);
+    }
+
+    .kpi-card.success::before { background-color: var(--accent-success); }
+    .kpi-card.warning::before { background-color: var(--accent-warning); }
+    .kpi-card.purple::before { background-color: var(--accent-purple); }
+    .kpi-card.cyan::before { background-color: var(--accent-cyan); }
+
+    .kpi-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .kpi-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.25rem;
+    }
+
+    .kpi-subtext {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Dashboard Layout Grids */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.25rem;
+    }
+
+    .col-12 { grid-column: span 12; }
+    .col-8  { grid-column: span 8; }
+    .col-6  { grid-column: span 6; }
+    .col-4  { grid-column: span 4; }
+
+    @media (max-width: 1024px) {
+      .col-8, .col-6, .col-4 { grid-column: span 12; }
+    }
+
+    /* Componente Card */
+    .chart-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .chart-card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+
+    .chart-container {
+      position: relative;
+      flex: 1;
+      min-height: 260px;
+      width: 100%;
+    }
+
+    /* Tabelas Internas */
+    .data-table-wrapper {
+      overflow-x: auto;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    .data-table th {
+      background-color: rgba(15, 23, 42, 0.6);
+      color: var(--text-muted);
+      padding: 0.75rem 1rem;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-color);
+      text-transform: uppercase;
+    }
+
+    .data-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+    }
+
+    .data-table tr:hover {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .badge-green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .badge-yellow { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+  </style>
+</head>
+
+<body class="bg-brand-dark text-slate-100 font-sans min-h-screen flex flex-col antialiased">
+
+  <!-- HEADER / MENU SUPERIOR RESPONSIVO -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+          <i class="fa-solid fa-sack-dollar text-brand-500 text-2xl"></i>
+          <span class="font-bold text-lg tracking-wider text-white">JETCONTROL <span class="text-brand-500">2026®™</span></span>
+        </div>
+
+        <!-- Navigation Desktop -->
+        <nav class="hidden md:flex space-x-1">
+          <a href="index.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">PÁGINA INICIAL</a>
+          <a href="cotas-extras.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">COTAS EXTRAS</a>
+          <a href="escalas.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">ESCALAS</a>
+          <a href="ciclos.html" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">CICLOS</a>
+          <a href="dashboard.html" class="px-3 py-2 rounded-md text-sm font-semibold bg-brand-600 text-white shadow-sm">DASHBOARD</a>
+          <a href="resetar-dados.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition">RESETAR DADOS</a>
+
+        </nav>
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden">
+          <button id="mobile-menu-btn" class="p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none">
+            <i class="fa-solid fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Navigation -->
+    <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-1">
+      <a href="index.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">PÁGINA INICIAL</a>
+      <a href="cotas-extras.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">COTAS EXTRAS</a>
+      <a href="escalas.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">ESCALAS</a>
+      <a href="ciclos.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">CICLOS</a>
+      <a href="dashboard.html" class="block px-3 py-2 rounded-md text-base font-semibold bg-brand-600 text-white">DASHBOARD</a>
+      <a href="resetar-dados.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">RESETAR DADOS</a>
+
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+
+    <!-- BANNER DA PÁGINA -->
+    <section class="rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-brand-dark border border-slate-800 shadow-xl p-6 sm:p-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <div class="flex items-center space-x-3 mb-2">
+            <i class="fa-solid fa-chart-line text-brand-500 text-2xl"></i>
+            <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase">
+              DASHBOARD DE <span class="text-brand-500">INTELIGÊNCIA OPERACIONAL & FINANCEIRA</span>
+            </h1>
+          </div>
+          <p class="text-sm sm:text-base text-slate-400 font-medium">
+            Métricas consolidativas acumuladas de ciclos encerrados somadas ao ciclo vigente em tempo real.
+          </p>
+        </div>
+        <div class="flex items-center gap-3 self-start sm:self-center bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-800">
+          <span class="badge-live">TEMPO REAL</span>
+          <span id="last-updated" class="text-xs text-slate-400 font-mono">Sincronizado: --:--:--</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         GRADE DE KPIS EXECUTIVOS
+
+         1) NOME DO CARD (kpi-label) — 100% FIXO. Para mudar, edite o texto
+            direto aqui embaixo, dentro da div "kpi-label" correspondente.
+            Não existe mais nenhuma configuração separada que sobrescreva
+            este texto — o que estiver aqui é o que aparece na tela.
+
+         2) LEGENDA DE BAIXO (kpi-subtext) — a maioria delas mostra NÚMEROS
+            que mudam a cada atualização (contagens, valores em R$, horas).
+            Por isso o texto que aparece abaixo, dentro da div "kpi-subtext",
+            é só um EXEMPLO/PLACEHOLDER — ele é sempre substituído assim que
+            a página carrega. Editar aqui NÃO TEM EFEITO para essas legendas.
+            Cada uma está marcada com um comentário dizendo onde editar de
+            verdade (procure pelo nome da função no bloco de JavaScript, na
+            parte de cima do arquivo). A única exceção é "Alíquota de 22%...", que
+            é mesmo fixa e pode ser editada aqui normalmente.
+         ===================================================================== -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label" id="label-kpi-receita-bruta">Receita Bruta Total</div>
+        <div class="kpi-value" id="kpi-receita-bruta">R$ 0,00</div>
+        <!-- Legenda calculada: editar em textoReceitaBrutaSub() -->
+        <div class="kpi-subtext" id="kpi-receita-bruta-sub">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card success">
+        <div class="kpi-label" id="label-kpi-receita-liquida">Receita Líquida Estimada</div>
+        <div class="kpi-value" id="kpi-receita-liquida">R$ 0,00</div>
+        <!-- Legenda calculada: editar em textoReceitaLiquidaSub() -->
+        <div class="kpi-subtext" id="kpi-ir-desc">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card warning">
+        <div class="kpi-label" id="label-kpi-total-escalas">Volume de Escalas</div>
+        <div class="kpi-value" id="kpi-total-escalas">0</div>
+        <!-- Legenda calculada: editar em textoVolumeEscalasSub() -->
+        <div class="kpi-subtext" id="kpi-escalas-sub">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label" id="label-kpi-diarias-auxilios">Diárias & Auxílios</div>
+        <div class="kpi-value" id="kpi-diarias-auxilios">R$ 0,00</div>
+        <!-- Legenda calculada: editar em textoDiariasAuxiliosSub() -->
+        <div class="kpi-subtext" id="kpi-pernoites-count">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card cyan">
+        <div class="kpi-label" id="label-kpi-rendimento-hora">Rendimento Médio / Hora</div>
+        <div class="kpi-value" id="kpi-rendimento-hora">R$ 0,00/h</div>
+        <!-- Legenda calculada: editar em textoRendimentoHoraSub() -->
+        <div class="kpi-subtext" id="kpi-total-horas">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label" id="label-kpi-total-desconto-ir">Total de Descontos de IR</div>
+        <div class="kpi-value" id="kpi-total-desconto-ir">R$ 0,00</div>
+        <!-- Esta legenda é FIXA de verdade — pode editar aqui direto. -->
+        <div class="kpi-subtext" id="kpi-total-desconto-ir-sub">Alíquota de 22% Sobre o Jeton Bruto</div>
+      </div>
+      <div class="kpi-card success">
+        <div class="kpi-label" id="label-kpi-recebiveis">Auxílios e Diárias Recebíveis</div>
+        <div class="kpi-value" id="kpi-recebiveis">R$ 0,00</div>
+        <!-- Legenda calculada: editar em textoRecebiveisSub() -->
+        <div class="kpi-subtext" id="kpi-recebiveis-sub">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label" id="label-kpi-balanco">Balanço dos Auxílios e Diárias</div>
+        <div class="kpi-value" id="kpi-balanco">R$ 0,00</div>
+        <!-- Legenda calculada: editar em textoBalancoSub() -->
+        <div class="kpi-subtext" id="kpi-balanco-sub">(calculado automaticamente)</div>
+      </div>
+    </section>
+
+    <!-- PAINEL DE GRÁFICOS - LINHA 1
+         PARA MUDAR O TÍTULO DE UM GRÁFICO, EDITE O TEXTO DIRETO DENTRO DA
+         DIV "chart-card-title" CORRESPONDENTE (mesma regra dos KPIs acima). -->
+    <section class="dashboard-grid">
+      <div class="chart-card col-8">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartEvolucaoCiclos">Evolução de Faturamento por Ciclo</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartEvolucaoCiclos"></canvas>
+        </div>
+      </div>
+      <div class="chart-card col-4">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartComposicaoReceita">Composição da Receita Bruta</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartComposicaoReceita"></canvas>
+        </div>
+        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">VALOR FINAL</span>
+          <span id="composicaoValorFinal" style="font-size: 1.25rem; font-weight: 900; color: var(--accent-success);">R$ 0,00</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAINEL DE GRÁFICOS - LINHA 2 -->
+    <section class="dashboard-grid">
+      <div class="chart-card col-4">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartTipologiaCarga">Tipologia de Carga de Trabalho</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTipologiaCarga"></canvas>
+        </div>
+      </div>
+      <div class="chart-card col-4">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartTurnos">Alocação de Turnos Operacionais</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTurnos"></canvas>
+        </div>
+      </div>
+      <div class="chart-card col-4">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartFuncoes">Distribuição de Funções</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartFuncoes"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAINEL DE GRÁFICOS - LINHA 3 (LOCAIS FISCALIZADOS) -->
+    <section class="dashboard-grid">
+      <div class="chart-card col-12">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartLocaisFiscalizados">Top 10 Locais Mais Fiscalizados</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartLocaisFiscalizados"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAINEL DE GRÁFICOS - LINHA 4 (CICLOS COM MAIOR GANHO) -->
+    <section class="dashboard-grid">
+      <div class="chart-card col-12">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartGanhoCiclos">6 Ciclos com Maior Ganho (Receita Bruta x Receita Líquida)</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartGanhoCiclos"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAINEL DE GRÁFICOS - LINHA 5 (TIPOLOGIA DE ATIVIDADE POR CICLO) -->
+    <section class="dashboard-grid">
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartAtividadeSimples">6 Ciclos com Mais Atividade Simples</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartAtividadeSimples"></canvas>
+        </div>
+      </div>
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartAtividadeDobradas">6 Ciclos com Mais Atividade Dobrada</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartAtividadeDobradas"></canvas>
+        </div>
+      </div>
+    </section>
+    <section class="dashboard-grid">
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartAtividadeTriplas">6 Ciclos com Mais Atividade Tripla</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartAtividadeTriplas"></canvas>
+        </div>
+      </div>
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartAtividadeQuadruplas">6 Ciclos com Mais Atividade Quádrupla</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartAtividadeQuadruplas"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAINEL DE GRÁFICOS - LINHA 6 (TOP 10 ESCALAS INDIVIDUAIS) -->
+    <section class="dashboard-grid">
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartTop10Horas">Top 10 Escalas com Maior Qtd. de Horas Trabalhadas</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop10Horas"></canvas>
+        </div>
+      </div>
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartTop10ValorHora">Top 10 Escalas com Maior Valor por Hora Trabalhada</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop10ValorHora"></canvas>
+        </div>
+      </div>
+    </section>
+    <section class="dashboard-grid">
+      <div class="chart-card col-12">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartTop10ValorRealJetonEscala">Top 10 Escalas com Maior Valor Real de Jeton</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop10ValorRealJetonEscala"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAINEL DE GRÁFICOS - LINHA 7 (RANKINGS DE CICLOS) -->
+    <section class="dashboard-grid">
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartTop6ValorRealJetonCiclo">6 Ciclos com Maior Valor Real de Jeton</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop6ValorRealJetonCiclo"></canvas>
+        </div>
+      </div>
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartTop6ValorMedioEscala">6 Ciclos com Maior Valor Médio por Escala</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop6ValorMedioEscala"></canvas>
+        </div>
+      </div>
+    </section>
+    <section class="dashboard-grid">
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartTop6ValorMedioAtividade">6 Ciclos com Maior Valor Médio por Atividade</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop6ValorMedioAtividade"></canvas>
+        </div>
+      </div>
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartTop6ValorMedioHora">6 Ciclos com Maior Valor Médio por Hora Trabalhada</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop6ValorMedioHora"></canvas>
+        </div>
+      </div>
+    </section>
+    <section class="dashboard-grid">
+      <div class="chart-card col-12">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartTop6DescontoIR">6 Ciclos com Maior Desconto de Imposto de Renda</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop6DescontoIR"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAINEL DE TABELAS E HISTÓRICOS -->
+    <section class="dashboard-grid">
+      <div class="chart-card col-12">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-historico-ciclos">Histórico de Ciclos & Período Vigente</div>
+        </div>
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Período / Ciclo</th>
+                <th>Escalas Registradas</th>
+                <th>Horas Totais</th>
+                <th>Rendimento Médio / Hora</th>
+                <th>Diárias & Auxílios</th>
+                <th>Jeton Bruto</th>
+                <th>Receita Líquida Total</th>
+                <th>Status / Recebimento</th>
+              </tr>
+            </thead>
+            <tbody id="table-ciclos-body">
+              <tr>
+                <td colspan="8" style="text-align: center; color: var(--text-muted);">Carregando histórico...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- LÓGICA PRINCIPAL EM JS -->
+  <script>
+    // Menu Mobile
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileBtn && mobileMenu) {
+      mobileBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+    }
+
+    // Instâncias Globais dos Gráficos Chart.js
+    let chartEvolucaoInstance = null;
+    let chartComposicaoInstance = null;
+    let chartTipologiaInstance = null;
+    let chartTurnosInstance = null;
+    let chartFuncoesInstance = null;
+
+    // Instâncias dos novos gráficos (Locais Fiscalizados / Ciclos com Maior Ganho / Tipologia por Ciclo)
+    let graficosExtras = {
+      locais: null,
+      ganho: null,
+      simples: null,
+      dobradas: null,
+      triplas: null,
+      quadruplas: null,
+      top10Horas: null,
+      top10ValorHora: null,
+      top10ValorRealJetonEscala: null,
+      top6ValorRealJetonCiclo: null,
+      top6ValorMedioEscala: null,
+      top6ValorMedioAtividade: null,
+      top6ValorMedioHora: null,
+      top6DescontoIR: null
+    };
+
+    // Helper: Converte valores numéricos ou formatados (R$) para Float
+    function parseMoeda(val) {
+      if (typeof val === 'number') return isNaN(val) ? 0 : val;
+      if (!val) return 0;
+      let str = val.toString().replace(/R\$\s?/g, '').replace(/\./g, '').replace(',', '.').trim();
+      let parsed = parseFloat(str);
+      return isNaN(parsed) ? 0 : parsed;
+    }
+
+    // FORMATA DATA ISO (AAAA-MM-DD) PARA O PADRÃO BR (DD/MM/AAAA)
+    function dataBR(iso) {
+      if (!iso) return '-';
+      const p = iso.split('-');
+      return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : iso;
+    }
+
+    // Helper: Formata valores para Moeda Corrente BRL
+    const formatMoeda = (valor) => {
+      return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    };
+
+    // Define o texto de um elemento (por id). Usado para as legendas dos
+    // KPIs que são recalculadas a cada atualização do dashboard (mostram
+    // números, não títulos fixos).
+    function definirTextoRotulo(id, texto) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = texto;
+    }
+
+    // =========================================================================
+    // TEXTOS DAS LEGENDAS CALCULADAS — EDITE AQUI A PARTE FIXA (AS PALAVRAS)
+    // -------------------------------------------------------------------------
+    // As 7 legendas abaixo mostram números que mudam a cada atualização do
+    // dashboard (quantidade de ciclos, valores em R$, horas, etc.), por isso
+    // NÃO podem ficar 100% fixas dentro do HTML da grade de KPIs — assim que
+    // a página carrega, o texto de exemplo que aparece lá em cima é sempre
+    // SUBSTITUÍDO pelo resultado de uma destas funções. Editar o texto de
+    // exemplo no HTML não tem efeito nenhum para estas 7 legendas específicas.
+    //
+    // Mas as PALAVRAS ao redor dos números (ex.: "Ciclo(s) Fechado(s)",
+    // "Jeton Líquido", "Diárias/Aux.") você PODE mudar à vontade — é só
+    // editar o texto entre aspas dentro de cada função abaixo, mantendo os
+    // trechos ${...} (esses colam os números calculados; não apague-os).
+    // =========================================================================
+    function textoReceitaBrutaSub(qtdCiclosFechados) {
+      return `${qtdCiclosFechados} Ciclo(s) Fechado(s) + Vigente`;
+    }
+    function textoReceitaLiquidaSub(percentualLiquidoIR) {
+      return `Jeton Líquido (${percentualLiquidoIR}%) + Diárias/Aux.`;
+    }
+    function textoVolumeEscalasSub(qtdSimples, qtdDobrada, qtdTripla, qtdQuadrupla) {
+      return `${qtdSimples} Simples | ${qtdDobrada} Dobradas | ${qtdTripla} Triplas | ${qtdQuadrupla} Quádruplas`;
+    }
+    function textoDiariasAuxiliosSub(valorAuxAlimentacao, valorAuxTransporte, valorDiariaAlimentacao, valorDiariaHospedagem) {
+      return `${formatMoeda(valorAuxAlimentacao)} Aux. Alimentação | ${formatMoeda(valorAuxTransporte)} Aux. Transporte | ${formatMoeda(valorDiariaAlimentacao)} Diária Alimentação | ${formatMoeda(valorDiariaHospedagem)} Diária Hospedagem`;
+    }
+    function textoRendimentoHoraSub(totalHoras) {
+      return `Total de ${totalHoras.toFixed(1)}h Trabalhadas`;
+    }
+    function textoRecebiveisSub(valorDiarias, valorAuxilios) {
+      return `${formatMoeda(valorDiarias)} Diárias | ${formatMoeda(valorAuxilios)} Auxílios`;
+    }
+    function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
+      return `${formatMoeda(valorDiferencaDiarias)} Diárias | ${formatMoeda(valorDiferencaAuxilios)} Auxílios`;
+    }
+
+    // Helper: Extrai valor textual do HTML arquivado
+    function extrairTextoHtml(htmlString, selector) {
+      if (!htmlString) return 'R$ 0,00';
+      const temp = document.createElement('div');
+      temp.innerHTML = htmlString;
+      const el = temp.querySelector(selector);
+      return el ? el.textContent.trim() : 'R$ 0,00';
+    }
+
+    // LISTA DE MUNICÍPIOS ELEGÍVEIS A DIÁRIAS (Igual à regra de cotas-extras.html)
+    const MUNICIPIOS_ELEGIVEIS = [
+      "CABO FRIO", "ARMAÇÃO DOS BÚZIOS", "BUZIOS", "ARRAIAL DO CABO", "SÃO PEDRO DA ALDEIA", "ARARUAMA", "SAQUAREMA", "IGUABA GRANDE",
+      "PETRÓPOLIS", "PETROPOLIS", "TERESÓPOLIS", "TERESOPOLIS", "NOVA FRIBURGO", "GUAPIMIRIM", "CACHOEIRAS DE MACACU", "CANTAGALO", "CORDEIRO", "BOM JARDIM",
+      "VOLTA REDONDA", "BARRA MANSA", "RESENDE", "ITATIAIA", "PIRAÍ", "PIRAI", "BARRA DO PIRAÍ", "BARRA DO PIRAI", "VALENÇA", "VALENCA", "VASSOURAS",
+      "CAMPOS DOS GOYTACAZES", "CAMPOS", "MACAÉ", "MACAE", "QUISSAMÃ", "QUISSAMA", "CONCEIÇÃO DE MACABU", "CONCEICAO DE MACABU", "SÃO JOÃO DA BARRA", "SAO JOAO DA BARRA", 
+      "ITAOCARA", "ITAPERUNA", "SANTO ANTÔNIO DE PÁDUA", "SANTO ANTONIO DE PADUA", "BOM JESUS DO ITABAPOANA", "MIRACEMA",
+      "ANGRA DOS REIS", "PARATY", "PARATI", "MANGARATIBA"
+    ];
+
+    // EXTRAI MÉTRICAS DETALHADAS DE UM SNAPSHOT HTML DE ESCALAS (USADO PARA CICLOS FECHADOS)
+    // Extrai o texto do valor de "JETON:" dentro do bloco de um período específico
+    // (Manhã/Tarde/Noite) de um card arquivado, identificando o bloco pelo ícone
+    // exclusivo daquele período (fa-sun / fa-cloud-sun / fa-moon). Retorna null se
+    // o período não foi preenchido na escala (bloco inexistente no card).
+    function extrairJetonDoBloco(card, iconClass) {
+      const icon = card.querySelector('i.' + iconClass);
+      if (!icon) return null;
+      const bloco = icon.closest('div.space-y-1');
+      if (!bloco) return null;
+      let jetonTexto = null;
+      bloco.querySelectorAll('p').forEach(p => {
+        const forte = p.querySelector('strong');
+        if (forte && forte.textContent.trim() === 'JETON:') {
+          jetonTexto = p.textContent.replace('JETON:', '').trim();
+        }
+      });
+      return jetonTexto;
+    }
+
+    function extrairMetricasDeHtmlEscalas(htmlEscalas) {
+      const metricas = {
+        totalEscalas: 0,
+        horasTrabalhadas: 0,
+        simples: 0,
+        dobrada: 0,
+        tripla: 0,
+        quadrupla: 0,
+        pernoites: 0,
+        turnos: { Manhã: 0, Tarde: 0, Noite: 0 },
+        funcoes: { Apoio: 0, Coordenador: 0, Motorista: 0, Relator: 0 },
+        locais: []
+      };
+
+      if (!htmlEscalas) return metricas;
+
+      const temp = document.createElement('div');
+      temp.innerHTML = htmlEscalas;
+
+      const cards = temp.querySelectorAll('#containerCardsEscalas > div, .pdf-card');
+      if (!cards.length) return metricas;
+
+      metricas.totalEscalas = cards.length;
+
+      cards.forEach(card => {
+        const text = card.textContent || '';
+
+        // ---------------------------------------------------------------
+        // Detecção CONFIÁVEL de turnos ativos (Manhã/Tarde/Noite).
+        // Cada período só exibe seu ícone exclusivo (sol / sol-nuvem / lua)
+        // quando aquele período foi realmente preenchido na escala. Não
+        // usamos mais regex no texto puro (ex: /MANHÃ/i) porque o bloco
+        // fixo de "ANOTAÇÕES DA ESCALA" sempre contém os rótulos
+        // "LOCAL - MANHÃ", "LOCAL - TARDE" e "LOCAL - NOITE" em TODO
+        // card, independente do período ter sido preenchido — isso fazia
+        // o sistema contar 3 turnos (Tripla) em 100% das escalas.
+        // ---------------------------------------------------------------
+        const temManha = !!card.querySelector('i.fa-sun');
+        const temTarde = !!card.querySelector('i.fa-cloud-sun');
+        const temNoite = !!card.querySelector('i.fa-moon');
+
+        if (temManha) metricas.turnos.Manhã++;
+        if (temTarde) metricas.turnos.Tarde++;
+        if (temNoite) metricas.turnos.Noite++;
+
+        let qtdTurnos = (temManha ? 1 : 0) + (temTarde ? 1 : 0) + (temNoite ? 1 : 0);
+
+        // 4º Jeton (Quádrupla) só é impresso dentro do bloco de NOITE, no
+        // formato "(4º JETON: SIM)". A regex antiga ("JETON\s*4") nunca
+        // batia com essa ordem de texto, então quádruplas nunca eram
+        // detectadas nos ciclos fechados.
+        const ehQuadrupla = /4[^a-zA-Z0-9]{0,3}JETON:\s*SIM/i.test(text);
+
+        // -----------------------------------------------------------------
+        // TIPOLOGIA DE ATIVIDADE — critérios INDEPENDENTES entre si (não é
+        // um if/else exclusivo; uma mesma escala pode contar em mais de uma
+        // categoria simultaneamente):
+        //   • Simples:  jeton do período (Manhã/Tarde/Noite) == R$ 100,00
+        //   • Dobrada:  jeton do período (Manhã/Tarde/Noite) == R$ 220,00
+        //   • Tripla:   local da NOITE foi preenchido
+        //   • Quádrupla: percepção do 4º jeton == SIM
+        // -----------------------------------------------------------------
+        if (temNoite && !ehQuadrupla) metricas.tripla++;
+        if (ehQuadrupla) metricas.quadrupla++;
+
+        const jetonManhaTxt = extrairJetonDoBloco(card, 'fa-sun');
+        const jetonTardeTxt = extrairJetonDoBloco(card, 'fa-cloud-sun');
+        const jetonNoiteTxt = extrairJetonDoBloco(card, 'fa-moon');
+
+        const valJetonManha = jetonManhaTxt !== null ? parseMoeda(jetonManhaTxt) : null;
+        const valJetonTarde = jetonTardeTxt !== null ? parseMoeda(jetonTardeTxt) : null;
+        let valJetonNoite = jetonNoiteTxt !== null ? parseMoeda(jetonNoiteTxt) : null;
+
+        // O card arquivado exibe o JETON da NOITE já dobrado quando o 4º
+        // jeton é SIM. Desfazemos a duplicação para obter o valor-base do
+        // local e comparar corretamente com R$100,00 / R$220,00.
+        if (valJetonNoite !== null && ehQuadrupla) {
+          valJetonNoite = valJetonNoite / 2;
+        }
+
+        [valJetonManha, valJetonTarde, valJetonNoite].forEach(valor => {
+          if (valor === null) return;
+          if (Math.abs(valor - 100) < 0.005) metricas.simples++;
+          if (Math.abs(valor - 220) < 0.005) metricas.dobrada++;
+        });
+
+        // Funções
+        if (/APOIO/i.test(text)) metricas.funcoes.Apoio++;
+        if (/COORDENADOR/i.test(text)) metricas.funcoes.Coordenador++;
+        if (/MOTORISTA/i.test(text)) metricas.funcoes.Motorista++;
+        if (/RELATOR/i.test(text)) metricas.funcoes.Relator++;
+
+        // Pernoite
+        if (/PERNOITE:\s*SIM/i.test(text)) metricas.pernoites++;
+
+        // ---------------------------------------------------------------
+        // Locais fiscalizados: extrai somente os parágrafos "LOCAL:" de
+        // cada período efetivamente preenchido (ignora "LOCAL - MANHÃ/
+        // TARDE/NOITE" do bloco de anotações, que tem rótulo diferente).
+        // ---------------------------------------------------------------
+        card.querySelectorAll('p').forEach(p => {
+          const forte = p.querySelector('strong');
+          if (forte && forte.textContent.trim() === 'LOCAL:') {
+            const localTexto = p.textContent.replace('LOCAL:', '').trim();
+            if (localTexto) metricas.locais.push(localTexto);
+          }
+        });
+
+        // Estimativa de horas — usa o valor REAL de "HORAS TRABALHADAS" já
+        // gravado no card da escala (ex.: "3H 00M"), que reflete o horário de
+        // saída/chegada informado. O cálculo antigo (qtdTurnos * 4) estimava
+        // 4h fixas por período preenchido, o que produzia totais incorretos
+        // (ex.: uma única escala de 3h sendo contada como 12h quando os 3
+        // períodos do dia estavam preenchidos).
+        const matchHoras = text.match(/HORAS TRABALHADAS:\s*(\d+)\s*H\s*(\d+)\s*M/i);
+        if (matchHoras) {
+          const minutosCard = parseInt(matchHoras[1], 10) * 60 + parseInt(matchHoras[2], 10);
+          metricas.horasTrabalhadas += (minutosCard / 60);
+        } else {
+          // Respaldo apenas para escalas legadas arquivadas sem o campo
+          // "HORAS TRABALHADAS" gravado no card.
+          metricas.horasTrabalhadas += (qtdTurnos * 4);
+        }
+      });
+
+      return metricas;
+    }
+
+    // EXTRAI O VALOR (TEXTO) DE UM CAMPO "RÓTULO: VALOR" DENTRO DO PAINEL
+    // "JORNADA" DE UM CARD DE ESCALA ARQUIVADO (ESTRUTURA: <div><strong>RÓTULO:
+    // </strong> <span>VALOR</span></div>). USADO PARA MONTAR OS RANKINGS DE
+    // "TOP 10 ESCALAS" A PARTIR DO HTML ARQUIVADO NOS CICLOS FECHADOS.
+    function extrairCampoPorRotulo(card, rotulo) {
+      let valor = null;
+      card.querySelectorAll('div > strong').forEach(forte => {
+        if (forte.textContent.trim() === rotulo) {
+          const span = forte.nextElementSibling;
+          valor = span ? span.textContent.trim() : forte.parentElement.textContent.replace(rotulo, '').trim();
+        }
+      });
+      return valor;
+    }
+
+    // EXTRAI, DE UM SNAPSHOT HTML DE ESCALAS ARQUIVADO, UMA LISTA COM OS DADOS
+    // INDIVIDUAIS DE CADA ESCALA (DATA, HORAS TRABALHADAS, VALOR/HORA E VALOR
+    // REAL DE JETON), USADA PARA OS RANKINGS "TOP 10 ESCALAS". OS VALORES SÃO
+    // SEMPRE RECALCULADOS A PARTIR DOS CAMPOS BRUTOS (JETON/DIÁRIAS/AUXÍLIOS/
+    // HORAS) — NUNCA A PARTIR DE "VALOR POR HORA" JÁ PRONTO NO CARD ARQUIVADO —
+    // PARA QUE OS RESULTADOS FIQUEM CORRETOS MESMO EM CICLOS FECHADOS ANTES DE
+    // UM AJUSTE NA FÓRMULA DE CÁLCULO.
+    function extrairEscalasDetalhadasDeHtml(htmlEscalas, nomeCiclo, computarDiariasEAuxilios) {
+      if (computarDiariasEAuxilios === undefined) computarDiariasEAuxilios = true;
+      const lista = [];
+      if (!htmlEscalas) return lista;
+
+      const temp = document.createElement('div');
+      temp.innerHTML = htmlEscalas;
+      const cards = temp.querySelectorAll('#containerCardsEscalas > div, .pdf-card');
+
+      cards.forEach(card => {
+        const spanData = card.querySelector('i.fa-calendar');
+        const dataTexto = spanData && spanData.closest('span') ? spanData.closest('span').textContent.trim() : '-';
+
+        const jetonTxt = extrairCampoPorRotulo(card, 'VALOR DIÁRIO DO JETON:');
+        const diariasTxt = extrairCampoPorRotulo(card, 'VALOR TOTAL DIÁRIO DAS DIÁRIAS:');
+        const auxiliosTxt = extrairCampoPorRotulo(card, 'VALOR TOTAL DIÁRIO DOS AUXÍLIOS:');
+        const horasTxt = extrairCampoPorRotulo(card, 'QTD. DE HORAS TRABALHADAS:');
+
+        const jetonBruto = jetonTxt !== null ? parseMoeda(jetonTxt) : 0;
+        const diarias = computarDiariasEAuxilios && diariasTxt !== null ? parseMoeda(diariasTxt) : 0;
+        const auxilios = computarDiariasEAuxilios && auxiliosTxt !== null ? parseMoeda(auxiliosTxt) : 0;
+
+        let horas = 0;
+        if (horasTxt) {
+          const m = horasTxt.match(/(\d+)\s*H\s*(\d+)\s*M/i);
+          if (m) horas = parseInt(m[1], 10) + (parseInt(m[2], 10) / 60);
+        }
+
+        const valorRealAposIR = (jetonBruto * 0.78) + diarias + auxilios;
+        const valorHora = horas > 0 ? (valorRealAposIR / horas) : 0;
+
+        lista.push({
+          data: dataTexto,
+          cicloNome: nomeCiclo,
+          horas,
+          valorHora,
+          valorRealJeton: jetonBruto * 0.78
+        });
+      });
+
+      return lista;
+    }
+
+    // SOMA OS VALORES DE UMA COLUNA ESPECÍFICA (ÍNDICE 0-BASEADO) DE UMA TABELA
+    // ARQUIVADA DE "ORGANOGRAMA DAS DIÁRIAS" OU "ORGANOGRAMA DOS AUXÍLIOS", USADO
+    // PARA OBTER O DETALHAMENTO POR TIPO DE DIÁRIA/AUXÍLIO (ALIMENTAÇÃO, HOSPEDAGEM,
+    // TRANSPORTE) EXIBIDO NO CARD "DIÁRIAS & AUXÍLIOS".
+    function somarColunaTabelaOrganograma(html, colIndex) {
+      if (!html) return 0;
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      let soma = 0;
+      temp.querySelectorAll('tbody tr').forEach(tr => {
+        const celulas = tr.querySelectorAll('td');
+        if (celulas.length < 6) return; // ignora a linha de "nenhum registro encontrado"
+        soma += parseMoeda(celulas[colIndex].textContent);
+      });
+      return soma;
+    }
+
+    // Acumula a contagem de fiscalizações por local em um mapa {LOCAL: qtd}
+    function registrarLocal(mapaLocais, nomeLocal) {
+      if (!nomeLocal) return;
+      const chave = nomeLocal.toString().trim().toUpperCase();
+      if (!chave) return;
+      mapaLocais[chave] = (mapaLocais[chave] || 0) + 1;
+    }
+
+    // PROCESSAMENTO E CONSOLIDAÇÃO DE TODOS OS DADOS (HISTÓRICOS + CICLO VIGENTE)
+    function carregarEProcessarDados() {
+      // Configurações e Parâmetros
+      // IMPORTANTE: a chave ATUAL usada pelo sistema é 'jetcontrol_valores_custom'
+      // (é nela que index.html/escalas.html/cotas-extras.html gravam as edições
+      // de Auxílios e Jetons). 'valores' e 'jetcontrol_valores' são nomes
+      // antigos, mantidos aqui só como fallback para navegadores que nunca
+      // mais abriram o sistema desde a versão anterior. Por isso a chave
+      // atual precisa ser checada PRIMEIRO — do contrário, um navegador com
+      // a chave antiga ainda presente mostraria valores desatualizados,
+      // ignorando qualquer edição feita hoje.
+      const valoresSalvos = JSON.parse(
+        localStorage.getItem('jetcontrol_valores_custom') || 
+        localStorage.getItem('valores') || 
+        localStorage.getItem('jetcontrol_valores') || '{}'
+      );
+
+      const cotasExtras = JSON.parse(localStorage.getItem('jetcontrol_cotas_extras_dados')) || {};
+
+      const valDiariaAlim = parseMoeda(valoresSalvos.diariaAlimentacao || valoresSalvos.alimentacaoDiaria || '52,00');
+      const valDiariaHosp = parseMoeda(valoresSalvos.diariaHospedagem || valoresSalvos.hospedagemDiaria || '274,10');
+      const valAuxAlim = parseMoeda(valoresSalvos.alimentacao || '57,70');
+      const valAuxTransp = parseMoeda(valoresSalvos.transporte || '31,08');
+      const aliquotaIR = 0.22; // Alíquota padrão IRRF Jeton
+
+      // ESTRUTURAS DE ACUMULAÇÃO GLOBAL
+      let acumuladoGeral = {
+        jetonBruto: 0,
+        diarias: 0,
+        auxilios: 0,
+        diariasRecebivel: 0,
+        auxiliosRecebivel: 0,
+        escalas: 0,
+        horas: 0,
+        pernoites: 0,
+        simples: 0,
+        dobrada: 0,
+        tripla: 0,
+        quadrupla: 0,
+        // DETALHAMENTO POR TIPO DE DIÁRIA/AUXÍLIO (CARD "DIÁRIAS & AUXÍLIOS")
+        diariaAlimentacao: 0,
+        diariaHospedagem: 0,
+        auxAlimentacao: 0,
+        auxTransporte: 0,
+        turnos: { Manhã: 0, Tarde: 0, Noite: 0 },
+        funcoes: { Apoio: 0, Coordenador: 0, Motorista: 0, Relator: 0 }
+      };
+
+      // ---------------------------------------------------------------------
+      // 1. PROCESSAR CICLOS FECHADOS (DADOS ARQUIVADOS)
+      // ---------------------------------------------------------------------
+      const ciclosFechados = JSON.parse(localStorage.getItem('jetcontrol_ciclos_fechados')) || [];
+      const listaCiclosProcessados = [];
+
+      // LISTA "ACHATADA" COM OS DADOS INDIVIDUAIS DE CADA ESCALA (DE TODOS OS
+      // CICLOS, FECHADOS + VIGENTE), USADA NOS RANKINGS "TOP 10 ESCALAS".
+      const listaEscalasDetalhadas = [];
+
+      // Mapa global de fiscalizações por local (fechados + vigente)
+      const contagemLocais = {};
+
+      ciclosFechados.forEach((ciclo, idx) => {
+        // -------------------------------------------------------------
+        // Fonte primária: a seção "Receitas do Ciclo" arquivada
+        // (ciclo.receitas) já traz, calculados na própria página de
+        // Escalas no momento do fechamento: Valor Total de Jeton,
+        // Valor das Diárias, Valor dos Auxílios e o Valor Real de
+        // Jeton (jeton líquido de IR + diárias + auxílios). Usar essa
+        // seção evita depender do snapshot separado do organograma de
+        // Cotas Extras, que só existe se a página tiver sido visitada
+        // antes do fechamento do ciclo.
+        // -------------------------------------------------------------
+        let jetonBrutoCiclo = parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorTotalJeton'));
+        let diariasCiclo = parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorDiarias'));
+        let auxiliosCiclo = parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorAuxilios'));
+        let receitaLiquidaCicloDireta = parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorRealJeton'));
+        // NOVO: valores "recebíveis" (apenas diárias/auxílios marcados como
+        // recebíveis em cada escala) — usados nos cards "Auxílios e Diárias
+        // Recebíveis" e "Balanço dos Auxílios e Diárias". Em ciclos fechados
+        // ANTES deste recurso existir, o campo simplesmente não existe no
+        // HTML arquivado — nesse caso, assume-se 100% recebível (mesmo
+        // comportamento padrão que já existia antes deste recurso).
+        let diariasRecebivelCiclo = (ciclo.receitas && ciclo.receitas.indexOf('recValorRecebivelDiarias') !== -1)
+          ? parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorRecebivelDiarias'))
+          : diariasCiclo;
+        let auxiliosRecebivelCiclo = (ciclo.receitas && ciclo.receitas.indexOf('recValorRecebivelAuxilios') !== -1)
+          ? parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorRecebivelAuxilios'))
+          : auxiliosCiclo;
+
+        // Fallback (compatibilidade com ciclos antigos arquivados sem a
+        // seção de receitas completa): usa o organograma legado de
+        // diárias/auxílios de Cotas Extras.
+        if (diariasCiclo === 0 && ciclo.organogramaDiarias) {
+          diariasCiclo = parseMoeda(extrairTextoHtml(ciclo.organogramaDiarias, '#totalDiarias'));
+          if (diariasCiclo === 0) {
+            let match = ciclo.organogramaDiarias.match(/TOTAL GERAL DE DIÁRIAS:<\/span>\s*<span[^>]*>(R\$\s*[\d.,]+)/i);
+            if (match) diariasCiclo = parseMoeda(match[1]);
+          }
+        }
+        if (auxiliosCiclo === 0 && ciclo.organogramaAuxilios) {
+          auxiliosCiclo = parseMoeda(extrairTextoHtml(ciclo.organogramaAuxilios, '#totalAuxilios'));
+          if (auxiliosCiclo === 0) {
+            let match = ciclo.organogramaAuxilios.match(/TOTAL GERAL DE AUXÍLIOS:<\/span>\s*<span[^>]*>(R\$\s*[\d.,]+)/i);
+            if (match) auxiliosCiclo = parseMoeda(match[1]);
+          }
+        }
+
+        const metricasEscalas = extrairMetricasDeHtmlEscalas(ciclo.escalas);
+
+        // DETALHAMENTO POR TIPO — extraído diretamente das colunas da tabela
+        // arquivada de "Organograma das Diárias" (ALIMENTAÇÃO / HOSPEDAGEM) e
+        // "Organograma dos Auxílios" (AUX. ALIMENTAÇÃO / AUX. TRANSPORTE).
+        const diariaAlimentacaoCiclo = somarColunaTabelaOrganograma(ciclo.organogramaDiarias, 3);
+        const diariaHospedagemCiclo = somarColunaTabelaOrganograma(ciclo.organogramaDiarias, 4);
+        const auxAlimentacaoCiclo = somarColunaTabelaOrganograma(ciclo.organogramaAuxilios, 3);
+        const auxTransporteCiclo = somarColunaTabelaOrganograma(ciclo.organogramaAuxilios, 4);
+
+        // Somar ao Acumulado Global
+        acumuladoGeral.jetonBruto += jetonBrutoCiclo;
+        acumuladoGeral.diarias += diariasCiclo;
+        acumuladoGeral.auxilios += auxiliosCiclo;
+        acumuladoGeral.diariasRecebivel += diariasRecebivelCiclo;
+        acumuladoGeral.auxiliosRecebivel += auxiliosRecebivelCiclo;
+        acumuladoGeral.escalas += metricasEscalas.totalEscalas;
+        acumuladoGeral.horas += metricasEscalas.horasTrabalhadas;
+        acumuladoGeral.pernoites += metricasEscalas.pernoites;
+        acumuladoGeral.simples += metricasEscalas.simples;
+        acumuladoGeral.dobrada += metricasEscalas.dobrada;
+        acumuladoGeral.tripla += metricasEscalas.tripla;
+        acumuladoGeral.quadrupla += metricasEscalas.quadrupla;
+
+        acumuladoGeral.diariaAlimentacao += diariaAlimentacaoCiclo;
+        acumuladoGeral.diariaHospedagem += diariaHospedagemCiclo;
+        acumuladoGeral.auxAlimentacao += auxAlimentacaoCiclo;
+        acumuladoGeral.auxTransporte += auxTransporteCiclo;
+
+        acumuladoGeral.turnos.Manhã += metricasEscalas.turnos.Manhã;
+        acumuladoGeral.turnos.Tarde += metricasEscalas.turnos.Tarde;
+        acumuladoGeral.turnos.Noite += metricasEscalas.turnos.Noite;
+
+        acumuladoGeral.funcoes.Apoio += metricasEscalas.funcoes.Apoio;
+        acumuladoGeral.funcoes.Coordenador += metricasEscalas.funcoes.Coordenador;
+        acumuladoGeral.funcoes.Motorista += metricasEscalas.funcoes.Motorista;
+        acumuladoGeral.funcoes.Relator += metricasEscalas.funcoes.Relator;
+
+        // Acumula locais fiscalizados deste ciclo no mapa global
+        metricasEscalas.locais.forEach(loc => registrarLocal(contagemLocais, loc));
+
+        // Receita Bruta Total do ciclo = Valor Total de Jeton + Valor das Diárias + Valor dos Auxílios
+        const totalBrutoCiclo = jetonBrutoCiclo + diariasCiclo + auxiliosCiclo;
+        // Receita Líquida Estimada do ciclo = Valor Real de Jeton (já vem pronto da página de Escalas;
+        // se indisponível em ciclos antigos, cai no cálculo equivalente como respaldo)
+        const receitaLiquidaCiclo = receitaLiquidaCicloDireta > 0
+          ? receitaLiquidaCicloDireta
+          : (jetonBrutoCiclo * (1 - aliquotaIR)) + diariasCiclo + auxiliosCiclo;
+        const rendimentoHoraCiclo = metricasEscalas.horasTrabalhadas > 0
+          ? (receitaLiquidaCiclo / metricasEscalas.horasTrabalhadas)
+          : 0;
+
+        // NOME DO CICLO: "CICLO - DATA DE ABERTURA À DATA DE FECHAMENTO" (novo padrão).
+        // Ciclos antigos, fechados antes desta atualização e sem o campo "nome"
+        // gravado, caem no cálculo a partir das datas arquivadas, ou no número
+        // sequencial antigo como último recurso.
+        const nomeCicloProcessado = ciclo.nome ||
+          (ciclo.dataAbertura && ciclo.dataFechamento
+            ? `CICLO - ${dataBR(ciclo.dataAbertura)} À ${dataBR(ciclo.dataFechamento)}`
+            : `CICLO ${ciclo.numero || (idx + 1)}`);
+
+        // NOVOS CAMPOS (RANKINGS): Desconto de IR, Valores Médios (por Escala/
+        // Atividade/Hora) e Valor Real de Jeton do ciclo — todos já calculados
+        // corretamente na página de Escalas (não são afetados pelo ajuste feito
+        // no valor/hora de cada escala individual), então são apenas extraídos
+        // da seção "Receitas do Ciclo" arquivada.
+        const valorDescontoIRCiclo = parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorDescontoIR')) || (jetonBrutoCiclo * aliquotaIR);
+        const valorMedioEscalaCiclo = parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorMedioEscala'));
+        const valorMedioAtividadeCiclo = parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorMedioAtividade'));
+        const valorMedioHoraCiclo = parseMoeda(extrairTextoHtml(ciclo.receitas, '#recValorMedioHora'));
+        const valorRealDeJetonCiclo = jetonBrutoCiclo * (1 - aliquotaIR);
+
+        listaCiclosProcessados.push({
+          num: ciclo.numero || (idx + 1),
+          nome: nomeCicloProcessado,
+          periodo: `${ciclo.dataAbertura || 'Abertura'} (${ciclo.recebimentoEm || 'Encerrado'})`,
+          horas: metricasEscalas.horasTrabalhadas,
+          escalas: metricasEscalas.totalEscalas,
+          jetonBruto: jetonBrutoCiclo,
+          diariasEAuxilios: diariasCiclo + auxiliosCiclo,
+          receitaLiquida: receitaLiquidaCiclo,
+          receitaBruta: totalBrutoCiclo,
+          rendimentoHora: rendimentoHoraCiclo,
+          simples: metricasEscalas.simples,
+          dobrada: metricasEscalas.dobrada,
+          tripla: metricasEscalas.tripla,
+          quadrupla: metricasEscalas.quadrupla,
+          valorDescontoIR: valorDescontoIRCiclo,
+          valorMedioEscala: valorMedioEscalaCiclo,
+          valorMedioAtividade: valorMedioAtividadeCiclo,
+          valorMedioHora: valorMedioHoraCiclo,
+          valorRealDeJeton: valorRealDeJetonCiclo,
+          status: 'FECHADO'
+        });
+
+        // Coleta os dados individuais de cada escala deste ciclo para os
+        // rankings "TOP 10 ESCALAS".
+        listaEscalasDetalhadas.push(...extrairEscalasDetalhadasDeHtml(ciclo.escalas, nomeCicloProcessado, ciclo.computarDiariasEAuxilios !== false));
+      });
+
+      // ---------------------------------------------------------------------
+      // 2. PROCESSAR CICLO VIGENTE (ABERTO / ATUAL)
+      // ---------------------------------------------------------------------
+      const escalasVigentes = JSON.parse(localStorage.getItem('jetcontrol_escalas_dados')) || [];
+
+      // NOME DO CICLO VIGENTE (calculado aqui, antes do loop de escalas, para
+      // já poder ser usado ao coletar os dados individuais de cada escala
+      // para os rankings "TOP 10 ESCALAS").
+      const cicloVigenteDadosPrevia = JSON.parse(localStorage.getItem('jetcontrol_ciclo_dados') || '{}');
+      const nomeCicloVigente = cicloVigenteDadosPrevia.nomeCiclo ||
+        (cicloVigenteDadosPrevia.dataAbertura && cicloVigenteDadosPrevia.dataFechamento
+          ? `CICLO - ${dataBR(cicloVigenteDadosPrevia.dataAbertura)} À ${dataBR(cicloVigenteDadosPrevia.dataFechamento)} (ABERTO)`
+          : `CICLO ${ciclosFechados.length + 1} (ABERTO)`);
+
+      let jetonBrutoVigente = 0;
+      let diariasVigente = 0;
+      let auxiliosVigente = 0;
+      let diariasRecebivelVigente = 0;
+      let auxiliosRecebivelVigente = 0;
+      let horasVigente = 0;
+      let pernoitesVigente = 0;
+
+      let simplesVigente = 0;
+      let dobradaVigente = 0;
+      let triplaVigente = 0;
+      let quadruplaVigente = 0;
+
+      const computarDiariasEAuxiliosVigente = localStorage.getItem('jetcontrol_computar_diarias_auxilios') !== 'false';
+
+      escalasVigentes.forEach(escala => {
+        // NOVO: coleta os dados desta escala individual para os rankings
+        // "TOP 10 ESCALAS", recalculando o valor/hora e o valor real de jeton
+        // a partir dos campos brutos (jeton/diárias/auxílios/horário), para
+        // garantir que o resultado esteja sempre correto.
+        const jManhaDetalhe = parseMoeda(escala.jetonManha || 0);
+        const jTardeDetalhe = parseMoeda(escala.jetonTarde || 0);
+        const jNoiteDetalhe = parseMoeda(escala.jetonNoite || 0) * (escala.percepcaoQuartoJeton === 'SIM' ? 2 : 1);
+        const jetonBrutoDetalhe = jManhaDetalhe + jTardeDetalhe + jNoiteDetalhe;
+        const diariasDetalhe = computarDiariasEAuxiliosVigente ? (parseFloat(escala.valorDiarias) || 0) : 0;
+        const auxiliosDetalhe = computarDiariasEAuxiliosVigente ? (parseFloat(escala.valorAuxilios) || 0) : 0;
+
+        let horasDetalhe = 0;
+        if (escala.horarioSaida && escala.horarioChegada) {
+          const [dsH, dsM] = escala.horarioSaida.split(':').map(Number);
+          const [dcH, dcM] = escala.horarioChegada.split(':').map(Number);
+          let dMinSaida = dsH * 60 + dsM;
+          let dMinChegada = dcH * 60 + dcM;
+          if (dMinChegada < dMinSaida) dMinChegada += 24 * 60;
+          horasDetalhe = (dMinChegada - dMinSaida) / 60;
+        }
+
+        const valorRealAposIRDetalhe = (jetonBrutoDetalhe * 0.78) + diariasDetalhe + auxiliosDetalhe;
+        listaEscalasDetalhadas.push({
+          data: escala.data ? dataBR(escala.data) : '-',
+          cicloNome: nomeCicloVigente,
+          horas: horasDetalhe,
+          valorHora: horasDetalhe > 0 ? (valorRealAposIRDetalhe / horasDetalhe) : 0,
+          valorRealJeton: jetonBrutoDetalhe * 0.78
+        });
+
+        // Cálculo de Horas
+        if (escala.saida && escala.chegada) {
+          const [h1, m1] = escala.saida.split(':').map(Number);
+          const [h2, m2] = escala.chegada.split(':').map(Number);
+          let diffMin = (h2 * 60 + m2) - (h1 * 60 + m1);
+          if (diffMin < 0) diffMin += 24 * 60;
+          horasVigente += (diffMin / 60);
+        } else {
+          horasVigente += 4;
+        }
+
+        // Mapeamento de Turnos Operacionais e Contagem
+        if (escala.localManha || escala.t1 || (escala.local && !escala.localTarde)) {
+          acumuladoGeral.turnos.Manhã++;
+        }
+        if (escala.localTarde || escala.t2) {
+          acumuladoGeral.turnos.Tarde++;
+        }
+        if (escala.localNoite || escala.t3) {
+          acumuladoGeral.turnos.Noite++;
+        }
+
+        // -----------------------------------------------------------------
+        // TIPOLOGIA DE ATIVIDADE — critérios INDEPENDENTES entre si (não é
+        // um if/else exclusivo; uma mesma escala pode contar em mais de uma
+        // categoria simultaneamente):
+        //   • Simples:  jeton do período (Manhã/Tarde/Noite) == R$ 100,00
+        //   • Dobrada:  jeton do período (Manhã/Tarde/Noite) == R$ 220,00
+        //   • Tripla:   local da NOITE foi preenchido
+        //   • Quádrupla: percepção do 4º jeton == SIM
+        // -----------------------------------------------------------------
+        [escala.jetonManha, escala.jetonTarde, escala.jetonNoite].forEach(j => {
+          const valor = parseMoeda(j);
+          if (Math.abs(valor - 100) < 0.005) simplesVigente++;
+          if (Math.abs(valor - 220) < 0.005) dobradaVigente++;
+        });
+        if (escala.localNoite && !(escala.jeton4 || escala.percepcaoQuartoJeton === 'SIM')) triplaVigente++;
+        if (escala.jeton4 || escala.percepcaoQuartoJeton === 'SIM') quadruplaVigente++;
+
+        // Funções (campos reais: arrays funcaoManha/funcaoTarde/funcaoNoite com valores
+        // 'APOIO' | 'COORDENADOR' | 'MOTORISTA' | 'RELATOR')
+        [...(escala.funcaoManha || []), ...(escala.funcaoTarde || []), ...(escala.funcaoNoite || [])].forEach(f => {
+          const funcUpper = String(f).toUpperCase();
+          if (funcUpper === 'APOIO') acumuladoGeral.funcoes.Apoio++;
+          if (funcUpper === 'COORDENADOR') acumuladoGeral.funcoes.Coordenador++;
+          if (funcUpper === 'MOTORISTA') acumuladoGeral.funcoes.Motorista++;
+          if (funcUpper === 'RELATOR') acumuladoGeral.funcoes.Relator++;
+        });
+
+        // ---------------------------------------------------------------
+        // Cálculo Monetário de Jeton (mesma fórmula usada em escalas.html):
+        // soma o jeton de cada período preenchido; o jeton da NOITE é
+        // dobrado quando o 4º Jeton (percepcaoQuartoJeton) for 'SIM'.
+        // O campo antigo "escala.valorJeton" não existe no modelo real de
+        // dados — por isso o Jeton Bruto do ciclo vigente sempre ficava
+        // zerado e a Receita Bruta/Líquida acabavam refletindo somente o
+        // valor das diárias.
+        // ---------------------------------------------------------------
+        const jetonManhaVal = parseMoeda(escala.jetonManha || 0);
+        const jetonTardeVal = parseMoeda(escala.jetonTarde || 0);
+        const jetonNoiteBase = parseMoeda(escala.jetonNoite || 0);
+        const jetonNoiteEfetivo = jetonNoiteBase * (escala.percepcaoQuartoJeton === 'SIM' ? 2 : 1);
+        jetonBrutoVigente += (jetonManhaVal + jetonTardeVal + jetonNoiteEfetivo);
+
+        // Verificação de Diárias Elegíveis
+        const locais = [escala.localManha, escala.localTarde, escala.localNoite, escala.local].filter(Boolean);
+
+        // Acumula locais fiscalizados do ciclo vigente no mapa global
+        locais.forEach(loc => registrarLocal(contagemLocais, loc));
+
+        let elegivelDiaria = false;
+        let comPernoite = false;
+
+        locais.forEach(loc => {
+          let locUpper = loc.toUpperCase();
+          if (MUNICIPIOS_ELEGIVEIS.some(m => locUpper.includes(m))) {
+            elegivelDiaria = true;
+          }
+        });
+
+        const pernoiteStr = String(escala.pernoite || escala.pernoiteManha || '').toUpperCase();
+        if (pernoiteStr === 'SIM' || pernoiteStr === 'TRUE') {
+          comPernoite = true;
+          pernoitesVigente++;
+        }
+
+        if (elegivelDiaria) {
+          const valorDiariaEstaEscala = valDiariaAlim + (comPernoite ? valDiariaHosp : 0);
+          diariasVigente += valorDiariaEstaEscala;
+          if (escala.diariasRecebivel !== false) diariasRecebivelVigente += valorDiariaEstaEscala;
+        }
+
+        // Verificação de Auxílios (Fim de semana ou feriado)
+        if (escala.data) {
+          const dt = new Date(escala.data + 'T00:00:00');
+          const diaSemana = dt.getDay();
+          if (diaSemana === 0 || diaSemana === 6 || escala.isFeriado) {
+            const valorAuxilioEstaEscala = valAuxAlim + valAuxTransp;
+            auxiliosVigente += valorAuxilioEstaEscala;
+            if (escala.auxiliosRecebivel !== false) auxiliosRecebivelVigente += valorAuxilioEstaEscala;
+          }
+        }
+      });
+
+      // Consolidação do Ciclo Vigente no Acumulado Global
+      acumuladoGeral.jetonBruto += jetonBrutoVigente;
+      acumuladoGeral.diarias += diariasVigente;
+      acumuladoGeral.auxilios += auxiliosVigente;
+      acumuladoGeral.diariasRecebivel += diariasRecebivelVigente;
+      acumuladoGeral.auxiliosRecebivel += auxiliosRecebivelVigente;
+      acumuladoGeral.escalas += escalasVigentes.length;
+      acumuladoGeral.horas += horasVigente;
+      acumuladoGeral.pernoites += pernoitesVigente;
+
+      acumuladoGeral.simples += simplesVigente;
+      acumuladoGeral.dobrada += dobradaVigente;
+      acumuladoGeral.tripla += triplaVigente;
+      acumuladoGeral.quadrupla += quadruplaVigente;
+
+      // DETALHAMENTO POR TIPO DO CICLO VIGENTE — obtido das tabelas de
+      // "Organograma das Diárias/Auxílios" mantidas atualizadas pela página
+      // Cotas Extras a cada carregamento (mesma fonte usada pelos ciclos
+      // fechados, garantindo consistência entre os dois).
+      const organogramaDiariasVigente = localStorage.getItem('jetcontrol_organograma_diarias_html') || '';
+      const organogramaAuxiliosVigente = localStorage.getItem('jetcontrol_organograma_auxilios_html') || '';
+      acumuladoGeral.diariaAlimentacao += somarColunaTabelaOrganograma(organogramaDiariasVigente, 3);
+      acumuladoGeral.diariaHospedagem += somarColunaTabelaOrganograma(organogramaDiariasVigente, 4);
+      acumuladoGeral.auxAlimentacao += somarColunaTabelaOrganograma(organogramaAuxiliosVigente, 3);
+      acumuladoGeral.auxTransporte += somarColunaTabelaOrganograma(organogramaAuxiliosVigente, 4);
+
+      const totalDiariasEAuxiliosGeral = acumuladoGeral.diarias + acumuladoGeral.auxilios;
+      const receitaBrutaGeral = acumuladoGeral.jetonBruto + totalDiariasEAuxiliosGeral;
+      const jetonLiquidoGeral = acumuladoGeral.jetonBruto * (1 - aliquotaIR);
+      const receitaLiquidaGeral = jetonLiquidoGeral + totalDiariasEAuxiliosGeral;
+      // "Rendimento Médio / Hora" = Receita Líquida Estimada ÷ Total de Horas Trabalhadas
+      // (antes usava a receita BRUTA, o que inflava o valor por hora).
+      const rendimentoHoraGeral = acumuladoGeral.horas > 0 ? (receitaLiquidaGeral / acumuladoGeral.horas) : 0;
+
+      // ---------------------------------------------------------------------
+      // 3. ATUALIZAÇÃO DOS CARDS (KPIs) NA TELA
+      // ---------------------------------------------------------------------
+      document.getElementById('kpi-receita-bruta').textContent = formatMoeda(receitaBrutaGeral);
+      definirTextoRotulo('kpi-receita-bruta-sub', textoReceitaBrutaSub(ciclosFechados.length));
+
+      document.getElementById('kpi-receita-liquida').textContent = formatMoeda(receitaLiquidaGeral);
+      definirTextoRotulo('kpi-ir-desc', textoReceitaLiquidaSub(100 - aliquotaIR * 100));
+
+      document.getElementById('kpi-total-escalas').textContent = acumuladoGeral.escalas;
+      definirTextoRotulo('kpi-escalas-sub', textoVolumeEscalasSub(acumuladoGeral.simples, acumuladoGeral.dobrada, acumuladoGeral.tripla, acumuladoGeral.quadrupla));
+
+      document.getElementById('kpi-diarias-auxilios').textContent = formatMoeda(totalDiariasEAuxiliosGeral);
+      definirTextoRotulo('kpi-pernoites-count',
+        textoDiariasAuxiliosSub(acumuladoGeral.auxAlimentacao, acumuladoGeral.auxTransporte, acumuladoGeral.diariaAlimentacao, acumuladoGeral.diariaHospedagem));
+
+      document.getElementById('kpi-rendimento-hora').textContent = `${formatMoeda(rendimentoHoraGeral)}/h`;
+      definirTextoRotulo('kpi-total-horas', textoRendimentoHoraSub(acumuladoGeral.horas));
+
+      document.getElementById('kpi-total-desconto-ir').textContent = formatMoeda(acumuladoGeral.jetonBruto * aliquotaIR);
+
+      // NOVO: "Auxílios e Diárias Recebíveis" (soma dos valores marcados como
+      // recebíveis em cada escala, de todos os ciclos) e "Balanço dos
+      // Auxílios e Diárias" (diferença entre o recebível e o total incorrido).
+      const totalRecebivelGeral = acumuladoGeral.diariasRecebivel + acumuladoGeral.auxiliosRecebivel;
+      const balancoDiariasGeral = acumuladoGeral.diariasRecebivel - acumuladoGeral.diarias;
+      const balancoAuxiliosGeral = acumuladoGeral.auxiliosRecebivel - acumuladoGeral.auxilios;
+      const balancoGeral = balancoDiariasGeral + balancoAuxiliosGeral;
+
+      document.getElementById('kpi-recebiveis').textContent = formatMoeda(totalRecebivelGeral);
+      definirTextoRotulo('kpi-recebiveis-sub', textoRecebiveisSub(acumuladoGeral.diariasRecebivel, acumuladoGeral.auxiliosRecebivel));
+
+      const elKpiBalanco = document.getElementById('kpi-balanco');
+      elKpiBalanco.textContent = formatMoeda(balancoGeral);
+      elKpiBalanco.style.color = balancoGeral < 0 ? 'var(--accent-danger)' : 'var(--accent-success)';
+      definirTextoRotulo('kpi-balanco-sub', textoBalancoSub(balancoDiariasGeral, balancoAuxiliosGeral));
+
+      // Atualizar timestamp
+      const agora = new Date();
+      document.getElementById('last-updated').textContent = `Sincronizado: ${agora.toLocaleTimeString('pt-BR')}`;
+
+      // ---------------------------------------------------------------------
+      // 4. ADICIONAR CICLO VIGENTE NA LISTA DE CICLOS PARA A TABELA E GRÁFICO
+      // ---------------------------------------------------------------------
+      const totalBrutoVigente = jetonBrutoVigente + diariasVigente + auxiliosVigente;
+      const receitaLiquidaVigente = (jetonBrutoVigente * (1 - aliquotaIR)) + diariasVigente + auxiliosVigente;
+      const rendimentoHoraVigente = horasVigente > 0 ? (receitaLiquidaVigente / horasVigente) : 0;
+
+      // NOVOS CAMPOS (RANKINGS) DO CICLO VIGENTE
+      const somaAtividadesVigente = simplesVigente + dobradaVigente + triplaVigente + quadruplaVigente;
+      const valorDescontoIRVigente = jetonBrutoVigente * aliquotaIR;
+      const valorMedioEscalaVigente = escalasVigentes.length > 0 ? (receitaLiquidaVigente / escalasVigentes.length) : 0;
+      const valorMedioAtividadeVigente = somaAtividadesVigente > 0 ? (receitaLiquidaVigente / somaAtividadesVigente) : 0;
+      const valorMedioHoraVigente = rendimentoHoraVigente;
+      const valorRealDeJetonVigente = jetonBrutoVigente * (1 - aliquotaIR);
+
+      listaCiclosProcessados.push({
+        num: (ciclosFechados.length + 1) + ' (Aberto)',
+        nome: nomeCicloVigente,
+        periodo: 'Ciclo Vigente em Aberto',
+        horas: horasVigente,
+        escalas: escalasVigentes.length,
+        jetonBruto: jetonBrutoVigente,
+        diariasEAuxilios: diariasVigente + auxiliosVigente,
+        receitaLiquida: receitaLiquidaVigente,
+        receitaBruta: totalBrutoVigente,
+        rendimentoHora: rendimentoHoraVigente,
+        simples: simplesVigente,
+        dobrada: dobradaVigente,
+        tripla: triplaVigente,
+        quadrupla: quadruplaVigente,
+        valorDescontoIR: valorDescontoIRVigente,
+        valorMedioEscala: valorMedioEscalaVigente,
+        valorMedioAtividade: valorMedioAtividadeVigente,
+        valorMedioHora: valorMedioHoraVigente,
+        valorRealDeJeton: valorRealDeJetonVigente,
+        status: 'VIGENTE'
+      });
+
+      // ---------------------------------------------------------------------
+      // 4.1. RANKINGS DERIVADOS PARA OS NOVOS CARDS (Top 10 Locais / Top 6 Ciclos)
+      // ---------------------------------------------------------------------
+      const top10Locais = Object.entries(contagemLocais)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+
+      const top6MaiorGanho = [...listaCiclosProcessados]
+        .sort((a, b) => b.receitaBruta - a.receitaBruta)
+        .slice(0, 6);
+
+      function top6PorTipologia(campo) {
+        return [...listaCiclosProcessados]
+          .filter(c => (c[campo] || 0) > 0)
+          .sort((a, b) => (b[campo] || 0) - (a[campo] || 0))
+          .slice(0, 6);
+      }
+
+      const top6Simples = top6PorTipologia('simples');
+      const top6Dobradas = top6PorTipologia('dobrada');
+      const top6Triplas = top6PorTipologia('tripla');
+      const top6Quadruplas = top6PorTipologia('quadrupla');
+
+      // NOVOS RANKINGS: TOP 10 ESCALAS INDIVIDUAIS
+      const top10Horas = [...listaEscalasDetalhadas].sort((a, b) => b.horas - a.horas).slice(0, 10);
+      const top10ValorHora = [...listaEscalasDetalhadas].sort((a, b) => b.valorHora - a.valorHora).slice(0, 10);
+      const top10ValorRealJetonEscala = [...listaEscalasDetalhadas].sort((a, b) => b.valorRealJeton - a.valorRealJeton).slice(0, 10);
+
+      // NOVOS RANKINGS: 6 CICLOS
+      const top6ValorRealJetonCiclo = top6PorTipologia('valorRealDeJeton');
+      const top6ValorMedioEscala = top6PorTipologia('valorMedioEscala');
+      const top6ValorMedioAtividade = top6PorTipologia('valorMedioAtividade');
+      const top6ValorMedioHora = top6PorTipologia('valorMedioHora');
+      const top6DescontoIR = top6PorTipologia('valorDescontoIR');
+
+      // ---------------------------------------------------------------------
+      // 5. RENDERIZAÇÃO DOS GRÁFICOS E TABELA
+      // ---------------------------------------------------------------------
+      renderizarGraficoEvolucao(listaCiclosProcessados);
+      renderizarGraficoComposicao(acumuladoGeral.jetonBruto, acumuladoGeral.diarias, acumuladoGeral.auxilios, receitaLiquidaGeral);
+      renderizarGraficoTipologia(acumuladoGeral.simples, acumuladoGeral.dobrada, acumuladoGeral.tripla, acumuladoGeral.quadrupla);
+      renderizarGraficoTurnos(acumuladoGeral.turnos);
+      renderizarGraficoFuncoes(acumuladoGeral.funcoes);
+      renderizarTabelaCiclos(listaCiclosProcessados);
+
+      renderizarGraficoLocais(top10Locais);
+      renderizarGraficoGanhoCiclos(top6MaiorGanho);
+      renderizarGraficoAtividadePorCiclo('chartAtividadeSimples', 'simples', top6Simples, 'simples', '#3b82f6', 'Atividades Simples');
+      renderizarGraficoAtividadePorCiclo('chartAtividadeDobradas', 'dobradas', top6Dobradas, 'dobrada', '#06b6d4', 'Atividades Dobradas');
+      renderizarGraficoAtividadePorCiclo('chartAtividadeTriplas', 'triplas', top6Triplas, 'tripla', '#8b5cf6', 'Atividades Triplas');
+      renderizarGraficoAtividadePorCiclo('chartAtividadeQuadruplas', 'quadruplas', top6Quadruplas, 'quadrupla', '#ef4444', 'Atividades Quádruplas');
+
+      // NOVOS GRÁFICOS: TOP 10 ESCALAS INDIVIDUAIS
+      renderizarGraficoTopEscalas('chartTop10Horas', 'top10Horas', top10Horas, 'horas', '#f59e0b', 'HORAS TRABALHADAS', false);
+      renderizarGraficoTopEscalas('chartTop10ValorHora', 'top10ValorHora', top10ValorHora, 'valorHora', '#06b6d4', 'VALOR POR HORA (R$)', true);
+      renderizarGraficoTopEscalas('chartTop10ValorRealJetonEscala', 'top10ValorRealJetonEscala', top10ValorRealJetonEscala, 'valorRealJeton', '#10b981', 'VALOR REAL DE JETON (R$)', true);
+
+      // NOVOS GRÁFICOS: 6 CICLOS
+      renderizarGraficoAtividadePorCiclo('chartTop6ValorRealJetonCiclo', 'top6ValorRealJetonCiclo', top6ValorRealJetonCiclo, 'valorRealDeJeton', '#10b981', 'VALOR REAL DE JETON (R$)');
+      renderizarGraficoAtividadePorCiclo('chartTop6ValorMedioEscala', 'top6ValorMedioEscala', top6ValorMedioEscala, 'valorMedioEscala', '#3b82f6', 'VALOR MÉDIO POR ESCALA (R$)');
+      renderizarGraficoAtividadePorCiclo('chartTop6ValorMedioAtividade', 'top6ValorMedioAtividade', top6ValorMedioAtividade, 'valorMedioAtividade', '#8b5cf6', 'VALOR MÉDIO POR ATIVIDADE (R$)');
+      renderizarGraficoAtividadePorCiclo('chartTop6ValorMedioHora', 'top6ValorMedioHora', top6ValorMedioHora, 'valorMedioHora', '#06b6d4', 'VALOR MÉDIO POR HORA (R$)');
+      renderizarGraficoAtividadePorCiclo('chartTop6DescontoIR', 'top6DescontoIR', top6DescontoIR, 'valorDescontoIR', '#ef4444', 'DESCONTO DE IR (R$)');
+    }
+
+    // --- RENDERIZADORES DE GRÁFICOS (Chart.js) ---
+
+    function renderizarGraficoEvolucao(listaCiclos) {
+      const ctx = document.getElementById('chartEvolucaoCiclos').getContext('2d');
+      if (chartEvolucaoInstance) chartEvolucaoInstance.destroy();
+
+      const labels = listaCiclos.map(c => (c.nome || `CICLO ${c.num}`).toUpperCase());
+
+      // Valor de CADA ciclo isoladamente (não somado/acumulado com os anteriores).
+      const dataReceitaPorCiclo = listaCiclos.map(c => c.receitaLiquida || 0);
+
+      chartEvolucaoInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'RECEITA LÍQUIDA DO CICLO (R$)',
+            data: dataReceitaPorCiclo,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.15)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.3,
+            pointBackgroundColor: '#60a5fa',
+            pointRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: (item) => formatMoeda(item.parsed.y) } }
+          },
+          scales: {
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: (v) => formatMoeda(v) } },
+            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    function renderizarGraficoComposicao(jeton, diarias, auxilios, valorFinal) {
+      const ctx = document.getElementById('chartComposicaoReceita').getContext('2d');
+      if (chartComposicaoInstance) chartComposicaoInstance.destroy();
+
+      const elValorFinal = document.getElementById('composicaoValorFinal');
+      if (elValorFinal) elValorFinal.textContent = formatMoeda(valorFinal);
+
+      chartComposicaoInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['JETON BRUTO', 'DIÁRIAS', 'AUXÍLIOS'],
+          datasets: [{
+            label: 'VALOR (R$)',
+            data: [jeton, diarias, auxilios],
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: (item) => formatMoeda(item.parsed.y) } }
+          },
+          scales: {
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: (v) => formatMoeda(v) } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    function renderizarGraficoTipologia(simples, dobrada, tripla, quadrupla) {
+      const ctx = document.getElementById('chartTipologiaCarga').getContext('2d');
+      if (chartTipologiaInstance) chartTipologiaInstance.destroy();
+
+      chartTipologiaInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['SIMPLES', 'DOBRADA', 'TRIPLA', 'QUÁDRUPLA'],
+          datasets: [{
+            label: 'QTD. ESCALAS',
+            data: [simples, dobrada, tripla, quadrupla],
+            backgroundColor: ['#3b82f6', '#06b6d4', '#8b5cf6', '#ef4444'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1 } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    function renderizarGraficoTurnos(turnos) {
+      const ctx = document.getElementById('chartTurnos').getContext('2d');
+      if (chartTurnosInstance) chartTurnosInstance.destroy();
+
+      chartTurnosInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['MANHÃ', 'TARDE', 'NOITE'],
+          datasets: [{
+            label: 'ESCALAS',
+            data: [turnos.Manhã, turnos.Tarde, turnos.Noite],
+            backgroundColor: ['#f59e0b', '#3b82f6', '#8b5cf6'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    function renderizarGraficoFuncoes(funcoes) {
+      const ctx = document.getElementById('chartFuncoes').getContext('2d');
+      if (chartFuncoesInstance) chartFuncoesInstance.destroy();
+
+      chartFuncoesInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['APOIO', 'COORDENADOR', 'MOTORISTA', 'RELATOR'],
+          datasets: [{
+            label: 'ATUAÇÕES',
+            data: [funcoes.Apoio, funcoes.Coordenador, funcoes.Motorista, funcoes.Relator],
+            backgroundColor: '#10b981',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    // --- NOVOS GRÁFICOS: LOCAIS FISCALIZADOS / CICLOS COM MAIOR GANHO / TIPOLOGIA POR CICLO ---
+
+    function renderizarGraficoLocais(topLocais) {
+      const ctx = document.getElementById('chartLocaisFiscalizados').getContext('2d');
+      if (graficosExtras.locais) graficosExtras.locais.destroy();
+
+      const labels = topLocais.map(([nome]) => nome);
+      const dados = topLocais.map(([, qtd]) => qtd);
+
+      graficosExtras.locais = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'FISCALIZAÇÕES',
+            data: dados,
+            backgroundColor: '#3b82f6',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8', autoSkip: false, maxRotation: 60, minRotation: 30, font: { size: 10 } } }
+          }
+        }
+      });
+    }
+
+    function renderizarGraficoGanhoCiclos(topGanho) {
+      const ctx = document.getElementById('chartGanhoCiclos').getContext('2d');
+      if (graficosExtras.ganho) graficosExtras.ganho.destroy();
+
+      const labels = topGanho.map(c => (c.nome || `CICLO ${c.num}`).toUpperCase());
+      const bruta = topGanho.map(c => c.receitaBruta);
+      const liquida = topGanho.map(c => c.receitaLiquida);
+
+      graficosExtras.ganho = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label: 'RECEITA BRUTA', data: bruta, backgroundColor: '#3b82f6', borderRadius: 6 },
+            { label: 'RECEITA LÍQUIDA', data: liquida, backgroundColor: '#10b981', borderRadius: 6 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#f8fafc', padding: 15 } },
+            tooltip: { callbacks: { label: (item) => `${item.dataset.label}: ${formatMoeda(item.parsed.y)}` } }
+          },
+          scales: {
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: (v) => formatMoeda(v) } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    // Renderizador genérico de "Top 6 Ciclos por Tipologia de Atividade" (Simples/Dobrada/Tripla/Quádrupla)
+    function renderizarGraficoAtividadePorCiclo(canvasId, chaveInstancia, listaCiclosTop, campo, cor, labelDataset) {
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      if (graficosExtras[chaveInstancia]) graficosExtras[chaveInstancia].destroy();
+
+      const labels = listaCiclosTop.map(c => (c.nome || `CICLO ${c.num}`).toUpperCase());
+      const dados = listaCiclosTop.map(c => c[campo] || 0);
+
+      graficosExtras[chaveInstancia] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: labelDataset,
+            data: dados,
+            backgroundColor: cor,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    // Renderizador genérico de "Top 10 Escalas Individuais" (por Horas / Valor
+    // por Hora / Valor Real de Jeton). "ehMoeda" controla se o eixo/tooltip
+    // formatam o valor como R$ (moeda) ou como número simples (horas).
+    function renderizarGraficoTopEscalas(canvasId, chaveInstancia, listaTop, campo, cor, labelDataset, ehMoeda) {
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      if (graficosExtras[chaveInstancia]) graficosExtras[chaveInstancia].destroy();
+
+      const labels = listaTop.map(e => `${e.data} — ${(e.cicloNome || '').toUpperCase()}`);
+      const dados = listaTop.map(e => e[campo] || 0);
+
+      graficosExtras[chaveInstancia] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: labelDataset,
+            data: dados,
+            backgroundColor: cor,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: (item) => ehMoeda ? formatMoeda(item.parsed.x) : `${item.parsed.x.toFixed(1)}H` } }
+          },
+          scales: {
+            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: (v) => ehMoeda ? formatMoeda(v) : `${v}H` } },
+            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    function renderizarTabelaCiclos(listaCiclos) {
+      const tbody = document.getElementById('table-ciclos-body');
+      tbody.innerHTML = '';
+
+      if (!listaCiclos || listaCiclos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Nenhum dado registrado.</td></tr>`;
+        return;
+      }
+
+      listaCiclos.forEach((c) => {
+        const tr = document.createElement('tr');
+        const badgeClass = c.status === 'VIGENTE' ? 'badge-yellow' : 'badge-blue';
+        const statusText = c.status === 'VIGENTE' ? 'EM ABERTO' : 'FECHADO';
+
+        tr.innerHTML = `
+          <td><span class="badge ${badgeClass}">${c.nome || `Ciclo ${c.num}`}</span> <span class="text-xs text-slate-400">(${c.periodo})</span></td>
+          <td>${c.escalas}</td>
+          <td>${c.horas.toFixed(1)}h</td>
+          <td>${formatMoeda(c.rendimentoHora)}/h</td>
+          <td>${formatMoeda(c.diariasEAuxilios)}</td>
+          <td>${formatMoeda(c.jetonBruto)}</td>
+          <td style="font-weight: 700; color: var(--accent-success);">${formatMoeda(c.receitaLiquida)}</td>
+          <td><span class="badge ${badgeClass}">${statusText}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // --- REATIVIDADE E ATUALIZAÇÃO AUTOMÁTICA EM TEMPO REAL ---
+
+    // Escutar alterações efetuadas em outras páginas/abas do navegador em tempo real
+    window.addEventListener('storage', (event) => {
+      if ([
+        'jetcontrol_escalas_dados',
+        'jetcontrol_ciclos_fechados',
+        'jetcontrol_cotas_extras_dados',
+        'valores',
+        'jetcontrol_valores_custom',
+        'jetcontrol_valores'
+      ].includes(event.key)) {
+        carregarEProcessarDados();
+      }
+    });
+
+    // Inicialização e Loop de Atualização Automática a cada 1 segundo (100000 ms)
+    document.addEventListener('DOMContentLoaded', () => {
+      var iniciar = function () {
+        carregarEProcessarDados();
+        setInterval(carregarEProcessarDados, 100000);
+      };
+      if (window.JetSyncReady && typeof window.JetSyncReady.finally === 'function') {
+        window.JetSyncReady.finally(iniciar);
+      } else {
+        iniciar();
+      }
+    });
+
+    // Atualiza os dados sozinho quando outro navegador/aparelho salvar algo
+    // novo (sem precisar dar F5). Os títulos dos cards são texto fixo direto
+    // no HTML e não mudam com a sincronização, então não precisam ser
+    // reaplicados aqui.
+    if (window.JetSyncOnChange) {
+      window.JetSyncOnChange(function () { carregarEProcessarDados(); });
+    }
+  </script>
+</body>
+</html>
