@@ -16,7 +16,7 @@
   
   <!-- Tailwind CSS CDN & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https:cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Fontes Google & Chart.js -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -681,32 +681,26 @@
     // trechos ${...} (esses colam os números calculados; não apague-os).
     // =========================================================================
     function textoReceitaBrutaSub(qtdCiclosFechados) {
-  return `${qtdCiclosFechados} Ciclo(s) Fechado(s) + Vigente`;
-}
-
-function textoReceitaLiquidaSub(percentualLiquidoIR) {
-  return `Jeton Líquido (${percentualLiquidoIR}%) + Diárias/Aux.`;
-}
-
-function textoVolumeEscalasSub(qtdSimples, qtdDobrada, qtdTripla, qtdQuadrupla) {
-  return `${qtdSimples} Simples <br> ${qtdDobrada} Dobradas <br> ${qtdTripla} Triplas <br> ${qtdQuadrupla} Quádruplas`;
-}
-
-function textoDiariasAuxiliosSub(valorAuxAlimentacao, valorAuxTransporte, valorDiariaAlimentacao, valorDiariaHospedagem) {
-  return `${formatMoeda(valorAuxAlimentacao)} Auxílio Alimentação <br> ${formatMoeda(valorAuxTransporte)} Auxílio Transporte <br> ${formatMoeda(valorDiariaAlimentacao)} Diária de Alimentação <br> ${formatMoeda(valorDiariaHospedagem)} Diária de Pernoite`;
-}
-
-function textoRendimentoHoraSub(totalHoras) {
-  return `Total de ${totalHoras.toFixed(1)}h Trabalhadas`;
-}
-
-function textoRecebiveisSub(valorDiarias, valorAuxilios) {
-  return `${formatMoeda(valorDiarias)} Diárias <br> ${formatMoeda(valorAuxilios)} Auxílios`;
-}
-
-function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
-  return `${formatMoeda(valorDiferencaDiarias)} Diárias <br> ${formatMoeda(valorDiferencaAuxilios)} Auxílios`;
-}
+      return `${qtdCiclosFechados} Ciclo(s) Fechado(s) + Vigente`;
+    }
+    function textoReceitaLiquidaSub(percentualLiquidoIR) {
+      return `Jeton Líquido (${percentualLiquidoIR}%) + Diárias/Aux.`;
+    }
+    function textoVolumeEscalasSub(qtdSimples, qtdDobrada, qtdTripla, qtdQuadrupla) {
+      return `${qtdSimples} Simples | ${qtdDobrada} Dobradas | ${qtdTripla} Triplas | ${qtdQuadrupla} Quádruplas`;
+    }
+    function textoDiariasAuxiliosSub(valorAuxAlimentacao, valorAuxTransporte, valorDiariaAlimentacao, valorDiariaHospedagem) {
+      return `${formatMoeda(valorAuxAlimentacao)} Aux. Alimentação | ${formatMoeda(valorAuxTransporte)} Aux. Transporte | ${formatMoeda(valorDiariaAlimentacao)} Diária Alimentação | ${formatMoeda(valorDiariaHospedagem)} Diária Hospedagem`;
+    }
+    function textoRendimentoHoraSub(totalHoras) {
+      return `Total de ${totalHoras.toFixed(1)}h Trabalhadas`;
+    }
+    function textoRecebiveisSub(valorDiarias, valorAuxilios) {
+      return `${formatMoeda(valorDiarias)} Diárias | ${formatMoeda(valorAuxilios)} Auxílios`;
+    }
+    function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
+      return `${formatMoeda(valorDiferencaDiarias)} Diárias | ${formatMoeda(valorDiferencaAuxilios)} Auxílios`;
+    }
 
     // Helper: Extrai valor textual do HTML arquivado
     function extrairTextoHtml(htmlString, selector) {
@@ -1363,9 +1357,14 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
       acumuladoGeral.auxTransporte += somarColunaTabelaOrganograma(organogramaAuxiliosVigente, 4);
 
       const totalDiariasEAuxiliosGeral = acumuladoGeral.diarias + acumuladoGeral.auxilios;
+      const totalDiariasEAuxiliosRecebivelGeral = acumuladoGeral.diariasRecebivel + acumuladoGeral.auxiliosRecebivel;
       const receitaBrutaGeral = acumuladoGeral.jetonBruto + totalDiariasEAuxiliosGeral;
       const jetonLiquidoGeral = acumuladoGeral.jetonBruto * (1 - aliquotaIR);
-      const receitaLiquidaGeral = jetonLiquidoGeral + totalDiariasEAuxiliosGeral;
+      // Receita Líquida Estimada = Jeton Líquido + o que REALMENTE é recebível
+      // de diárias/auxílios (não o total apenas incorrido/gerado nas escalas).
+      // Como Recebível = Incorrido + Balanço, isso já reflete automaticamente
+      // o card "Balanço dos Auxílios e Diárias" dentro da Receita Líquida.
+      const receitaLiquidaGeral = jetonLiquidoGeral + totalDiariasEAuxiliosRecebivelGeral;
       // "Rendimento Médio / Hora" = Receita Líquida Estimada ÷ Total de Horas Trabalhadas
       // (antes usava a receita BRUTA, o que inflava o valor por hora).
       const rendimentoHoraGeral = acumuladoGeral.horas > 0 ? (receitaLiquidaGeral / acumuladoGeral.horas) : 0;
@@ -1415,7 +1414,9 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
       // 4. ADICIONAR CICLO VIGENTE NA LISTA DE CICLOS PARA A TABELA E GRÁFICO
       // ---------------------------------------------------------------------
       const totalBrutoVigente = jetonBrutoVigente + diariasVigente + auxiliosVigente;
-      const receitaLiquidaVigente = (jetonBrutoVigente * (1 - aliquotaIR)) + diariasVigente + auxiliosVigente;
+      // Mesma correção do cálculo geral: usa o total RECEBÍVEL de diárias/
+      // auxílios (não o incorrido), para já refletir o balanço.
+      const receitaLiquidaVigente = (jetonBrutoVigente * (1 - aliquotaIR)) + diariasRecebivelVigente + auxiliosRecebivelVigente;
       const rendimentoHoraVigente = horasVigente > 0 ? (receitaLiquidaVigente / horasVigente) : 0;
 
       // NOVOS CAMPOS (RANKINGS) DO CICLO VIGENTE
