@@ -30,6 +30,10 @@
     /* Jeton fica visualmente bloqueado quando o local correspondente estiver vazio */
     select.jeton-sem-local:disabled { opacity: 0.65; cursor: not-allowed; }
 
+    /* Campos bloqueados quando a escala é marcada como Home Office (ver
+       aplicarBloqueioCamposHomeOffice() no script) ficam visualmente apagados. */
+    input:disabled, select:disabled { opacity: 0.4; cursor: not-allowed; }
+
     /* TODO o texto exibido na página (rótulos, cards, campos, placeholders)
        aparece em maiúsculas. O que o usuário digita também é convertido para
        maiúsculas de fato (ver script no fim da página), garantindo que os
@@ -229,6 +233,29 @@
             <i class="fa-solid fa-clock"></i>
           </div>
         </div>
+
+        <!-- TOTAL DE HOME OFFICES -->
+        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+          <div>
+            <span class="block text-xs uppercase font-bold text-slate-400">Home Offices</span>
+            <span id="statHomeOffices" class="text-xl font-black text-purple-400">0</span>
+            <span id="statHomeOfficesDetalhe" class="block text-[10px] text-slate-500 uppercase mt-0.5">0 Compulsório | 0 Reunião | 0 Solicitado</span>
+          </div>
+          <div class="bg-purple-500/10 text-purple-400 p-3 rounded-lg text-lg">
+            <i class="fa-solid fa-house-laptop"></i>
+          </div>
+        </div>
+
+        <!-- TOTAL DE HORAS DE HOME OFFICE (CONDIÇÃO - REUNIÃO (SEDE)) -->
+        <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+          <div>
+            <span class="block text-xs uppercase font-bold text-slate-400">Horas de Home Office (Reunião - Sede)</span>
+            <span id="statHorasHomeOfficeReuniao" class="text-xl font-black text-indigo-400">0H 00M</span>
+          </div>
+          <div class="bg-indigo-500/10 text-indigo-400 p-3 rounded-lg text-lg">
+            <i class="fa-solid fa-people-group"></i>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -343,6 +370,36 @@
           <div>
             <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Horário de Saída *</label>
             <input type="time" id="horarioSaida" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500">
+          </div>
+          <div id="wrapperHomeOffice">
+            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Home Office</label>
+            <div class="flex items-center gap-2 h-[42px]">
+              <button type="button" data-joinha="sim" onclick="alternarHomeOffice('', true)" title="Sim" class="w-10 h-10 rounded-xl border border-slate-700 text-slate-500 flex items-center justify-center hover:border-emerald-600 hover:text-emerald-400 transition"><i class="fa-solid fa-thumbs-up"></i></button>
+              <button type="button" data-joinha="nao" onclick="alternarHomeOffice('', false)" title="Não" class="w-10 h-10 rounded-xl border border-slate-700 text-slate-500 flex items-center justify-center hover:border-red-600 hover:text-red-400 transition"><i class="fa-solid fa-thumbs-down"></i></button>
+            </div>
+            <input type="checkbox" id="chkHomeOffice" class="hidden" data-decidido="1">
+          </div>
+        </div>
+
+        <!-- CONDIÇÃO DO HOME OFFICE (SÓ APARECE QUANDO "SIM" ESTÁ MARCADO) -->
+        <div id="wrapperHomeOfficeCondicao" class="hidden">
+          <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Condição do Home Office</label>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" data-condicao="compulsorio" onclick="selecionarCondicaoHomeOffice('', 'compulsorio')" class="text-xs font-bold uppercase px-4 py-2 rounded-xl border border-slate-700 text-slate-400 hover:border-brand-600 transition">Compulsório (Contingência)</button>
+            <button type="button" data-condicao="reuniao" onclick="selecionarCondicaoHomeOffice('', 'reuniao')" class="text-xs font-bold uppercase px-4 py-2 rounded-xl border border-slate-700 text-slate-400 hover:border-brand-600 transition">Reunião (Sede)</button>
+            <button type="button" data-condicao="solicitado" onclick="selecionarCondicaoHomeOffice('', 'solicitado')" class="text-xs font-bold uppercase px-4 py-2 rounded-xl border border-slate-700 text-slate-400 hover:border-brand-600 transition">Solicitado (Folga)</button>
+          </div>
+          <input type="hidden" id="homeOfficeCondicao">
+
+          <div id="boxMotivoHomeOffice" class="hidden mt-3 bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <span class="block text-[11px] uppercase font-bold text-slate-400">Motivo do Home Office</span>
+              <span id="textoMotivoHomeOffice" class="text-sm font-bold text-white uppercase">Selecione ao Lado</span>
+            </div>
+            <div class="sm:text-right">
+              <span class="block text-[11px] uppercase font-bold text-slate-400">Média de Perda de Rendimento</span>
+              <span id="valorMediaPerdaRendimento" class="text-lg font-black text-red-400">R$ 0,00</span>
+            </div>
           </div>
         </div>
 
@@ -667,6 +724,35 @@
           <div>
             <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Horário de Chegada *</label>
             <input type="time" id="modalHorarioChegada" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm">
+          </div>
+          <div id="modalWrapperHomeOffice">
+            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Home Office</label>
+            <div class="flex items-center gap-2 h-[42px]">
+              <button type="button" data-joinha="sim" onclick="alternarHomeOffice('modal', true)" title="Sim" class="w-10 h-10 rounded-xl border border-slate-700 text-slate-500 flex items-center justify-center hover:border-emerald-600 hover:text-emerald-400 transition"><i class="fa-solid fa-thumbs-up"></i></button>
+              <button type="button" data-joinha="nao" onclick="alternarHomeOffice('modal', false)" title="Não" class="w-10 h-10 rounded-xl border border-slate-700 text-slate-500 flex items-center justify-center hover:border-red-600 hover:text-red-400 transition"><i class="fa-solid fa-thumbs-down"></i></button>
+            </div>
+            <input type="checkbox" id="modalChkHomeOffice" class="hidden" data-decidido="1">
+          </div>
+        </div>
+
+        <div id="modalWrapperHomeOfficeCondicao" class="hidden">
+          <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Condição do Home Office</label>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" data-condicao="compulsorio" onclick="selecionarCondicaoHomeOffice('modal', 'compulsorio')" class="text-xs font-bold uppercase px-4 py-2 rounded-xl border border-slate-700 text-slate-400 hover:border-brand-600 transition">Compulsório (Contingência)</button>
+            <button type="button" data-condicao="reuniao" onclick="selecionarCondicaoHomeOffice('modal', 'reuniao')" class="text-xs font-bold uppercase px-4 py-2 rounded-xl border border-slate-700 text-slate-400 hover:border-brand-600 transition">Reunião (Sede)</button>
+            <button type="button" data-condicao="solicitado" onclick="selecionarCondicaoHomeOffice('modal', 'solicitado')" class="text-xs font-bold uppercase px-4 py-2 rounded-xl border border-slate-700 text-slate-400 hover:border-brand-600 transition">Solicitado (Folga)</button>
+          </div>
+          <input type="hidden" id="modalHomeOfficeCondicao">
+
+          <div id="modalBoxMotivoHomeOffice" class="hidden mt-3 bg-slate-900 border border-slate-700 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <span class="block text-[11px] uppercase font-bold text-slate-400">Motivo do Home Office</span>
+              <span id="modalTextoMotivoHomeOffice" class="text-sm font-bold text-white uppercase">Selecione ao Lado</span>
+            </div>
+            <div class="sm:text-right">
+              <span class="block text-[11px] uppercase font-bold text-slate-400">Média de Perda de Rendimento</span>
+              <span id="modalValorMediaPerdaRendimento" class="text-lg font-black text-red-400">R$ 0,00</span>
+            </div>
           </div>
         </div>
 
@@ -1362,6 +1448,216 @@
       if (msg) msg.classList.toggle('hidden', algumVisivel);
     }
 
+    // =========================================================================
+    // HOME OFFICE (por escala/dia)
+    // -------------------------------------------------------------------------
+    // 👎 (NÃO) vem ativo por padrão. Clicar de novo no botão já ativo volta ao
+    // estado NEUTRO (só para corrigir um clique errado — ao salvar, o estado
+    // neutro é gravado como "não decidido", assim como nos itens recebíveis).
+    // Quando SIM está marcado, abre o seletor da condição do home office
+    // (Compulsório/Reunião/Solicitado) — só uma pode ficar selecionada.
+    // =========================================================================
+
+    // MÉDIA DE PERDA DE RENDIMENTO (dia em Home Office)
+    // -------------------------------------------------------------------------
+    // Estimativa de quanto se deixa de ganhar num dia de home office: a média
+    // entre um jeton de atividade Dobrada (R$220) e um jeton de atividade
+    // Quádrupla já em dobro (R$440), com o Imposto de Renda já descontado.
+    // EDITE OS VALORES AQUI para ajustar a estimativa.
+    const JETON_MEDIO_DOBRADA = 220;
+    const JETON_MEDIO_QUADRUPLA = 440;
+    const ALIQUOTA_IR_HOME_OFFICE = 0.22;
+    const VALOR_MEDIA_PERDA_RENDIMENTO =
+      ((JETON_MEDIO_DOBRADA + JETON_MEDIO_QUADRUPLA) / 2) * (1 - ALIQUOTA_IR_HOME_OFFICE);
+
+    const LABELS_CONDICAO_HOME_OFFICE = {
+      compulsorio: 'Compulsório (Contingência)',
+      reuniao: 'Reunião (Sede)',
+      solicitado: 'Solicitado (Folga)'
+    };
+
+    function idsHomeOffice(prefixo) {
+      return {
+        chkId: prefixo ? `${prefixo}ChkHomeOffice` : 'chkHomeOffice',
+        wrapperId: prefixo ? `${prefixo}WrapperHomeOffice` : 'wrapperHomeOffice',
+        condicaoWrapperId: prefixo ? `${prefixo}WrapperHomeOfficeCondicao` : 'wrapperHomeOfficeCondicao',
+        condicaoInputId: prefixo ? `${prefixo}HomeOfficeCondicao` : 'homeOfficeCondicao',
+        motivoBoxId: prefixo ? `${prefixo}BoxMotivoHomeOffice` : 'boxMotivoHomeOffice',
+        motivoTextoId: prefixo ? `${prefixo}TextoMotivoHomeOffice` : 'textoMotivoHomeOffice',
+        mediaPerdaId: prefixo ? `${prefixo}ValorMediaPerdaRendimento` : 'valorMediaPerdaRendimento'
+      };
+    }
+
+    function definirEstadoHomeOffice(prefixo, valor, decidido, condicao) {
+      const { chkId, condicaoInputId } = idsHomeOffice(prefixo);
+      const chk = document.getElementById(chkId);
+      if (!chk) return;
+      chk.checked = valor === true;
+      chk.dataset.decidido = decidido ? '1' : '0';
+      const inputCondicao = document.getElementById(condicaoInputId);
+      if (inputCondicao) inputCondicao.value = condicao || '';
+      atualizarVisualHomeOffice(prefixo);
+    }
+
+    // Chamado pelo clique do usuário num dos dois botões (👍 ou 👎).
+    function alternarHomeOffice(prefixo, valor) {
+      const { chkId } = idsHomeOffice(prefixo);
+      const chk = document.getElementById(chkId);
+      if (!chk) return;
+      const jaEstavaNesseEstado = chk.dataset.decidido === '1' && chk.checked === valor;
+      definirEstadoHomeOffice(prefixo, jaEstavaNesseEstado ? false : valor, !jaEstavaNesseEstado, '');
+      chk.dispatchEvent(new Event('change'));
+    }
+
+    function atualizarVisualHomeOffice(prefixo) {
+      const { chkId, wrapperId, condicaoWrapperId } = idsHomeOffice(prefixo);
+      const chk = document.getElementById(chkId);
+      const wrapper = document.getElementById(wrapperId);
+      if (!chk || !wrapper) return;
+      const btnSim = wrapper.querySelector('[data-joinha="sim"]');
+      const btnNao = wrapper.querySelector('[data-joinha="nao"]');
+      if (!btnSim || !btnNao) return;
+      const decidido = chk.dataset.decidido === '1';
+      [btnSim, btnNao].forEach(btn => {
+        btn.classList.remove('bg-emerald-600', 'border-emerald-500', 'bg-red-600', 'border-red-500', 'text-white');
+        btn.classList.add('border-slate-700', 'text-slate-500');
+      });
+      if (decidido && chk.checked) {
+        btnSim.classList.remove('border-slate-700', 'text-slate-500');
+        btnSim.classList.add('bg-emerald-600', 'border-emerald-500', 'text-white');
+      } else if (decidido && !chk.checked) {
+        btnNao.classList.remove('border-slate-700', 'text-slate-500');
+        btnNao.classList.add('bg-red-600', 'border-red-500', 'text-white');
+      }
+      const wrapperCondicao = document.getElementById(condicaoWrapperId);
+      const mostrarCondicao = decidido && chk.checked;
+      if (wrapperCondicao) wrapperCondicao.classList.toggle('hidden', !mostrarCondicao);
+      const { motivoBoxId, mediaPerdaId } = idsHomeOffice(prefixo);
+      const motivoBox = document.getElementById(motivoBoxId);
+      const valorMediaEl = document.getElementById(mediaPerdaId);
+      if (motivoBox) motivoBox.classList.toggle('hidden', !mostrarCondicao);
+      if (valorMediaEl) valorMediaEl.textContent = mostrarCondicao ? formatarMoeda(VALOR_MEDIA_PERDA_RENDIMENTO) : formatarMoeda(0);
+      atualizarVisualCondicaoHomeOffice(prefixo);
+    }
+
+    // Chamado pelo clique numa das 3 condições (Compulsório/Reunião/Solicitado).
+    function selecionarCondicaoHomeOffice(prefixo, valor) {
+      const { condicaoInputId } = idsHomeOffice(prefixo);
+      const input = document.getElementById(condicaoInputId);
+      if (!input) return;
+      input.value = (input.value === valor) ? '' : valor;
+      atualizarVisualCondicaoHomeOffice(prefixo);
+      input.dispatchEvent(new Event('change'));
+    }
+
+    function atualizarVisualCondicaoHomeOffice(prefixo) {
+      const { condicaoWrapperId, condicaoInputId, motivoTextoId } = idsHomeOffice(prefixo);
+      const wrapperCondicao = document.getElementById(condicaoWrapperId);
+      const input = document.getElementById(condicaoInputId);
+      if (!wrapperCondicao || !input) return;
+      const valor = input.value;
+      wrapperCondicao.querySelectorAll('[data-condicao]').forEach(btn => {
+        const ativo = btn.dataset.condicao === valor;
+        btn.classList.toggle('bg-brand-600', ativo);
+        btn.classList.toggle('border-brand-500', ativo);
+        btn.classList.toggle('text-white', ativo);
+        btn.classList.toggle('border-slate-700', !ativo);
+        btn.classList.toggle('text-slate-400', !ativo);
+      });
+      const textoMotivo = document.getElementById(motivoTextoId);
+      if (textoMotivo) textoMotivo.textContent = LABELS_CONDICAO_HOME_OFFICE[valor] || 'Selecione ao Lado';
+      aplicarBloqueioCamposHomeOffice(prefixo);
+    }
+
+    // Devolve true/false/null (null = "não decidido") — usado ao SALVAR.
+    function valorHomeOfficeParaSalvar(prefixo) {
+      const { chkId } = idsHomeOffice(prefixo);
+      const chk = document.getElementById(chkId);
+      if (!chk || chk.dataset.decidido !== '1') return null;
+      return chk.checked === true;
+    }
+
+    // Devolve a condição escolhida (só faz sentido quando homeOffice === true).
+    function condicaoHomeOfficeParaSalvar(prefixo) {
+      if (valorHomeOfficeParaSalvar(prefixo) !== true) return null;
+      const { condicaoInputId } = idsHomeOffice(prefixo);
+      const input = document.getElementById(condicaoInputId);
+      return (input && input.value) ? input.value : null;
+    }
+
+    // Só existe (e só faz sentido) quando homeOffice === true.
+    function valorMediaPerdaRendimentoParaSalvar(prefixo) {
+      return valorHomeOfficeParaSalvar(prefixo) === true ? VALOR_MEDIA_PERDA_RENDIMENTO : null;
+    }
+
+    // Diferença em minutos entre dois horários "HH:MM" (considera virada de
+    // meia-noite, se o horário final for menor que o inicial).
+    function calcularMinutosEntreHorarios(horarioInicio, horarioFim) {
+      if (!horarioInicio || !horarioFim) return 0;
+      const [hI, mI] = horarioInicio.split(':').map(Number);
+      const [hF, mF] = horarioFim.split(':').map(Number);
+      let minutoInicio = hI * 60 + mI;
+      let minutoFim = hF * 60 + mF;
+      if (minutoFim < minutoInicio) minutoFim += 24 * 60;
+      return minutoFim - minutoInicio;
+    }
+
+    // =========================================================================
+    // BLOQUEIO DE CAMPOS QUANDO A ESCALA É HOME OFFICE
+    // -------------------------------------------------------------------------
+    // Num dia de Home Office não existe deslocamento físico, então local,
+    // horários, jeton, função e a percepção do 4º jeton não fazem sentido —
+    // ficam desabilitados e limpos, restando só a Data da Atividade para
+    // preencher. ÚNICA EXCEÇÃO: quando a condição for "Reunião (Sede)", os
+    // campos Horário de Saída e Horário de Chegada voltam a ficar habilitados,
+    // para registrar a duração da reunião (usada no card "Total de Horas de
+    // Home Office (Reunião - Sede)").
+    // =========================================================================
+    function idsCamposBloqueaveisHomeOffice(prefixo) {
+      const idify = (nome) => prefixo ? `${prefixo}${nome.charAt(0).toUpperCase()}${nome.slice(1)}` : nome;
+      const idsHorarios = [idify('horarioSaida'), idify('horarioChegada')];
+      const idsDemais = [idify('percepcaoQuartoJeton')];
+      ['Manha', 'Tarde', 'Noite'].forEach(periodo => {
+        idsDemais.push(idify(`local${periodo}`), idify(`pernoite${periodo}`), idify(`jeton${periodo}`));
+      });
+      const namesFuncao = ['Manha', 'Tarde', 'Noite'].map(periodo => idify(`funcao${periodo}`));
+      return { idsHorarios, idsDemais, namesFuncao };
+    }
+
+    function definirCampoBloqueado(elemento, bloquear) {
+      if (!elemento) return;
+      elemento.disabled = bloquear;
+      if (bloquear) {
+        // Limpa o valor: campos desabilitados continuam acessíveis via
+        // JavaScript (elemento.value), então sem isso um valor antigo
+        // "fantasma" poderia continuar entrando nos cálculos.
+        if (elemento.tagName === 'SELECT') elemento.selectedIndex = 0;
+        else if (elemento.type === 'checkbox') elemento.checked = false;
+        else elemento.value = '';
+      }
+    }
+
+    function aplicarBloqueioCamposHomeOffice(prefixo) {
+      const { chkId, condicaoInputId } = idsHomeOffice(prefixo);
+      const chk = document.getElementById(chkId);
+      if (!chk) return;
+      const ehHomeOffice = chk.dataset.decidido === '1' && chk.checked === true;
+      const condicaoInput = document.getElementById(condicaoInputId);
+      const ehReuniao = ehHomeOffice && condicaoInput && condicaoInput.value === 'reuniao';
+
+      const { idsHorarios, idsDemais, namesFuncao } = idsCamposBloqueaveisHomeOffice(prefixo);
+
+      // Horário de Saída/Chegada: bloqueados no Home Office, EXCETO na
+      // condição Reunião (Sede), onde ficam liberados de propósito.
+      idsHorarios.forEach(id => definirCampoBloqueado(document.getElementById(id), ehHomeOffice && !ehReuniao));
+
+      // Demais campos do dia: sempre bloqueados durante o Home Office.
+      idsDemais.forEach(id => definirCampoBloqueado(document.getElementById(id), ehHomeOffice));
+      namesFuncao.forEach(name => {
+        document.getElementsByName(name).forEach(el => definirCampoBloqueado(el, ehHomeOffice));
+      });
+    }
+
     function calcularValoresEscala() {
       let jManha = parseFloat(document.getElementById('jetonManha').value) || 0;
       let jTarde = parseFloat(document.getElementById('jetonTarde').value) || 0;
@@ -1394,6 +1690,7 @@
         { local: document.getElementById('localNoite').value.trim(), pernoite: document.getElementById('pernoiteNoite').value }
       ]);
       atualizarVisibilidadeItensRecebiveis('', extrasAtual);
+      atualizarVisualHomeOffice('');
       const flagsAtual = {
         diariaAlimentacaoRecebivel: document.getElementById('chkDiariaAlimentacaoRecebivel')?.checked === true,
         diariaPernoiteRecebivel: document.getElementById('chkDiariaPernoiteRecebivel')?.checked === true,
@@ -1440,7 +1737,7 @@
       }
     }
 
-    document.querySelectorAll('#dataAtividade, #horarioSaida, #horarioChegada, #localManha, #localTarde, #localNoite, #jetonManha, #jetonTarde, #jetonNoite, #percepcaoQuartoJeton, #chkDiariaAlimentacaoRecebivel, #chkDiariaPernoiteRecebivel, #chkDiariaTrasladoRecebivel, #chkAuxAlimentacaoRecebivel, #chkAuxTransporteRecebivel').forEach(el => {
+    document.querySelectorAll('#dataAtividade, #horarioSaida, #horarioChegada, #localManha, #localTarde, #localNoite, #jetonManha, #jetonTarde, #jetonNoite, #percepcaoQuartoJeton, #chkDiariaAlimentacaoRecebivel, #chkDiariaPernoiteRecebivel, #chkDiariaTrasladoRecebivel, #chkAuxAlimentacaoRecebivel, #chkAuxTransporteRecebivel, #chkHomeOffice, #homeOfficeCondicao').forEach(el => {
       el.addEventListener('change', calcularValoresEscala);
     });
 
@@ -1466,6 +1763,8 @@
       let totalQuadruplas = 0;
       let totalMinutosTrabalhados = 0;
       let valorTotalJeton = 0;
+      let totalHomeOffices = 0, totalHomeOfficesCompulsorio = 0, totalHomeOfficesReuniao = 0, totalHomeOfficesSolicitado = 0;
+      let totalMinutosHomeOfficeReuniao = 0;
 
       escalasSalvas.forEach(esc => {
         const jetons = [esc.jetonManha, esc.jetonTarde, esc.jetonNoite];
@@ -1485,13 +1784,16 @@
           totalQuadruplas++;
         }
 
-        if (esc.horarioSaida && esc.horarioChegada) {
-          const [sH, sM] = esc.horarioSaida.split(':').map(Number);
-          const [cH, cM] = esc.horarioChegada.split(':').map(Number);
-          let mSaida = sH * 60 + sM;
-          let mChegada = cH * 60 + cM;
-          if (mChegada < mSaida) mChegada += 24 * 60;
-          totalMinutosTrabalhados += (mChegada - mSaida);
+        if (esc.homeOffice === true) {
+          totalHomeOffices++;
+          if (esc.homeOfficeCondicao === 'compulsorio') totalHomeOfficesCompulsorio++;
+          if (esc.homeOfficeCondicao === 'reuniao') {
+            totalHomeOfficesReuniao++;
+            totalMinutosHomeOfficeReuniao += calcularMinutosEntreHorarios(esc.horarioSaida, esc.horarioChegada);
+          }
+          if (esc.homeOfficeCondicao === 'solicitado') totalHomeOfficesSolicitado++;
+        } else if (esc.horarioSaida && esc.horarioChegada) {
+          totalMinutosTrabalhados += calcularMinutosEntreHorarios(esc.horarioSaida, esc.horarioChegada);
         }
 
         const jetonStat = (parseFloat(esc.jetonManha) || 0) + (parseFloat(esc.jetonTarde) || 0) + ((parseFloat(esc.jetonNoite) || 0) * (esc.percepcaoQuartoJeton === 'SIM' ? 2 : 1));
@@ -1500,6 +1802,8 @@
 
       const horasTotais = Math.floor(totalMinutosTrabalhados / 60);
       const minutosTotais = totalMinutosTrabalhados % 60;
+      const horasHomeOfficeReuniao = Math.floor(totalMinutosHomeOfficeReuniao / 60);
+      const minutosHomeOfficeReuniao = totalMinutosHomeOfficeReuniao % 60;
       const totalHorasNumerico = totalMinutosTrabalhados / 60;
 
       document.getElementById('statSimples').innerText = totalSimples;
@@ -1508,6 +1812,9 @@
       document.getElementById('statQuadruplas').innerText = totalQuadruplas;
       document.getElementById('statTotalEscalas').innerText = escalasSalvas.length;
       document.getElementById('statTotalHoras').innerText = `${horasTotais}H ${minutosTotais.toString().padStart(2, '0')}M`;
+      document.getElementById('statHomeOffices').innerText = totalHomeOffices;
+      document.getElementById('statHomeOfficesDetalhe').innerText = `${totalHomeOfficesCompulsorio} Compulsório | ${totalHomeOfficesReuniao} Reunião | ${totalHomeOfficesSolicitado} Solicitado`;
+      document.getElementById('statHorasHomeOfficeReuniao').innerText = `${horasHomeOfficeReuniao}H ${String(minutosHomeOfficeReuniao).padStart(2, '0')}M`;
 
       document.getElementById('recValorTotalJeton').innerText = formatarMoeda(valorTotalJeton);
 
@@ -1763,6 +2070,9 @@
         diariaTrasladoRecebivel: flagsSalvar.diariaTrasladoRecebivel,
         auxAlimentacaoRecebivel: flagsSalvar.auxAlimentacaoRecebivel,
         auxTransporteRecebivel: flagsSalvar.auxTransporteRecebivel,
+        homeOffice: valorHomeOfficeParaSalvar(''),
+        homeOfficeCondicao: condicaoHomeOfficeParaSalvar(''),
+        valorMediaPerdaRendimento: valorMediaPerdaRendimentoParaSalvar(''),
         horasTrabalhadasStr,
         valorHoraStr,
         anotacoes: { notaVtr, notaLocalManha, notaLocalTarde, notaLocalNoite, notaOutros }
@@ -2165,6 +2475,7 @@
       document.getElementById('btnCancelarEdicao').classList.add('hidden');
       localStorage.removeItem(STORAGE_KEY_RASCUNHO);
       ITENS_RECEBIVEIS.forEach(sufixo => definirEstadoRecebivel('', sufixo, false, false));
+      definirEstadoHomeOffice('', false, true, '');
       gerenciarCamposPernoite();
       calcularValoresEscala();
 
@@ -2206,6 +2517,7 @@
       definirEstadoRecebivel('', 'DiariaTraslado', esc.diariaTrasladoRecebivel === true, esc.diariaTrasladoRecebivel !== undefined && esc.diariaTrasladoRecebivel !== null);
       definirEstadoRecebivel('', 'AuxAlimentacao', esc.auxAlimentacaoRecebivel === true, esc.auxAlimentacaoRecebivel !== undefined && esc.auxAlimentacaoRecebivel !== null);
       definirEstadoRecebivel('', 'AuxTransporte', esc.auxTransporteRecebivel === true, esc.auxTransporteRecebivel !== undefined && esc.auxTransporteRecebivel !== null);
+      definirEstadoHomeOffice('', esc.homeOffice === true, esc.homeOffice !== null, esc.homeOfficeCondicao);
 
       document.querySelectorAll('input[name="funcaoManha"]').forEach(cb => { cb.checked = esc.funcaoManha?.includes(cb.value); });
       document.querySelectorAll('input[name="funcaoTarde"]').forEach(cb => { cb.checked = esc.funcaoTarde?.includes(cb.value); });
@@ -2532,6 +2844,8 @@
       let totalSimples = 0, totalDobradas = 0, totalTriplas = 0, totalQuadruplas = 0;
       let totalMinutosTrabalhados = 0, valorTotalJeton = 0, valorDiarias = 0, valorAuxilios = 0;
       let valorDiariasRecebivel = 0, valorAuxiliosRecebivel = 0;
+      let totalHomeOffices = 0, totalHomeOfficesCompulsorio = 0, totalHomeOfficesReuniao = 0, totalHomeOfficesSolicitado = 0;
+      let totalMinutosHomeOfficeReuniao = 0;
 
       escalasArr.forEach(esc => {
         const jetons = [esc.jetonManha, esc.jetonTarde, esc.jetonNoite];
@@ -2541,14 +2855,16 @@
         });
         if (esc.localNoite && esc.percepcaoQuartoJeton !== 'SIM') totalTriplas++;
         if (esc.percepcaoQuartoJeton === 'SIM') totalQuadruplas++;
-
-        if (esc.horarioSaida && esc.horarioChegada) {
-          const [sH, sM] = esc.horarioSaida.split(':').map(Number);
-          const [cH, cM] = esc.horarioChegada.split(':').map(Number);
-          let mSaida = sH * 60 + sM;
-          let mChegada = cH * 60 + cM;
-          if (mChegada < mSaida) mChegada += 24 * 60;
-          totalMinutosTrabalhados += (mChegada - mSaida);
+        if (esc.homeOffice === true) {
+          totalHomeOffices++;
+          if (esc.homeOfficeCondicao === 'compulsorio') totalHomeOfficesCompulsorio++;
+          if (esc.homeOfficeCondicao === 'reuniao') {
+            totalHomeOfficesReuniao++;
+            totalMinutosHomeOfficeReuniao += calcularMinutosEntreHorarios(esc.horarioSaida, esc.horarioChegada);
+          }
+          if (esc.homeOfficeCondicao === 'solicitado') totalHomeOfficesSolicitado++;
+        } else if (esc.horarioSaida && esc.horarioChegada) {
+          totalMinutosTrabalhados += calcularMinutosEntreHorarios(esc.horarioSaida, esc.horarioChegada);
         }
 
         const jetonStat = (parseFloat(esc.jetonManha) || 0) + (parseFloat(esc.jetonTarde) || 0) + ((parseFloat(esc.jetonNoite) || 0) * (esc.percepcaoQuartoJeton === 'SIM' ? 2 : 1));
@@ -2580,6 +2896,8 @@
 
       const horasTotais = Math.floor(totalMinutosTrabalhados / 60);
       const minutosTotais = totalMinutosTrabalhados % 60;
+      const horasHomeOfficeReuniao = Math.floor(totalMinutosHomeOfficeReuniao / 60);
+      const minutosHomeOfficeReuniao = totalMinutosHomeOfficeReuniao % 60;
       const totalHorasNumerico = totalMinutosTrabalhados / 60;
       const qtdEscalas = escalasArr.length;
       const somaAtividades = totalSimples + totalDobradas + totalTriplas + totalQuadruplas;
@@ -2603,7 +2921,9 @@
         totalEscalas: qtdEscalas, horasTotais, minutosTotais,
         valorTotalJeton, valorMedioEscala, valorMedioAtividade, valorMedioHora,
         valorDiarias, valorAuxilios, valorDiariasRecebivel, valorAuxiliosRecebivel,
-        balancoDiarias, balancoAuxilios, valorDescontoIR, valorRealJeton
+        balancoDiarias, balancoAuxilios, valorDescontoIR, valorRealJeton,
+        totalHomeOffices, totalHomeOfficesCompulsorio, totalHomeOfficesReuniao, totalHomeOfficesSolicitado,
+        horasHomeOfficeReuniao, minutosHomeOfficeReuniao
       };
     }
 
@@ -2622,6 +2942,8 @@
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Atividades Quádruplas</span><span id="statQuadruplas" class="text-xl font-black text-emerald-400">${v.totalQuadruplas}</span></div>
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Total de Escalas</span><span id="statTotalEscalas" class="text-xl font-black text-white">${v.totalEscalas}</span></div>
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Horas Trabalhadas</span><span id="statTotalHoras" class="text-xl font-black text-cyan-400">${v.horasTotais}H ${String(v.minutosTotais).padStart(2, '0')}M</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Home Offices</span><span id="statHomeOffices" class="text-xl font-black text-purple-400">${v.totalHomeOffices}</span><span id="statHomeOfficesDetalhe" class="block text-[10px] text-slate-500 uppercase mt-0.5">${v.totalHomeOfficesCompulsorio} Compulsório | ${v.totalHomeOfficesReuniao} Reunião | ${v.totalHomeOfficesSolicitado} Solicitado</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Horas de Home Office (Reunião - Sede)</span><span id="statHorasHomeOfficeReuniao" class="text-xl font-black text-indigo-400">${v.horasHomeOfficeReuniao}H ${String(v.minutosHomeOfficeReuniao).padStart(2, '0')}M</span></div>
           </div>
         </section>
       `;
@@ -2716,6 +3038,7 @@
       definirEstadoRecebivel('modal', 'DiariaTraslado', esc.diariaTrasladoRecebivel === true, esc.diariaTrasladoRecebivel !== undefined && esc.diariaTrasladoRecebivel !== null);
       definirEstadoRecebivel('modal', 'AuxAlimentacao', esc.auxAlimentacaoRecebivel === true, esc.auxAlimentacaoRecebivel !== undefined && esc.auxAlimentacaoRecebivel !== null);
       definirEstadoRecebivel('modal', 'AuxTransporte', esc.auxTransporteRecebivel === true, esc.auxTransporteRecebivel !== undefined && esc.auxTransporteRecebivel !== null);
+      definirEstadoHomeOffice('modal', esc.homeOffice === true, esc.homeOffice !== null, esc.homeOfficeCondicao);
       atualizarVisibilidadeItensRecebiveis('modal', obterValoresExtrasEscala(esc.data, [
         { local: esc.localManha || '', pernoite: esc.pernoiteManha },
         { local: esc.localTarde || '', pernoite: esc.pernoiteTarde },
@@ -2852,6 +3175,9 @@
         diariaTrasladoRecebivel: flagsModal.diariaTrasladoRecebivel,
         auxAlimentacaoRecebivel: flagsModal.auxAlimentacaoRecebivel,
         auxTransporteRecebivel: flagsModal.auxTransporteRecebivel,
+        homeOffice: valorHomeOfficeParaSalvar('modal'),
+        homeOfficeCondicao: condicaoHomeOfficeParaSalvar('modal'),
+        valorMediaPerdaRendimento: valorMediaPerdaRendimentoParaSalvar('modal'),
         horasTrabalhadasStr, valorHoraStr,
         anotacoes: {
           notaVtr: document.getElementById('modalNotaVtr').value,
