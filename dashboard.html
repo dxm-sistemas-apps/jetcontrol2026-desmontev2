@@ -342,6 +342,24 @@
         <!-- Legenda calculada: editar em textoVolumeEscalasSub() -->
         <div class="kpi-subtext" id="kpi-escalas-sub">(calculado automaticamente)</div>
       </div>
+      <div class="kpi-card">
+        <div class="kpi-label" id="label-kpi-home-offices">Volume de Home Offices</div>
+        <div class="kpi-value" id="kpi-home-offices">0</div>
+        <!-- Legenda calculada: editar em textoHomeOfficesSub() -->
+        <div class="kpi-subtext" id="kpi-home-offices-sub">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card warning">
+        <div class="kpi-label" id="label-kpi-perda-rendimento">Perda de Rendimento (Home Office)</div>
+        <div class="kpi-value" id="kpi-perda-rendimento">R$ 0,00</div>
+        <!-- Legenda calculada: editar em textoPerdaRendimentoSub() -->
+        <div class="kpi-subtext" id="kpi-perda-rendimento-sub">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label" id="label-kpi-horas-home-office">Horas de Home Office (Reunião - Sede)</div>
+        <div class="kpi-value" id="kpi-horas-home-office">0H 00M</div>
+        <!-- Legenda calculada: editar em textoHorasHomeOfficeSub() -->
+        <div class="kpi-subtext" id="kpi-horas-home-office-sub">(calculado automaticamente)</div>
+      </div>
       <div class="kpi-card purple">
         <div class="kpi-label" id="label-kpi-diarias-auxilios">Diárias & Auxílios</div>
         <div class="kpi-value" id="kpi-diarias-auxilios">R$ 0,00</div>
@@ -486,6 +504,14 @@
         </div>
         <div class="chart-container">
           <canvas id="chartAtividadeQuadruplas"></canvas>
+        </div>
+      </div>
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartTop6HomeOffices">6 Ciclos com Mais Home Offices</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTop6HomeOffices"></canvas>
         </div>
       </div>
     </section>
@@ -657,12 +683,24 @@
       return (valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     };
 
+    // Diferença em minutos entre dois horários "HH:MM" (considera virada de
+    // meia-noite, se o horário final for menor que o inicial).
+    function calcularMinutosEntreHorarios(horarioInicio, horarioFim) {
+      if (!horarioInicio || !horarioFim) return 0;
+      const [hI, mI] = horarioInicio.split(':').map(Number);
+      const [hF, mF] = horarioFim.split(':').map(Number);
+      let minutoInicio = hI * 60 + mI;
+      let minutoFim = hF * 60 + mF;
+      if (minutoFim < minutoInicio) minutoFim += 24 * 60;
+      return minutoFim - minutoInicio;
+    }
+
     // Define o texto de um elemento (por id). Usado para as legendas dos
     // KPIs que são recalculadas a cada atualização do dashboard (mostram
     // números, não títulos fixos).
     function definirTextoRotulo(id, texto) {
       const el = document.getElementById(id);
-      if (el) el.innerHTML = texto;
+      if (el) el.textContent = texto;
     }
 
     // =========================================================================
@@ -680,33 +718,36 @@
     // editar o texto entre aspas dentro de cada função abaixo, mantendo os
     // trechos ${...} (esses colam os números calculados; não apague-os).
     // =========================================================================
-   function textoReceitaBrutaSub(qtdCiclosFechados) {
-  return `${qtdCiclosFechados} Ciclo(s) Fechado(s) + Vigente`;
-}
-
-function textoReceitaLiquidaSub(percentualLiquidoIR) {
-  return `Jeton Líquido (${percentualLiquidoIR}%) + Diárias/Aux.`;
-}
-
-function textoVolumeEscalasSub(qtdSimples, qtdDobrada, qtdTripla, qtdQuadrupla) {
-  return `${qtdSimples} Simples <br> ${qtdDobrada} Dobradas <br> ${qtdTripla} Triplas <br> ${qtdQuadrupla} Quádruplas`;
-}
-
-function textoDiariasAuxiliosSub(valorAuxAlimentacao, valorAuxTransporte, valorDiariaAlimentacao, valorDiariaHospedagem) {
-  return `${formatMoeda(valorAuxAlimentacao)} Auxílio Alimentação <br> ${formatMoeda(valorAuxTransporte)} Auxílio Transporte <br> ${formatMoeda(valorDiariaAlimentacao)} Diária de Alimentação <br> ${formatMoeda(valorDiariaHospedagem)} Diária de Pernoite`;
-}
-
-function textoRendimentoHoraSub(totalHoras) {
-  return `Total de ${totalHoras.toFixed(1)}h Trabalhadas`;
-}
-
-function textoRecebiveisSub(valorDiarias, valorAuxilios) {
-  return `${formatMoeda(valorDiarias)} Diárias <br> ${formatMoeda(valorAuxilios)} Auxílios`;
-}
-
-function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
-  return `${formatMoeda(valorDiferencaDiarias)} Diárias <br> ${formatMoeda(valorDiferencaAuxilios)} Auxílios`;
-}
+    function textoReceitaBrutaSub(qtdCiclosFechados) {
+      return `${qtdCiclosFechados} Ciclo(s) Fechado(s) + Vigente`;
+    }
+    function textoReceitaLiquidaSub(percentualLiquidoIR) {
+      return `Jeton Líquido (${percentualLiquidoIR}%) + Diárias/Aux.`;
+    }
+    function textoVolumeEscalasSub(qtdSimples, qtdDobrada, qtdTripla, qtdQuadrupla) {
+      return `${qtdSimples} Simples | ${qtdDobrada} Dobradas | ${qtdTripla} Triplas | ${qtdQuadrupla} Quádruplas`;
+    }
+    function textoHomeOfficesSub(qtdCompulsorio, qtdReuniao, qtdSolicitado) {
+      return `${qtdCompulsorio} Compulsório | ${qtdReuniao} Reunião | ${qtdSolicitado} Solicitado`;
+    }
+    function textoPerdaRendimentoSub(valorCompulsorio, valorReuniao, valorSolicitado) {
+      return `${formatMoeda(valorCompulsorio)} Compulsório | ${formatMoeda(valorReuniao)} Reunião | ${formatMoeda(valorSolicitado)} Solicitado`;
+    }
+    function textoHorasHomeOfficeSub(qtdReunioes) {
+      return `${qtdReunioes} Reunião/Reuniões Registrada(s)`;
+    }
+    function textoDiariasAuxiliosSub(valorAuxAlimentacao, valorAuxTransporte, valorDiariaAlimentacao, valorDiariaHospedagem) {
+      return `${formatMoeda(valorAuxAlimentacao)} Aux. Alimentação | ${formatMoeda(valorAuxTransporte)} Aux. Transporte | ${formatMoeda(valorDiariaAlimentacao)} Diária Alimentação | ${formatMoeda(valorDiariaHospedagem)} Diária Hospedagem`;
+    }
+    function textoRendimentoHoraSub(totalHoras) {
+      return `Total de ${totalHoras.toFixed(1)}h Trabalhadas`;
+    }
+    function textoRecebiveisSub(valorDiarias, valorAuxilios) {
+      return `${formatMoeda(valorDiarias)} Diárias | ${formatMoeda(valorAuxilios)} Auxílios`;
+    }
+    function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
+      return `${formatMoeda(valorDiferencaDiarias)} Diárias | ${formatMoeda(valorDiferencaAuxilios)} Auxílios`;
+    }
 
     // Helper: Extrai valor textual do HTML arquivado
     function extrairTextoHtml(htmlString, selector) {
@@ -1004,6 +1045,22 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
         dobrada: 0,
         tripla: 0,
         quadrupla: 0,
+        // HOME OFFICE: total de datas em home office no período, e o total
+        // de cada condição (Compulsório/Reunião/Solicitado).
+        homeOffices: 0,
+        homeOfficesCompulsorio: 0,
+        homeOfficesReuniao: 0,
+        homeOfficesSolicitado: 0,
+        // PERDA DE RENDIMENTO ESTIMADA NOS DIAS DE HOME OFFICE (soma do campo
+        // "Média de Perda de Rendimento" de cada escala em home office),
+        // total e por condição.
+        perdaRendimentoHomeOffice: 0,
+        perdaRendimentoCompulsorio: 0,
+        perdaRendimentoReuniao: 0,
+        perdaRendimentoSolicitado: 0,
+        // TOTAL DE MINUTOS DE HOME OFFICE NA CONDIÇÃO REUNIÃO (SEDE), calculado
+        // a partir de horarioSaida/horarioChegada de cada escala nessa condição.
+        minutosHomeOfficeReuniao: 0,
         // DETALHAMENTO POR TIPO DE DIÁRIA/AUXÍLIO (CARD "DIÁRIAS & AUXÍLIOS")
         diariaAlimentacao: 0,
         diariaHospedagem: 0,
@@ -1124,6 +1181,38 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
           ? (receitaLiquidaCiclo / metricasEscalas.horasTrabalhadas)
           : 0;
 
+        // HOME OFFICE deste ciclo: lido de escalasData (cópia estruturada das
+        // escalas, gravada ao fechar o ciclo). Ciclos fechados ANTES deste
+        // recurso existir não têm escalasData com esses campos — nesse caso
+        // o total simplesmente fica 0 (não havia o conceito ainda).
+        const escalasDoCiclo = ciclo.escalasData || [];
+        const homeOfficesCiclo = escalasDoCiclo.filter(e => e.homeOffice === true).length;
+        const homeOfficesCompulsorioCiclo = escalasDoCiclo.filter(e => e.homeOffice === true && e.homeOfficeCondicao === 'compulsorio').length;
+        const homeOfficesReuniaoCiclo = escalasDoCiclo.filter(e => e.homeOffice === true && e.homeOfficeCondicao === 'reuniao').length;
+        const homeOfficesSolicitadoCiclo = escalasDoCiclo.filter(e => e.homeOffice === true && e.homeOfficeCondicao === 'solicitado').length;
+        acumuladoGeral.homeOffices += homeOfficesCiclo;
+        acumuladoGeral.homeOfficesCompulsorio += homeOfficesCompulsorioCiclo;
+        acumuladoGeral.homeOfficesReuniao += homeOfficesReuniaoCiclo;
+        acumuladoGeral.homeOfficesSolicitado += homeOfficesSolicitadoCiclo;
+
+        // PERDA DE RENDIMENTO deste ciclo: soma do campo "Média de Perda de
+        // Rendimento" gravado em cada escala de home office (também vindo de
+        // escalasData).
+        const somarPerda = (condicaoFiltro) => escalasDoCiclo
+          .filter(e => e.homeOffice === true && (!condicaoFiltro || e.homeOfficeCondicao === condicaoFiltro))
+          .reduce((soma, e) => soma + (parseFloat(e.valorMediaPerdaRendimento) || 0), 0);
+        acumuladoGeral.perdaRendimentoHomeOffice += somarPerda();
+        acumuladoGeral.perdaRendimentoCompulsorio += somarPerda('compulsorio');
+        acumuladoGeral.perdaRendimentoReuniao += somarPerda('reuniao');
+        acumuladoGeral.perdaRendimentoSolicitado += somarPerda('solicitado');
+
+        // HORAS DE HOME OFFICE NA CONDIÇÃO REUNIÃO (SEDE) deste ciclo, a
+        // partir de horarioSaida/horarioChegada de cada escala nessa condição.
+        const minutosHomeOfficeReuniaoCiclo = escalasDoCiclo
+          .filter(e => e.homeOffice === true && e.homeOfficeCondicao === 'reuniao')
+          .reduce((soma, e) => soma + calcularMinutosEntreHorarios(e.horarioSaida, e.horarioChegada), 0);
+        acumuladoGeral.minutosHomeOfficeReuniao += minutosHomeOfficeReuniaoCiclo;
+
         // NOME DO CICLO: "CICLO - DATA DE ABERTURA À DATA DE FECHAMENTO" (novo padrão).
         // Ciclos antigos, fechados antes desta atualização e sem o campo "nome"
         // gravado, caem no cálculo a partir das datas arquivadas, ou no número
@@ -1159,6 +1248,7 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
           dobrada: metricasEscalas.dobrada,
           tripla: metricasEscalas.tripla,
           quadrupla: metricasEscalas.quadrupla,
+          homeOffices: homeOfficesCiclo,
           valorDescontoIR: valorDescontoIRCiclo,
           valorMedioEscala: valorMedioEscalaCiclo,
           valorMedioAtividade: valorMedioAtividadeCiclo,
@@ -1198,6 +1288,16 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
       let dobradaVigente = 0;
       let triplaVigente = 0;
       let quadruplaVigente = 0;
+
+      let homeOfficesVigente = 0;
+      let homeOfficesCompulsorioVigente = 0;
+      let homeOfficesReuniaoVigente = 0;
+      let homeOfficesSolicitadoVigente = 0;
+      let perdaRendimentoVigente = 0;
+      let perdaRendimentoCompulsorioVigente = 0;
+      let perdaRendimentoReuniaoVigente = 0;
+      let perdaRendimentoSolicitadoVigente = 0;
+      let minutosHomeOfficeReuniaoVigente = 0;
 
       const computarDiariasEAuxiliosVigente = localStorage.getItem('jetcontrol_computar_diarias_auxilios') !== 'false';
 
@@ -1270,6 +1370,20 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
         });
         if (escala.localNoite && !(escala.jeton4 || escala.percepcaoQuartoJeton === 'SIM')) triplaVigente++;
         if (escala.jeton4 || escala.percepcaoQuartoJeton === 'SIM') quadruplaVigente++;
+
+        // HOME OFFICE desta escala
+        if (escala.homeOffice === true) {
+          homeOfficesVigente++;
+          const perdaEsc = parseFloat(escala.valorMediaPerdaRendimento) || 0;
+          perdaRendimentoVigente += perdaEsc;
+          if (escala.homeOfficeCondicao === 'compulsorio') { homeOfficesCompulsorioVigente++; perdaRendimentoCompulsorioVigente += perdaEsc; }
+          if (escala.homeOfficeCondicao === 'reuniao') {
+            homeOfficesReuniaoVigente++;
+            perdaRendimentoReuniaoVigente += perdaEsc;
+            minutosHomeOfficeReuniaoVigente += calcularMinutosEntreHorarios(escala.horarioSaida, escala.horarioChegada);
+          }
+          if (escala.homeOfficeCondicao === 'solicitado') { homeOfficesSolicitadoVigente++; perdaRendimentoSolicitadoVigente += perdaEsc; }
+        }
 
         // Funções (campos reais: arrays funcaoManha/funcaoTarde/funcaoNoite com valores
         // 'APOIO' | 'COORDENADOR' | 'MOTORISTA' | 'RELATOR')
@@ -1351,6 +1465,17 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
       acumuladoGeral.tripla += triplaVigente;
       acumuladoGeral.quadrupla += quadruplaVigente;
 
+      acumuladoGeral.homeOffices += homeOfficesVigente;
+      acumuladoGeral.homeOfficesCompulsorio += homeOfficesCompulsorioVigente;
+      acumuladoGeral.homeOfficesReuniao += homeOfficesReuniaoVigente;
+      acumuladoGeral.homeOfficesSolicitado += homeOfficesSolicitadoVigente;
+
+      acumuladoGeral.perdaRendimentoHomeOffice += perdaRendimentoVigente;
+      acumuladoGeral.perdaRendimentoCompulsorio += perdaRendimentoCompulsorioVigente;
+      acumuladoGeral.perdaRendimentoReuniao += perdaRendimentoReuniaoVigente;
+      acumuladoGeral.perdaRendimentoSolicitado += perdaRendimentoSolicitadoVigente;
+      acumuladoGeral.minutosHomeOfficeReuniao += minutosHomeOfficeReuniaoVigente;
+
       // DETALHAMENTO POR TIPO DO CICLO VIGENTE — obtido das tabelas de
       // "Organograma das Diárias/Auxílios" mantidas atualizadas pela página
       // Cotas Extras a cada carregamento (mesma fonte usada pelos ciclos
@@ -1386,6 +1511,17 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
 
       document.getElementById('kpi-total-escalas').textContent = acumuladoGeral.escalas;
       definirTextoRotulo('kpi-escalas-sub', textoVolumeEscalasSub(acumuladoGeral.simples, acumuladoGeral.dobrada, acumuladoGeral.tripla, acumuladoGeral.quadrupla));
+
+      document.getElementById('kpi-home-offices').textContent = acumuladoGeral.homeOffices;
+      definirTextoRotulo('kpi-home-offices-sub', textoHomeOfficesSub(acumuladoGeral.homeOfficesCompulsorio, acumuladoGeral.homeOfficesReuniao, acumuladoGeral.homeOfficesSolicitado));
+
+      document.getElementById('kpi-perda-rendimento').textContent = formatMoeda(acumuladoGeral.perdaRendimentoHomeOffice);
+      definirTextoRotulo('kpi-perda-rendimento-sub', textoPerdaRendimentoSub(acumuladoGeral.perdaRendimentoCompulsorio, acumuladoGeral.perdaRendimentoReuniao, acumuladoGeral.perdaRendimentoSolicitado));
+
+      const horasHomeOfficeReuniaoGeral = Math.floor(acumuladoGeral.minutosHomeOfficeReuniao / 60);
+      const minutosHomeOfficeReuniaoGeral = acumuladoGeral.minutosHomeOfficeReuniao % 60;
+      document.getElementById('kpi-horas-home-office').textContent = `${horasHomeOfficeReuniaoGeral}H ${String(minutosHomeOfficeReuniaoGeral).padStart(2, '0')}M`;
+      definirTextoRotulo('kpi-horas-home-office-sub', textoHorasHomeOfficeSub(acumuladoGeral.homeOfficesReuniao));
 
       document.getElementById('kpi-diarias-auxilios').textContent = formatMoeda(totalDiariasEAuxiliosGeral);
       definirTextoRotulo('kpi-pernoites-count',
@@ -1448,6 +1584,7 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
         dobrada: dobradaVigente,
         tripla: triplaVigente,
         quadrupla: quadruplaVigente,
+        homeOffices: homeOfficesVigente,
         valorDescontoIR: valorDescontoIRVigente,
         valorMedioEscala: valorMedioEscalaVigente,
         valorMedioAtividade: valorMedioAtividadeVigente,
@@ -1478,6 +1615,7 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
       const top6Dobradas = top6PorTipologia('dobrada');
       const top6Triplas = top6PorTipologia('tripla');
       const top6Quadruplas = top6PorTipologia('quadrupla');
+      const top6HomeOffices = top6PorTipologia('homeOffices');
 
       // NOVOS RANKINGS: TOP 10 ESCALAS INDIVIDUAIS
       const top10Horas = [...listaEscalasDetalhadas].sort((a, b) => b.horas - a.horas).slice(0, 10);
@@ -1507,6 +1645,7 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
       renderizarGraficoAtividadePorCiclo('chartAtividadeDobradas', 'dobradas', top6Dobradas, 'dobrada', '#06b6d4', 'Atividades Dobradas');
       renderizarGraficoAtividadePorCiclo('chartAtividadeTriplas', 'triplas', top6Triplas, 'tripla', '#8b5cf6', 'Atividades Triplas');
       renderizarGraficoAtividadePorCiclo('chartAtividadeQuadruplas', 'quadruplas', top6Quadruplas, 'quadrupla', '#ef4444', 'Atividades Quádruplas');
+      renderizarGraficoAtividadePorCiclo('chartTop6HomeOffices', 'top6HomeOffices', top6HomeOffices, 'homeOffices', '#a855f7', 'Home Offices');
 
       // NOVOS GRÁFICOS: TOP 10 ESCALAS INDIVIDUAIS
       renderizarGraficoTopEscalas('chartTop10Horas', 'top10Horas', top10Horas, 'horas', '#f59e0b', 'HORAS TRABALHADAS', false);
@@ -1582,15 +1721,16 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
           }]
         },
         options: {
+          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
-            tooltip: { callbacks: { label: (item) => formatMoeda(item.parsed.y) } }
+            tooltip: { callbacks: { label: (item) => formatMoeda(item.parsed.x) } }
           },
           scales: {
-            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: (v) => formatMoeda(v) } },
-            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: (v) => formatMoeda(v) } },
+            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
       });
@@ -1612,12 +1752,13 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
           }]
         },
         options: {
+          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1 } },
-            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1 } },
+            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
       });
@@ -1639,12 +1780,13 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
           }]
         },
         options: {
+          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
-            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
+            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
       });
@@ -1666,12 +1808,13 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
           }]
         },
         options: {
+          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
-            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
+            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
       });
@@ -1698,12 +1841,13 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
           }]
         },
         options: {
+          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
-            x: { grid: { display: false }, ticks: { color: '#94a3b8', autoSkip: false, maxRotation: 60, minRotation: 30, font: { size: 10 } } }
+            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
+            y: { grid: { display: false }, ticks: { color: '#94a3b8', autoSkip: false, font: { size: 10 } } }
           }
         }
       });
@@ -1727,15 +1871,16 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
           ]
         },
         options: {
+          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: { position: 'bottom', labels: { color: '#f8fafc', padding: 15 } },
-            tooltip: { callbacks: { label: (item) => `${item.dataset.label}: ${formatMoeda(item.parsed.y)}` } }
+            tooltip: { callbacks: { label: (item) => `${item.dataset.label}: ${formatMoeda(item.parsed.x)}` } }
           },
           scales: {
-            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: (v) => formatMoeda(v) } },
-            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: (v) => formatMoeda(v) } },
+            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
       });
@@ -1761,12 +1906,13 @@ function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
           }]
         },
         options: {
+          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
-            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
+            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
       });
