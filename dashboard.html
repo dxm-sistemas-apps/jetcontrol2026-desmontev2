@@ -700,7 +700,7 @@
     // números, não títulos fixos).
     function definirTextoRotulo(id, texto) {
       const el = document.getElementById(id);
-      if (el) el.textContent = texto;
+      if (el) el.innerHTML = texto;
     }
 
     // =========================================================================
@@ -719,34 +719,34 @@
     // trechos ${...} (esses colam os números calculados; não apague-os).
     // =========================================================================
     function textoReceitaBrutaSub(qtdCiclosFechados) {
-      return `${qtdCiclosFechados} Ciclo(s) Fechado(s) + Vigente`;
+      return `${qtdCiclosFechados} Ciclo(s) Fechado(s) + Ciclo Vigente`;
     }
     function textoReceitaLiquidaSub(percentualLiquidoIR) {
-      return `Jeton Líquido (${percentualLiquidoIR}%) + Diárias/Aux.`;
+      return `Jeton Líquido (${percentualLiquidoIR}%) + Auxílios e Diárias`;
     }
     function textoVolumeEscalasSub(qtdSimples, qtdDobrada, qtdTripla, qtdQuadrupla) {
-      return `${qtdSimples} Simples | ${qtdDobrada} Dobradas | ${qtdTripla} Triplas | ${qtdQuadrupla} Quádruplas`;
+      return `${qtdSimples} Simples <br> ${qtdDobrada} Dobradas <br> ${qtdTripla} Triplas <br> ${qtdQuadrupla} Quádruplas`;
     }
     function textoHomeOfficesSub(qtdCompulsorio, qtdReuniao, qtdSolicitado) {
-      return `${qtdCompulsorio} Compulsório | ${qtdReuniao} Reunião | ${qtdSolicitado} Solicitado`;
+      return `${qtdCompulsorio} Compulsório <br> ${qtdReuniao} Reunião <br> ${qtdSolicitado} Solicitado`;
     }
     function textoPerdaRendimentoSub(valorCompulsorio, valorReuniao, valorSolicitado) {
-      return `${formatMoeda(valorCompulsorio)} Compulsório | ${formatMoeda(valorReuniao)} Reunião | ${formatMoeda(valorSolicitado)} Solicitado`;
+      return `${formatMoeda(valorCompulsorio)} Compulsório <br> ${formatMoeda(valorReuniao)} Reunião <br> ${formatMoeda(valorSolicitado)} Solicitado`;
     }
     function textoHorasHomeOfficeSub(qtdReunioes) {
       return `${qtdReunioes} Reunião/Reuniões Registrada(s)`;
     }
     function textoDiariasAuxiliosSub(valorAuxAlimentacao, valorAuxTransporte, valorDiariaAlimentacao, valorDiariaHospedagem) {
-      return `${formatMoeda(valorAuxAlimentacao)} Aux. Alimentação | ${formatMoeda(valorAuxTransporte)} Aux. Transporte | ${formatMoeda(valorDiariaAlimentacao)} Diária Alimentação | ${formatMoeda(valorDiariaHospedagem)} Diária Hospedagem`;
+      return `${formatMoeda(valorAuxAlimentacao)} Auxílio Alimentação <br> ${formatMoeda(valorAuxTransporte)} Auxílio Transporte <br> ${formatMoeda(valorDiariaAlimentacao)} Diária de Alimentação <br> ${formatMoeda(valorDiariaHospedagem)} Diária de Pernoite`;
     }
     function textoRendimentoHoraSub(totalHoras) {
       return `Total de ${totalHoras.toFixed(1)}h Trabalhadas`;
     }
     function textoRecebiveisSub(valorDiarias, valorAuxilios) {
-      return `${formatMoeda(valorDiarias)} Diárias | ${formatMoeda(valorAuxilios)} Auxílios`;
+      return `${formatMoeda(valorAuxilios)} Auxílios <br> ${formatMoeda(valorDiarias)} Diárias`;
     }
     function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios) {
-      return `${formatMoeda(valorDiferencaDiarias)} Diárias | ${formatMoeda(valorDiferencaAuxilios)} Auxílios`;
+      return `${formatMoeda(valorDiferencaAuxilios)} Auxílios <br> ${formatMoeda(valorDiferencaDiarias)} Diárias`;
     }
 
     // Helper: Extrai valor textual do HTML arquivado
