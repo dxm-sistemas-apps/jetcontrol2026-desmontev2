@@ -28,7 +28,7 @@
   </script>
   <style>
     body { text-transform: uppercase; }
-    /* Esconde barra de rolagem mas mantém rolagem ativa */
+    /* Oculta barra de rolagem visual mantendo a rolagem ativa */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -76,7 +76,6 @@
       <a href="ciclos.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">CICLOS</a>
       <a href="dashboard.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">DASHBOARD</a>
       <a href="resetar-dados.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">RESETAR DADOS</a>    
-
     </div>
   </header>
 
@@ -225,7 +224,7 @@
               Data de Abertura do Ciclo <span class="text-brand-500 font-normal"> <br> (Todo Dia 26)</span>
             </label>
 
-            <!-- Campo Visível: abre o calendário customizado ao ser clicado -->
+            <!-- Campo Visível -->
             <button type="button" id="btnAbrirCalendarioAbertura"
                     class="w-full flex items-center justify-between bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none focus:border-brand-500 transition text-left">
               <span id="dataAberturaDisplay" class="text-slate-500">SELECIONE O DIA 26 NO CALENDÁRIO</span>
@@ -237,9 +236,7 @@
               <i class="fa-solid fa-circle-info mr-1"></i> NAVEGUE ENTRE QUALQUER MÊS/ANO — SOMENTE O DIA 26 FICA HABILITADO PARA ESCOLHA.
             </p>
 
-            <!-- CALENDÁRIO CUSTOMIZADO (POPUP): TODOS OS MESES SÃO NAVEGÁVEIS,
-                 MAS SOMENTE O DIA 26 APARECE HABILITADO PARA SELEÇÃO EM
-                 QUALQUER MÊS/ANO EXIBIDO. -->
+            <!-- CALENDÁRIO CUSTOMIZADO -->
             <div id="calendarioAbertura" class="hidden absolute z-40 mt-2 w-full sm:w-72 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-4">
               <div class="flex items-center justify-between mb-3">
                 <button type="button" id="btnMesAnterior" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition">
@@ -257,7 +254,7 @@
             </div>
           </div>
 
-          <!-- Data de Fechamento do Ciclo (Automática: Dia 25 do mês seguinte) -->
+          <!-- Data de Fechamento do Ciclo -->
           <div class="space-y-2">
             <label for="dataFechamento" class="block text-xs font-bold uppercase text-slate-300">
               Data de Fechamento do Ciclo <span class="text-brand-500 font-normal"> <br> (Todo Dia 25 do mês seguinte A ABERTURA DO CICLO)</span>
@@ -266,7 +263,7 @@
                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none cursor-not-allowed">
           </div>
 
-          <!-- Recebimento em (Campo Automático +3 Meses) -->
+          <!-- Recebimento em -->
           <div class="space-y-2">
             <label for="recebimentoEm" class="block text-xs font-bold uppercase text-slate-300">
               Mês de Recebimento do Jeton <span class="text-brand-500 font-normal"> <br> (Todo 3º mês após o mês de abertura do ciclo)</span>
@@ -280,7 +277,7 @@
     </section>
   </main>
 
-  <!-- MENU INFERIOR FIXO / BOTTOM NAVIGATION BAR -->
+  <!-- MENU NO RODAPÉ DA TELA FIXO COM ÍCONES E NOMES -->
   <nav id="bottom-nav-container" class="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 shadow-2xl px-2 py-1.5 overflow-x-auto no-scrollbar">
     <div class="flex items-center justify-start md:justify-center gap-2 min-w-max mx-auto px-2">
       
@@ -319,12 +316,14 @@
 
   <!-- LÓGICA JAVASCRIPT -->
   <script>
-    // Menu Mobile
+    // Menu Mobile Superior
     const mobileBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
-    mobileBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-    });
+    if (mobileBtn && mobileMenu) {
+      mobileBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+    }
 
     // Chaves de LocalStorage
     const STORAGE_KEY_CICLO = 'jetcontrol_ciclo_dados';
@@ -347,7 +346,7 @@
     const inputDataFechamento = document.getElementById('dataFechamento');
     const saveStatus = document.getElementById('saveStatus');
 
-    // Elementos do Calendário Customizado (Data de Abertura)
+    // Elementos do Calendário Customizado
     const btnAbrirCalendarioAbertura = document.getElementById('btnAbrirCalendarioAbertura');
     const calendarioAbertura = document.getElementById('calendarioAbertura');
     const calendarioMesAno = document.getElementById('calendarioMesAno');
@@ -356,19 +355,15 @@
     const btnMesProximo = document.getElementById('btnMesProximo');
     const dataAberturaDisplay = document.getElementById('dataAberturaDisplay');
 
-    // Mês/ano atualmente exibido no calendário (objeto Date, dia irrelevante)
     let calendarioMesExibido = new Date();
 
-    // FORMATA DATA ISO (AAAA-MM-DD) PARA O PADRÃO BR (DD/MM/AAAA)
     function formatarDataBR(iso) {
       if (!iso) return '';
       const partes = iso.split('-');
       return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : iso;
     }
 
-    // CALCULA A DATA DE FECHAMENTO DO CICLO (DIA 25 DO MÊS IMEDIATAMENTE SEGUINTE À ABERTURA)
     function calcularDataFechamento(ano, mes) {
-      // mes é 0-indexado (0 = Janeiro)
       const proximoMesIndex = (mes + 1) % 12;
       const proximoAno = mes === 11 ? ano + 1 : ano;
       const mesFmt = String(proximoMesIndex + 1).padStart(2, '0');
@@ -380,7 +375,6 @@
       "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"
     ];
 
-    // CARREGAR E EXIBIR VALORES
     function carregarValores() {
       const salvos = JSON.parse(localStorage.getItem(STORAGE_KEY_VALORES)) || VALORES_PADRAO;
       document.getElementById('val-alimentacao').innerText = `R$ ${salvos.alimentacao || VALORES_PADRAO.alimentacao}`;
@@ -392,7 +386,6 @@
       document.getElementById('val-diariaTraslado').innerText = `R$ ${salvos.diariaTraslado || VALORES_PADRAO.diariaTraslado}`;
     }
 
-    // ATUALIZAR VALOR DE UM CAMPO ESPECÍFICO
     function editarValor(chave, nomeCampo) {
       const salvos = JSON.parse(localStorage.getItem(STORAGE_KEY_VALORES)) || { ...VALORES_PADRAO };
       const valorAtual = salvos[chave] || VALORES_PADRAO[chave];
@@ -408,7 +401,6 @@
       }
     }
 
-    // VALIDAÇÃO E CÁLCULO DE DATA (+3 meses no dia 26)
     function validarEProcessarData() {
       const dataVal = inputDataAbertura.value;
 
@@ -435,7 +427,6 @@
       return resultado;
     }
 
-    // CALENDÁRIO CUSTOMIZADO DA DATA DE ABERTURA
     function renderizarCalendarioAbertura() {
       const ano = calendarioMesExibido.getFullYear();
       const mes = calendarioMesExibido.getMonth();
@@ -524,7 +515,6 @@
       calendarioAbertura.classList.add('hidden');
     });
 
-    // SALVAR CICLO NO LOCALSTORAGE
     function salvarDadosLocal() {
       const partes = (inputDataAbertura.value || '').split('-');
       let dataFechamentoIso = '';
@@ -551,7 +541,6 @@
       exibirStatusSalvamento();
     }
 
-    // CARREGAR CICLO DO LOCALSTORAGE
     function carregarDadosLocal() {
       carregarValores();
 
@@ -588,7 +577,7 @@
       }, 3000);
     }
 
-    // ATIVAÇÃO E ROLAGEM AUTOMÁTICA DO MENU INFERIOR
+    // SINCRONIZAÇÃO E ROLAGEM AUTOMÁTICA DO MENU DO RODAPÉ
     function inicializarMenuRodape() {
       let paginaAtual = window.location.pathname.split('/').pop().toLowerCase();
       if (!paginaAtual || paginaAtual === '') {
@@ -600,15 +589,23 @@
 
       itens.forEach(item => {
         const paginaItem = (item.getAttribute('data-page') || '').toLowerCase();
+        const icone = item.querySelector('i');
+        
         if (paginaItem === paginaAtual || (paginaAtual === '' && paginaItem === 'index.html')) {
           itemAtivo = item;
           item.classList.remove('text-slate-400');
           item.classList.add('bg-brand-600', 'text-white', 'shadow-md');
-          const icone = item.querySelector('i');
-          if (icone) icone.classList.add('text-white');
+          if (icone) {
+            icone.classList.remove('text-brand-500', 'text-slate-400');
+            icone.classList.add('text-white');
+          }
         } else {
           item.classList.add('text-slate-400');
           item.classList.remove('bg-brand-600', 'text-white', 'shadow-md');
+          if (icone) {
+            icone.classList.remove('text-white');
+            icone.classList.add('text-brand-500');
+          }
         }
       });
 
