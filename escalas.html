@@ -344,7 +344,7 @@
         <!-- VALOR REAL DE JETON -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1 border-emerald-500/50">
           <span class="block text-sm uppercase font-bold text-slate-400">Valor Real de Jeton</span>
-          <span id="recValorRealJeton" class="text-2xl font-black text-emerald-400">R$ 0,00</span>
+          <span id="recValorRealJeton" class="text-xl font-black text-emerald-400">R$ 0,00</span>
         </div>
       </div>
     </section>
@@ -365,16 +365,16 @@
         <!-- Linha 1: Data e Horários Principais -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="relative">
-            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Data da Atividade *</label>
+            <label class="block text-sm uppercase font-bold text-slate-400 mb-1">Data da Atividade *</label>
             <input type="hidden" id="dataAtividade">
             <input type="text" id="dataAtividadeDisplay" readonly placeholder="SELECIONE A DATA" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-brand-500 cursor-pointer uppercase">
           </div>
           <div>
-            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Horário de Saída *</label>
+            <label class="block text-sm uppercase font-bold text-slate-400 mb-1">Horário de Saída *</label>
             <input type="time" id="horarioSaida" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500">
           </div>
           <div id="wrapperHomeOffice">
-            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Home Office</label>
+            <label class="block text-sm uppercase font-bold text-slate-400 mb-1">Home Office</label>
             <div class="flex items-center gap-2 h-[42px]">
               <button type="button" data-joinha="sim" onclick="alternarHomeOffice('', true)" title="Sim" class="w-10 h-10 rounded-xl border border-slate-700 text-slate-500 flex items-center justify-center hover:border-emerald-600 hover:text-emerald-400 transition"><i class="fa-solid fa-thumbs-up"></i></button>
               <button type="button" data-joinha="nao" onclick="alternarHomeOffice('', false)" title="Não" class="w-10 h-10 rounded-xl border border-slate-700 text-slate-500 flex items-center justify-center hover:border-red-600 hover:text-red-400 transition"><i class="fa-solid fa-thumbs-down"></i></button>
@@ -385,7 +385,7 @@
 
         <!-- CONDIÇÃO DO HOME OFFICE (SÓ APARECE QUANDO "SIM" ESTÁ MARCADO) -->
         <div id="wrapperHomeOfficeCondicao" class="hidden">
-          <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Condição do Home Office</label>
+          <label class="block text-sm uppercase font-bold text-slate-400 mb-1">Condição do Home Office</label>
           <div class="flex flex-wrap gap-2">
             <button type="button" data-condicao="compulsorio" onclick="selecionarCondicaoHomeOffice('', 'compulsorio')" class="text-xs font-bold uppercase px-4 py-2 rounded-xl border border-slate-700 text-slate-400 hover:border-brand-600 transition">Compulsório (Contingência)</button>
             <button type="button" data-condicao="reuniao" onclick="selecionarCondicaoHomeOffice('', 'reuniao')" class="text-xs font-bold uppercase px-4 py-2 rounded-xl border border-slate-700 text-slate-400 hover:border-brand-600 transition">Reunião (Sede)</button>
@@ -439,7 +439,7 @@
             <div class="lg:col-span-12">
               <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Função - Manhã</label>
               <div class="flex flex-wrap gap-3 pt-1">
-                <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoManha" value="APOIO" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>APOIO</span></label>
+                <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoManha" value="AGENTE" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>AGENTE</span></label>
                 <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoManha" value="COORDENADOR" class="ronded bg-slate-900 border-slate-700 text-brand-600"><span>COORDENADOR</span></label>
                 <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoManha" value="MOTORISTA" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>MOTORISTA</span></label>
                 <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoManha" value="RELATOR" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>RELATOR</span></label>
@@ -480,7 +480,7 @@
             <div class="lg:col-span-12">
               <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Função - Tarde</label>
               <div class="flex flex-wrap gap-3 pt-1">
-                <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoTarde" value="APOIO" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>APOIO</span></label>
+                <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoTarde" value="AGENTE" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>AGENTE</span></label>
                 <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoTarde" value="COORDENADOR" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>COORDENADOR</span></label>
                 <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoTarde" value="MOTORISTA" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>MOTORISTA</span></label>
                 <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoTarde" value="RELATOR" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>RELATOR</span></label>
@@ -521,7 +521,7 @@
             <div class="lg:col-span-12">
               <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Função - Noite</label>
               <div class="flex flex-wrap gap-3 pt-1">
-                <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoNoite" value="APOIO" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>APOIO</span></label>
+                <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoNoite" value="AGENTE" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>AGENTE</span></label>
                 <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoNoite" value="COORDENADOR" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>COORDENADOR</span></label>
                 <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoNoite" value="MOTORISTA" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>MOTORISTA</span></label>
                 <label class="flex items-center space-x-1.5 text-xs text-slate-300 cursor-pointer"><input type="checkbox" name="funcaoNoite" value="RELATOR" class="rounded bg-slate-900 border-slate-700 text-brand-600"><span>RELATOR</span></label>
@@ -534,9 +534,9 @@
             <div>
               <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Percepção do 4º Jeton *</label>
               <select id="percepcaoQuartoJeton" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500 font-semibold">
-                <option value="" disabled selected>Marque a percepção</option>
-                <option value="SIM">Sim</option>
-                <option value="NAO">Não</option>
+                <option value="" disabled selected>MARQUE A PERCEPÇÃO</option>
+                <option value="SIM">SIM</option>
+                <option value="NAO">NÃO</option>
               </select>
             </div>
           </div>
@@ -546,7 +546,7 @@
                para a data/local desta escala; veja atualizarVisibilidadeItensRecebiveis()) -->
           <div class="pt-2">
             <p class="text-xs font-bold uppercase text-white mb-1">Itens Recebíveis Nesta Escala</p>
-            <p class="text-[11px] text-slate-500 uppercase leading-snug mb-3">Marque com 👍 os itens que realmente serão pagos nesta escala, ou 👎 para os que não serão. Os valores continuam sendo calculados e exibidos normalmente.</p>
+            <p class="text-justify text-[11px] text-slate-500 uppercase leading-snug mb-3">Marque com 👍 os itens que realmente serão pagos nesta escala, ou 👎 para os que não serão. Os valores continuam sendo calculados e exibidos normalmente.</p>
             <p id="msgNenhumItemRecebivelElegivel" class="text-[11px] text-slate-500 uppercase italic mb-3">Nenhum item recebível é elegível para esta escala ainda — preencha data e local.</p>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
               <div id="wrapperDiariaAlimentacaoRecebivel" class="hidden bg-slate-900/80 border border-slate-800 rounded-xl p-3 flex flex-col items-center gap-2">
@@ -598,26 +598,26 @@
         <!-- CAMPOS CALCULADOS AUTOMATICAMENTE -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-900/80 p-4 rounded-xl border border-slate-800">
           <div>
-            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Valor do Jeton Diário</label>
-            <input type="text" id="calcJetonDiario" readonly value="R$ 0,00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-brand-400 font-bold text-sm">
+            <label class="block text-sm uppercase font-bold text-slate-400 mb-1">Valor do Jeton Diário</label>
+            <input type="text" id="calcJetonDiario" readonly value="R$ 0,00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-emerald-400 font-bold text-sm">
           </div>
           <div>
-            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Valor Diário Total</label>
+            <label class="block text-sm uppercase font-bold text-slate-400 mb-1">Valor Diário Total</label>
             <input type="text" id="calcValorDiario" readonly value="R$ 0,00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-emerald-400 font-bold text-sm">
           </div>
           <div>
-            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Qtd. de Horas Trabalhadas</label>
-            <input type="text" id="calcHorasTrabalhadas" readonly value="0h 00m" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-amber-400 font-bold text-sm">
+            <label class="block text-sm uppercase font-bold text-slate-400 mb-1">Qtd. de Horas Trabalhadas</label>
+            <input type="text" id="calcHorasTrabalhadas" readonly value="0h 00m" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-white font-bold text-sm">
           </div>
           <div>
-            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Valor por Hora Trabalhada</label>
-            <input type="text" id="calcValorHoraTrabalhada" readonly value="R$ 0,00 /h" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-indigo-400 font-bold text-sm">
+            <label class="block text-sm uppercase font-bold text-slate-400 mb-1">Valor por Hora Trabalhada</label>
+            <input type="text" id="calcValorHoraTrabalhada" readonly value="R$ 0,00 /h" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-white font-bold text-sm">
           </div>
         </div>
 
         <!-- HORÁRIO DE CHEGADA -->
         <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
-          <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Horário de Chegada *</label>
+          <label class="block text-sm uppercase font-bold text-slate-400 mb-1">Horário de Chegada *</label>
           <input type="time" id="horarioChegada" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-brand-500">
         </div>
 
@@ -651,7 +651,7 @@
         </div>
 
         <!-- BOTÃO DE SALVAR -->
-        <div class="flex justify-end pt-4">
+        <div class="flex justify-center pt-4">
           <button type="button" id="btnSalvarEscala" class="bg-brand-600 hover:bg-brand-500 text-white font-bold px-8 py-3 rounded-xl shadow-lg transition flex items-center space-x-2">
             <i class="fa-solid fa-floppy-disk"></i>
             <span id="btnSalvarTexto">SALVAR ESCALA</span>
@@ -696,7 +696,7 @@
     <i class="fa-solid fa-box-archive text-blue-400 text-xl"></i>
     <h2 class="text-lg font-bold uppercase tracking-wide text-white">Ciclos Fechados</h2>
   </div>
-  <span class="text-xs text-slate-400">As escalas destes ciclos podem ser editadas aqui e sincronizadas com a página Ciclos.</span>
+  <span class="text-justify text-xs text-slate-400">As escalas destes ciclos podem ser editadas aqui e sincronizadas com a página Ciclos.</span>
 </div>
       <div id="containerCiclosFechados" class="space-y-4">
         <div class="bg-brand-card rounded-2xl border border-slate-800 p-8 text-center text-slate-500 italic">
@@ -772,7 +772,7 @@
               <option value="">Jeton</option><option value="100.00">R$ 100,00</option><option value="220.00">R$ 220,00</option>
             </select>
             <div class="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-300">
-              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoManha" value="APOIO">APOIO</label>
+              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoManha" value="AGENTE">AGENTE</label>
               <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoManha" value="COORDENADOR">COORD.</label>
               <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoManha" value="MOTORISTA">MOTOR.</label>
               <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoManha" value="RELATOR">RELATOR</label>
@@ -789,7 +789,7 @@
               <option value="">Jeton</option><option value="100.00">R$ 100,00</option><option value="220.00">R$ 220,00</option>
             </select>
             <div class="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-300">
-              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoTarde" value="APOIO">APOIO</label>
+              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoTarde" value="AGENTE">AGENTE</label>
               <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoTarde" value="COORDENADOR">COORD.</label>
               <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoTarde" value="MOTORISTA">MOTOR.</label>
               <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoTarde" value="RELATOR">RELATOR</label>
@@ -806,7 +806,7 @@
               <option value="">Jeton</option><option value="100.00">R$ 100,00</option><option value="220.00">R$ 220,00</option>
             </select>
             <div class="flex flex-wrap gap-2 pt-1 text-[11px] text-slate-300">
-              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoNoite" value="APOIO">APOIO</label>
+              <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoNoite" value="AGENTE">AGENTE</label>
               <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoNoite" value="COORDENADOR">COORD.</label>
               <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoNoite" value="MOTORISTA">MOTOR.</label>
               <label class="flex items-center gap-1"><input type="checkbox" name="modalFuncaoNoite" value="RELATOR">RELATOR</label>
