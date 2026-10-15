@@ -875,7 +875,7 @@ function inicializarMenuRodape() {
         quadrupla: 0,
         pernoites: 0,
         turnos: { Manhã: 0, Tarde: 0, Noite: 0 },
-        funcoes: { Apoio: 0, Coordenador: 0, Motorista: 0, Relator: 0 },
+        funcoes: { AGENTE: 0, Coordenador: 0, Motorista: 0, Relator: 0 },
         locais: []
       };
 
@@ -952,7 +952,7 @@ function inicializarMenuRodape() {
         });
 
         // Funções
-        if (/APOIO/i.test(text)) metricas.funcoes.Apoio++;
+        if (/AGENTE/i.test(text)) metricas.funcoes.AGENTE++;
         if (/COORDENADOR/i.test(text)) metricas.funcoes.Coordenador++;
         if (/MOTORISTA/i.test(text)) metricas.funcoes.Motorista++;
         if (/RELATOR/i.test(text)) metricas.funcoes.Relator++;
@@ -1144,7 +1144,7 @@ function inicializarMenuRodape() {
         auxAlimentacao: 0,
         auxTransporte: 0,
         turnos: { Manhã: 0, Tarde: 0, Noite: 0 },
-        funcoes: { Apoio: 0, Coordenador: 0, Motorista: 0, Relator: 0 }
+        funcoes: { AGENTE: 0, Coordenador: 0, Motorista: 0, Relator: 0 }
       };
 
       // ---------------------------------------------------------------------
@@ -1239,7 +1239,7 @@ function inicializarMenuRodape() {
         acumuladoGeral.turnos.Tarde += metricasEscalas.turnos.Tarde;
         acumuladoGeral.turnos.Noite += metricasEscalas.turnos.Noite;
 
-        acumuladoGeral.funcoes.Apoio += metricasEscalas.funcoes.Apoio;
+        acumuladoGeral.funcoes.AGENTE += metricasEscalas.funcoes.AGENTE;
         acumuladoGeral.funcoes.Coordenador += metricasEscalas.funcoes.Coordenador;
         acumuladoGeral.funcoes.Motorista += metricasEscalas.funcoes.Motorista;
         acumuladoGeral.funcoes.Relator += metricasEscalas.funcoes.Relator;
@@ -1463,10 +1463,10 @@ function inicializarMenuRodape() {
         }
 
         // Funções (campos reais: arrays funcaoManha/funcaoTarde/funcaoNoite com valores
-        // 'APOIO' | 'COORDENADOR' | 'MOTORISTA' | 'RELATOR')
+        // 'AGENTE' | 'COORDENADOR' | 'MOTORISTA' | 'RELATOR')
         [...(escala.funcaoManha || []), ...(escala.funcaoTarde || []), ...(escala.funcaoNoite || [])].forEach(f => {
           const funcUpper = String(f).toUpperCase();
-          if (funcUpper === 'APOIO') acumuladoGeral.funcoes.Apoio++;
+          if (funcUpper === 'AGENTE') acumuladoGeral.funcoes.AGENTE++;
           if (funcUpper === 'COORDENADOR') acumuladoGeral.funcoes.Coordenador++;
           if (funcUpper === 'MOTORISTA') acumuladoGeral.funcoes.Motorista++;
           if (funcUpper === 'RELATOR') acumuladoGeral.funcoes.Relator++;
@@ -1876,10 +1876,10 @@ function inicializarMenuRodape() {
       chartFuncoesInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['APOIO', 'COORDENADOR', 'MOTORISTA', 'RELATOR'],
+          labels: ['AGENTE', 'COORDENADOR', 'MOTORISTA', 'RELATOR'],
           datasets: [{
             label: 'ATUAÇÕES',
-            data: [funcoes.Apoio, funcoes.Coordenador, funcoes.Motorista, funcoes.Relator],
+            data: [funcoes.AGENTE, funcoes.Coordenador, funcoes.Motorista, funcoes.Relator],
             backgroundColor: '#10b981',
             borderRadius: 6
           }]
