@@ -133,8 +133,8 @@
 
         <!-- Data de Abertura (Somente Leitura) -->
         <div class="space-y-2">
-          <label for="escalaDataAberturaView" class="block text-xs font-bold uppercase text-slate-300">
-            Data de Abertura do Ciclo <span class="text-brand-500 font-normal"> <br> (Todo Dia 26)</span>
+          <label for="escalaDataAberturaView" class="block text-sm font-bold uppercase text-slate-300">
+            Data de Abertura do Ciclo <span class="text-xs text-brand-500 font-normal"> <br> (selecione o Dia 26 no calendário abaixo)</span>
           </label>
           <input type="text" id="escalaDataAberturaView" readonly disabled placeholder="NÃO DEFINIDA"
                  class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none cursor-not-allowed">
@@ -142,8 +142,8 @@
 
         <!-- Data de Fechamento do Ciclo (Somente Leitura) -->
         <div class="space-y-2">
-          <label for="escalaDataFechamentoView" class="block text-xs font-bold uppercase text-slate-300">
-            Data de Fechamento do Ciclo <span class="text-brand-500 font-normal"> <br> (Todo Dia 25 do mês seguinte a abertura do ciclo)</span>
+          <label for="escalaDataFechamentoView" class="block text-sm font-bold uppercase text-slate-300">
+            Data de Fechamento do Ciclo <span class="text-xs text-brand-500 font-normal"> <br> (Todo Dia 25 do mês seguinte a abertura do ciclo)</span>
           </label>
           <input type="text" id="escalaDataFechamentoView" readonly disabled placeholder="NÃO DEFINIDA"
                  class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none cursor-not-allowed">
@@ -151,8 +151,8 @@
 
         <!-- Recebimento em (Somente Leitura) -->
         <div class="space-y-2">
-          <label for="escalaRecebimentoEmView" class="block text-xs font-bold uppercase text-slate-300">
-            Mês de Recebimento do Jeton <span class="text-brand-500 font-normal"> <br> (Todo 3º mês após o mês de abertura do ciclo)</span>
+          <label for="escalaRecebimentoEmView" class="block text-sm font-bold uppercase text-slate-300">
+            Mês de Recebimento do Jeton <span class="text-xs text-brand-500 font-normal"> <br> (Todo 3º mês após o mês de abertura do ciclo)</span>
           </label>
           <input type="text" id="escalaRecebimentoEmView" readonly disabled placeholder="NÃO DEFINIDO"
                  class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-100 focus:outline-none cursor-not-allowed">
@@ -173,8 +173,8 @@
         <!-- TOTAL DE ATIVIDADES SIMPLES -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
           <div>
-            <span class="block text-xs uppercase font-bold text-slate-400">Atividades Simples</span>
-            <span id="statSimples" class="text-xl font-black text-brand-400">0</span>
+            <span class="block text-sm uppercase font-bold text-slate-400">Atividades Simples</span>
+            <span id="statSimples" class="text-xl font-black text-white">0</span>
           </div>
           <div class="bg-brand-500/10 text-brand-500 p-3 rounded-lg text-lg">
             <i class="fa-solid fa-file-lines"></i>
@@ -184,8 +184,8 @@
         <!-- TOTAL DE ATIVIDADES DOBRADAS -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
           <div>
-            <span class="block text-xs uppercase font-bold text-slate-400">Atividades Dobradas</span>
-            <span id="statDobradas" class="text-xl font-black text-amber-400">0</span>
+            <span class="block text-sm uppercase font-bold text-slate-400">Atividades Dobradas</span>
+            <span id="statDobradas" class="text-xl font-black text-white">0</span>
           </div>
           <div class="bg-amber-500/10 text-amber-500 p-3 rounded-lg text-lg">
             <i class="fa-solid fa-copy"></i>
@@ -195,8 +195,8 @@
         <!-- TOTAL DE ATIVIDADES TRIPLAS -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
           <div>
-            <span class="block text-xs uppercase font-bold text-slate-400">Atividades Triplas</span>
-            <span id="statTriplas" class="text-xl font-black text-indigo-400">0</span>
+            <span class="block text-sm uppercase font-bold text-slate-400">Atividades Triplas</span>
+            <span id="statTriplas" class="text-xl font-black text-white">0</span>
           </div>
           <div class="bg-indigo-500/10 text-indigo-400 p-3 rounded-lg text-lg">
             <i class="fa-solid fa-layer-group"></i>
@@ -206,8 +206,8 @@
         <!-- TOTAL DE ATIVIDADES QUÁDRUPLAS -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
           <div>
-            <span class="block text-xs uppercase font-bold text-slate-400">Atividades Quádruplas</span>
-            <span id="statQuadruplas" class="text-xl font-black text-emerald-400">0</span>
+            <span class="block text-sm uppercase font-bold text-slate-400">Atividades Quádruplas</span>
+            <span id="statQuadruplas" class="text-xl font-black text-white">0</span>
           </div>
           <div class="bg-emerald-500/10 text-emerald-500 p-3 rounded-lg text-lg">
             <i class="fa-solid fa-cubes"></i>
@@ -217,7 +217,7 @@
         <!-- TOTAL DE ESCALAS -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
           <div>
-            <span class="block text-xs uppercase font-bold text-slate-400">Total de Escalas</span>
+            <span class="block text-sm uppercase font-bold text-slate-400">Total de Escalas</span>
             <span id="statTotalEscalas" class="text-xl font-black text-white">0</span>
           </div>
           <div class="bg-slate-700/30 text-slate-300 p-3 rounded-lg text-lg">
@@ -228,8 +228,8 @@
         <!-- TOTAL DE HORAS TRABALHADAS -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
           <div>
-            <span class="block text-xs uppercase font-bold text-slate-400">Total de Horas Trabalhadas</span>
-            <span id="statTotalHoras" class="text-xl font-black text-cyan-400">0H 00M</span>
+            <span class="block text-sm uppercase font-bold text-slate-400">Total de Horas Trabalhadas</span>
+            <span id="statTotalHoras" class="text-xl font-black text-white">0H 00M</span>
           </div>
           <div class="bg-cyan-500/10 text-cyan-400 p-3 rounded-lg text-lg">
             <i class="fa-solid fa-clock"></i>
@@ -239,9 +239,9 @@
         <!-- TOTAL DE HOME OFFICES -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
           <div>
-            <span class="block text-xs uppercase font-bold text-slate-400">Home Offices</span>
-            <span id="statHomeOffices" class="text-xl font-black text-purple-400">0</span>
-            <span id="statHomeOfficesDetalhe" class="block text-[10px] text-slate-500 uppercase mt-0.5">0 Compulsório | 0 Reunião | 0 Solicitado</span>
+            <span class="block text-sm uppercase font-bold text-slate-400">Home Offices</span>
+            <span id="statHomeOffices" class="text-xl font-black text-white">0</span>
+            <span id="statHomeOfficesDetalhe" class="block text-[11px] text-slate-500 uppercase mt-0.5">0 Compulsório <br> 0 Reunião <br> 0 Solicitado</span>
           </div>
           <div class="bg-purple-500/10 text-purple-400 p-3 rounded-lg text-lg">
             <i class="fa-solid fa-house-laptop"></i>
@@ -251,8 +251,8 @@
         <!-- TOTAL DE HORAS DE HOME OFFICE (CONDIÇÃO - REUNIÃO (SEDE)) -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
           <div>
-            <span class="block text-xs uppercase font-bold text-slate-400">Horas de Home Office (Reunião - Sede)</span>
-            <span id="statHorasHomeOfficeReuniao" class="text-xl font-black text-indigo-400">0H 00M</span>
+            <span class="block text-sm uppercase font-bold text-slate-400">Horas de Home Office (Reunião - Sede)</span>
+            <span id="statHorasHomeOfficeReuniao" class="text-xl font-black text-white">0H 00M</span>
           </div>
           <div class="bg-indigo-500/10 text-indigo-400 p-3 rounded-lg text-lg">
             <i class="fa-solid fa-people-group"></i>
@@ -271,79 +271,79 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <!-- VALOR TOTAL DE JETON -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
-          <span class="block text-xs uppercase font-bold text-slate-400">Valor Total de Jeton</span>
-          <span id="recValorTotalJeton" class="text-xl font-black text-brand-400">R$ 0,00</span>
+          <span class="block text-sm uppercase font-bold text-slate-400">Valor Total de Jeton</span>
+          <span id="recValorTotalJeton" class="text-xl font-black text-emerald-400">R$ 0,00</span>
         </div>
 
         <!-- VALOR MÉDIO POR ESCALA -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
-          <span class="block text-xs uppercase font-bold text-slate-400">Valor Médio por Escala</span>
-          <span id="recValorMedioEscala" class="text-xl font-black text-slate-200">R$ 0,00</span>
+          <span class="block text-sm uppercase font-bold text-slate-400">Valor Médio por Escala</span>
+          <span id="recValorMedioEscala" class="text-xl font-black text-white">R$ 0,00</span>
         </div>
 
         <!-- VALOR MÉDIO POR ATIVIDADE -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
-          <span class="block text-xs uppercase font-bold text-slate-400">Valor Médio por Atividade</span>
-          <span id="recValorMedioAtividade" class="text-xl font-black text-slate-200">R$ 0,00</span>
+          <span class="block text-sm uppercase font-bold text-slate-400">Valor Médio por Atividade</span>
+          <span id="recValorMedioAtividade" class="text-xl font-black text-white">R$ 0,00</span>
         </div>
 
         <!-- VALOR MÉDIO POR HORA TRABALHADA -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
-          <span class="block text-xs uppercase font-bold text-slate-400">Valor Médio por Hora Trabalhada</span>
-          <span id="recValorMedioHora" class="text-xl font-black text-cyan-400">R$ 0,00</span>
+          <span class="block text-sm uppercase font-bold text-slate-400">Valor Médio por Hora Trabalhada</span>
+          <span id="recValorMedioHora" class="text-xl font-black text-white">R$ 0,00</span>
         </div>
 
         <!-- VALOR DAS DIÁRIAS -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
-          <span class="block text-xs uppercase font-bold text-slate-400">Valor das Diárias</span>
-          <span id="recValorDiarias" class="text-xl font-black text-emerald-400">R$ 0,00</span>
+          <span class="block text-sm uppercase font-bold text-slate-400">Valor das Diárias</span>
+          <span id="recValorDiarias" class="text-xl font-black text-amber-400">R$ 0,00</span>
         </div>
 
         <!-- VALOR DOS AUXÍLIOS -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
-          <span class="block text-xs uppercase font-bold text-slate-400">Valor dos Auxílios</span>
+          <span class="block text-sm uppercase font-bold text-slate-400">Valor dos Auxílios</span>
           <span id="recValorAuxilios" class="text-xl font-black text-amber-400">R$ 0,00</span>
         </div>
 
         <!-- VALOR RECEBÍVEL DAS DIÁRIAS -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
-          <span class="block text-xs uppercase font-bold text-slate-400">Valor Recebível das Diárias</span>
-          <span id="recValorRecebivelDiarias" class="text-xl font-black text-emerald-300">R$ 0,00</span>
+          <span class="block text-sm uppercase font-bold text-slate-400">Valor Recebível das Diárias</span>
+          <span id="recValorRecebivelDiarias" class="text-xl font-black text-amber-400">R$ 0,00</span>
         </div>
 
         <!-- VALOR RECEBÍVEL DOS AUXÍLIOS -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
-          <span class="block text-xs uppercase font-bold text-slate-400">Valor Recebível dos Auxílios</span>
-          <span id="recValorRecebivelAuxilios" class="text-xl font-black text-amber-300">R$ 0,00</span>
+          <span class="block text-sm uppercase font-bold text-slate-400">Valor Recebível dos Auxílios</span>
+          <span id="recValorRecebivelAuxilios" class="text-xl font-black text-amber-400">R$ 0,00</span>
         </div>
 
         <!-- BALANÇO DAS DIÁRIAS -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
-          <span class="block text-xs uppercase font-bold text-slate-400">Balanço das Diárias</span>
-          <span id="recBalancoDiarias" class="text-xl font-black text-emerald-400">R$ 0,00</span>
+          <span class="block text-sm uppercase font-bold text-slate-400">Balanço das Diárias</span>
+          <span id="recBalancoDiarias" class="text-xl font-black text-amber-400">R$ 0,00</span>
         </div>
 
         <!-- BALANÇO DOS AUXÍLIOS -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
-          <span class="block text-xs uppercase font-bold text-slate-400">Balanço dos Auxílios</span>
-          <span id="recBalancoAuxilios" class="text-xl font-black text-emerald-400">R$ 0,00</span>
+          <span class="block text-sm uppercase font-bold text-slate-400">Balanço dos Auxílios</span>
+          <span id="recBalancoAuxilios" class="text-xl font-black text-amber-400">R$ 0,00</span>
         </div>
 
         <!-- ALÍQUOTA DE IMPOSTO DE RENDA (VALOR FIXO) -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
-          <span class="block text-xs uppercase font-bold text-slate-400">Alíquota de Imposto de Renda (%)</span>
+          <span class="block text-sm uppercase font-bold text-slate-400">Alíquota de Imposto de Renda (%)</span>
           <span id="recAliqIR" class="text-xl font-black text-white">22%</span>
         </div>
 
         <!-- VALOR DO DESCONTO DE IMPOSTO DE RENDA -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1">
-          <span class="block text-xs uppercase font-bold text-slate-400">Desconto de Imposto de Renda</span>
+          <span class="block text-sm uppercase font-bold text-slate-400">Desconto de Imposto de Renda</span>
           <span id="recValorDescontoIR" class="text-xl font-black text-red-400">R$ 0,00</span>
         </div>
 
         <!-- VALOR REAL DE JETON -->
         <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1 border-emerald-500/50">
-          <span class="block text-xs uppercase font-bold text-emerald-400">Valor Real de Jeton</span>
+          <span class="block text-sm uppercase font-bold text-slate-400">Valor Real de Jeton</span>
           <span id="recValorRealJeton" class="text-2xl font-black text-emerald-400">R$ 0,00</span>
         </div>
       </div>
