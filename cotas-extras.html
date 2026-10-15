@@ -24,8 +24,18 @@
       }
     }
   </script>
+  <style>
+    /* Oculta a barra de rolagem visual do menu no rodapé mantendo a rolagem ativa */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
 </head>
-<body class="bg-brand-dark text-slate-100 font-sans min-h-screen flex flex-col uppercase antialiased">
+<body class="bg-brand-dark text-slate-100 font-sans min-h-screen flex flex-col uppercase antialiased pb-20">
 
   <!-- HEADER / MENU SUPERIOR RESPONSIVO -->
   <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 shadow-lg">
@@ -65,6 +75,7 @@
       <a href="resetar-dados.html" class="nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:bg-slate-800">RESETAR DADOS</a>
     </div>
   </header>
+
   <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
 
     <section class="rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-brand-dark border border-slate-800 shadow-xl p-6 sm:p-8">
@@ -235,13 +246,52 @@
 
   </main>
 
+  <!-- MENU INFERIOR FIXO / BOTTOM NAVIGATION BAR -->
+  <nav id="bottom-nav-container" class="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 shadow-2xl px-2 py-1.5 overflow-x-auto no-scrollbar">
+    <div class="flex items-center justify-start md:justify-center gap-2 min-w-max mx-auto px-2">
+      
+      <a href="index.html" data-page="index.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+        <i class="fa-solid fa-house text-base mb-1 transition-transform group-hover:scale-110"></i>
+        <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">INICIAL</span>
+      </a>
+
+      <a href="cotas-extras.html" data-page="cotas-extras.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+        <i class="fa-solid fa-money-bill-trend-up text-base mb-1 transition-transform group-hover:scale-110"></i>
+        <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">COTAS EXTRAS</span>
+      </a>
+
+      <a href="escalas.html" data-page="escalas.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+        <i class="fa-solid fa-calendar-check text-base mb-1 transition-transform group-hover:scale-110"></i>
+        <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">ESCALAS</span>
+      </a>
+
+      <a href="ciclos.html" data-page="ciclos.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+        <i class="fa-solid fa-recycle text-base mb-1 transition-transform group-hover:scale-110"></i>
+        <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">CICLOS</span>
+      </a>
+
+      <a href="dashboard.html" data-page="dashboard.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+        <i class="fa-solid fa-chart-line text-base mb-1 transition-transform group-hover:scale-110"></i>
+        <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">DASHBOARD</span>
+      </a>
+
+      <a href="resetar-dados.html" data-page="resetar-dados.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+        <i class="fa-solid fa-trash-can text-base mb-1 transition-transform group-hover:scale-110"></i>
+        <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">RESETAR</span>
+      </a>
+
+    </div>
+  </nav>
+
   <script>
     // Menu Mobile
     const mobileBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
-    mobileBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-    });
+    if (mobileBtn && mobileMenu) {
+      mobileBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+    }
 
     const STORAGE_KEY_ESCALAS = 'jetcontrol_escalas_dados';
     const STORAGE_KEY_VALORES = 'jetcontrol_valores_custom';
@@ -406,7 +456,51 @@
       localStorage.setItem('jetcontrol_organograma_auxilios_html', dadosCotasExtras.organogramaAuxiliosHTML);
     }
 
+    // ATIVAÇÃO E ROLAGEM AUTOMÁTICA DO MENU DO RODAPÉ
+    function inicializarMenuRodape() {
+      let paginaAtual = window.location.pathname.split('/').pop().toLowerCase();
+      if (!paginaAtual || paginaAtual === '') {
+        paginaAtual = 'index.html';
+      }
+
+      const itens = document.querySelectorAll('.bottom-nav-item');
+      let itemAtivo = null;
+
+      itens.forEach(item => {
+        const paginaItem = (item.getAttribute('data-page') || '').toLowerCase();
+        const icone = item.querySelector('i');
+        
+        if (paginaItem === paginaAtual || (paginaAtual === '' && paginaItem === 'index.html')) {
+          itemAtivo = item;
+          item.classList.remove('text-slate-400');
+          item.classList.add('bg-brand-600', 'text-white', 'shadow-md');
+          if (icone) {
+            icone.classList.remove('text-brand-500', 'text-slate-400');
+            icone.classList.add('text-white');
+          }
+        } else {
+          item.classList.add('text-slate-400');
+          item.classList.remove('bg-brand-600', 'text-white', 'shadow-md');
+          if (icone) {
+            icone.classList.remove('text-white');
+            icone.classList.add('text-brand-500');
+          }
+        }
+      });
+
+      if (itemAtivo) {
+        setTimeout(() => {
+          itemAtivo.scrollIntoView({
+            behavior: 'smooth',
+            inline: 'center',
+            block: 'nearest'
+          });
+        }, 150);
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', function () {
+      inicializarMenuRodape();
       var prosseguir = function () { renderizarOrganogramas(); };
       if (window.JetSyncReady && typeof window.JetSyncReady.finally === 'function') {
         window.JetSyncReady.finally(prosseguir);
@@ -415,7 +509,6 @@
       }
     });
 
-    // Atualiza a tela sozinha quando outro navegador/aparelho salvar algo novo.
     if (window.JetSyncOnChange) {
       window.JetSyncOnChange(function () { renderizarOrganogramas(); });
     }
