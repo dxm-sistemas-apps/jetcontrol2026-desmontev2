@@ -28,9 +28,17 @@
   </script>
   <style>
     body { text-transform: uppercase; }
+    /* Esconde barra de rolagem mas mantém rolagem ativa */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
   </style>
 </head>
-<body class="bg-brand-dark text-slate-100 font-sans min-h-screen flex flex-col antialiased">
+<body class="bg-brand-dark text-slate-100 font-sans min-h-screen flex flex-col antialiased pb-20">
 
   <!-- HEADER / MENU SUPERIOR RESPONSIVO -->
   <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 shadow-lg">
@@ -272,6 +280,43 @@
     </section>
   </main>
 
+  <!-- MENU INFERIOR FIXO / BOTTOM NAVIGATION BAR -->
+  <nav id="bottom-nav-container" class="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 shadow-2xl px-2 py-1.5 overflow-x-auto no-scrollbar">
+    <div class="flex items-center justify-start md:justify-center gap-2 min-w-max mx-auto px-2">
+      
+      <a href="index.html" data-page="index.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+        <i class="fa-solid fa-house text-base mb-1 transition-transform group-hover:scale-110"></i>
+        <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">INICIAL</span>
+      </a>
+
+      <a href="cotas-extras.html" data-page="cotas-extras.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+        <i class="fa-solid fa-money-bill-trend-up text-base mb-1 transition-transform group-hover:scale-110"></i>
+        <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">COTAS EXTRAS</span>
+      </a>
+
+      <a href="escalas.html" data-page="escalas.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+        <i class="fa-solid fa-calendar-check text-base mb-1 transition-transform group-hover:scale-110"></i>
+        <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">ESCALAS</span>
+      </a>
+
+      <a href="ciclos.html" data-page="ciclos.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+        <i class="fa-solid fa-recycle text-base mb-1 transition-transform group-hover:scale-110"></i>
+        <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">CICLOS</span>
+      </a>
+
+      <a href="dashboard.html" data-page="dashboard.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+        <i class="fa-solid fa-chart-line text-base mb-1 transition-transform group-hover:scale-110"></i>
+        <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">DASHBOARD</span>
+      </a>
+
+      <a href="resetar-dados.html" data-page="resetar-dados.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+        <i class="fa-solid fa-trash-can text-base mb-1 transition-transform group-hover:scale-110"></i>
+        <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">RESETAR</span>
+      </a>
+
+    </div>
+  </nav>
+
   <!-- LÓGICA JAVASCRIPT -->
   <script>
     // Menu Mobile
@@ -364,10 +409,6 @@
     }
 
     // VALIDAÇÃO E CÁLCULO DE DATA (+3 meses no dia 26)
-    // A DATA DE ABERTURA (campo oculto #dataAbertura) só é preenchida pelo
-    // calendário customizado abaixo, que exibe apenas o dia 26 como
-    // habilitado em qualquer mês/ano — não há mais como o valor chegar aqui
-    // com um dia diferente de 26.
     function validarEProcessarData() {
       const dataVal = inputDataAbertura.value;
 
@@ -388,27 +429,20 @@
       const resultado = `${meses[mesRecebimentoIndex]} / ${anoRecebimento}`;
       inputRecebimento.value = resultado;
 
-      // DATA DE FECHAMENTO DO CICLO: SEMPRE O DIA 25 DO MÊS IMEDIATAMENTE SEGUINTE À ABERTURA.
       const dataFechamentoIso = calcularDataFechamento(ano, mes);
       inputDataFechamento.value = formatarDataBR(dataFechamentoIso);
 
       return resultado;
     }
 
-    // =====================================================================
-    // CALENDÁRIO CUSTOMIZADO DA DATA DE ABERTURA — TODOS OS MESES/ANOS SÃO
-    // NAVEGÁVEIS LIVREMENTE, MAS SOMENTE O DIA 26 É EXIBIDO HABILITADO PARA
-    // SELEÇÃO EM QUALQUER MÊS EXIBIDO; OS DEMAIS DIAS FICAM DESABILITADOS
-    // (SEM CLIQUE) NO PRÓPRIO GRID DO CALENDÁRIO.
-    // =====================================================================
-
+    // CALENDÁRIO CUSTOMIZADO DA DATA DE ABERTURA
     function renderizarCalendarioAbertura() {
       const ano = calendarioMesExibido.getFullYear();
-      const mes = calendarioMesExibido.getMonth(); // 0-indexado
+      const mes = calendarioMesExibido.getMonth();
 
       calendarioMesAno.innerText = `${meses[mes]} / ${ano}`;
 
-      const primeiroDiaSemana = new Date(ano, mes, 1).getDay(); // 0=Dom
+      const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
       const diasNoMes = new Date(ano, mes + 1, 0).getDate();
 
       const dataSelecionadaIso = inputDataAbertura.value || '';
@@ -464,7 +498,6 @@
         calendarioAbertura.classList.add('hidden');
         return;
       }
-      // Ao abrir, posiciona o calendário no mês da data já selecionada (se houver).
       if (inputDataAbertura.value) {
         const partes = inputDataAbertura.value.split('-');
         calendarioMesExibido = new Date(parseInt(partes[0], 10), parseInt(partes[1], 10) - 1, 1);
@@ -511,8 +544,6 @@
       };
 
       localStorage.setItem(STORAGE_KEY_CICLO, JSON.stringify(dados));
-      // Mantém uma cópia do container completo da Descrição do Período
-      // para que o fechamento do ciclo possa arquivá-lo posteriormente.
       const secaoPeriodo = document.getElementById('dataAbertura')?.closest('section');
       if (secaoPeriodo) {
         localStorage.setItem('jetcontrol_periodo_container_html', secaoPeriodo.outerHTML);
@@ -557,8 +588,44 @@
       }, 3000);
     }
 
+    // ATIVAÇÃO E ROLAGEM AUTOMÁTICA DO MENU INFERIOR
+    function inicializarMenuRodape() {
+      let paginaAtual = window.location.pathname.split('/').pop().toLowerCase();
+      if (!paginaAtual || paginaAtual === '') {
+        paginaAtual = 'index.html';
+      }
+
+      const itens = document.querySelectorAll('.bottom-nav-item');
+      let itemAtivo = null;
+
+      itens.forEach(item => {
+        const paginaItem = (item.getAttribute('data-page') || '').toLowerCase();
+        if (paginaItem === paginaAtual || (paginaAtual === '' && paginaItem === 'index.html')) {
+          itemAtivo = item;
+          item.classList.remove('text-slate-400');
+          item.classList.add('bg-brand-600', 'text-white', 'shadow-md');
+          const icone = item.querySelector('i');
+          if (icone) icone.classList.add('text-white');
+        } else {
+          item.classList.add('text-slate-400');
+          item.classList.remove('bg-brand-600', 'text-white', 'shadow-md');
+        }
+      });
+
+      if (itemAtivo) {
+        setTimeout(() => {
+          itemAtivo.scrollIntoView({
+            behavior: 'smooth',
+            inline: 'center',
+            block: 'nearest'
+          });
+        }, 150);
+      }
+    }
+
     // Inicialização
     window.addEventListener('DOMContentLoaded', function () {
+      inicializarMenuRodape();
       var prosseguir = function () { carregarDadosLocal(); };
       if (window.JetSyncReady && typeof window.JetSyncReady.finally === 'function') {
         window.JetSyncReady.finally(prosseguir);
@@ -567,7 +634,6 @@
       }
     });
 
-    // Atualiza a tela sozinha quando outro navegador/aparelho salvar algo novo.
     if (window.JetSyncOnChange) {
       window.JetSyncOnChange(function () { carregarDadosLocal(); });
     }
