@@ -35,10 +35,12 @@
     body {
       text-transform: uppercase;
     }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 
-<body class="bg-brand-dark text-slate-100 font-sans min-h-screen flex flex-col antialiased">
+<body class="bg-brand-dark text-slate-100 font-sans min-h-screen flex flex-col antialiased pb-20">
 
   <!-- HEADER / MENU SUPERIOR RESPONSIVO -->
   <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 shadow-lg">
@@ -94,10 +96,84 @@
     <section class="bg-slate-900 rounded-2xl border border-slate-800 shadow-xl p-4 sm:p-6">
       <div id="listaCiclos" class="space-y-6"></div>
     </section>
-
+    <nav id="bottom-nav-container" class="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 shadow-2xl px-2 py-1.5 overflow-x-auto no-scrollbar">
+  <div class="flex items-center justify-start md:justify-center gap-2 min-w-max mx-auto px-2">
+    <a href="index.html" data-page="index.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+      <i class="fa-solid fa-house text-base mb-1 transition-transform group-hover:scale-110"></i>
+      <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">INICIAL</span>
+    </a>
+    <a href="cotas-extras.html" data-page="cotas-extras.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+      <i class="fa-solid fa-money-bill-trend-up text-base mb-1 transition-transform group-hover:scale-110"></i>
+      <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">COTAS EXTRAS</span>
+    </a>
+    <a href="escalas.html" data-page="escalas.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+      <i class="fa-solid fa-calendar-check text-base mb-1 transition-transform group-hover:scale-110"></i>
+      <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">ESCALAS</span>
+    </a>
+    <a href="ciclos.html" data-page="ciclos.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+      <i class="fa-solid fa-recycle text-base mb-1 transition-transform group-hover:scale-110"></i>
+      <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">CICLOS</span>
+    </a>
+    <a href="dashboard.html" data-page="dashboard.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+      <i class="fa-solid fa-chart-line text-base mb-1 transition-transform group-hover:scale-110"></i>
+      <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">DASHBOARD</span>
+    </a>
+    <a href="resetar-dados.html" data-page="resetar-dados.html" class="bottom-nav-item flex flex-col items-center justify-center px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-white transition group min-w-[76px]">
+      <i class="fa-solid fa-trash-can text-base mb-1 transition-transform group-hover:scale-110"></i>
+      <span class="text-[10px] font-bold tracking-tight whitespace-nowrap">RESETAR</span>
+    </a>
+  </div>
+</nav>
   </main>
 
   <script>
+    // FUNÇÃO DE ATIVAÇÃO E ROLAGEM AUTOMÁTICA DO MENU INFERIOR
+function inicializarMenuRodape() {
+  // Pega o nome do arquivo atual da URL (ex: 'escalas.html', 'dashboard.html', etc.)
+  let paginaAtual = window.location.pathname.split('/').pop().toLowerCase();
+  if (!paginaAtual || paginaAtual === '') {
+    paginaAtual = 'index.html';
+  }
+
+  const itens = document.querySelectorAll('.bottom-nav-item');
+  let itemAtivo = null;
+
+  itens.forEach(item => {
+    const paginaItem = (item.getAttribute('data-page') || '').toLowerCase();
+    const icone = item.querySelector('i');
+    
+    // Verifica se este link corresponde à página aberta no momento
+    if (paginaItem === paginaAtual || (paginaAtual === '' && paginaItem === 'index.html')) {
+      itemAtivo = item;
+      // Estilo ativo: fundo azul da marca, texto e ícone brancos
+      item.classList.remove('text-slate-400');
+      item.classList.add('bg-brand-600', 'text-white', 'shadow-md');
+      if (icone) {
+        icone.classList.remove('text-brand-500', 'text-slate-400');
+        icone.classList.add('text-white');
+      }
+    } else {
+      // Estilo inativo: texto cinza e ícone na cor da marca (text-brand-500)
+      item.classList.add('text-slate-400');
+      item.classList.remove('bg-brand-600', 'text-white', 'shadow-md');
+      if (icone) {
+        icone.classList.remove('text-white');
+        icone.classList.add('text-brand-500');
+      }
+    }
+  });
+
+  // Se houver item ativo, rola o menu horizontalmente até centralizá-lo na tela
+  if (itemAtivo) {
+    setTimeout(() => {
+      itemAtivo.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'center',
+        block: 'nearest'
+      });
+    }, 150);
+  }
+}
     const STORAGE_KEY_CICLOS = 'jetcontrol_ciclos_fechados';
 
     function esc(v) {
@@ -805,6 +881,7 @@
     });
 
     window.addEventListener('DOMContentLoaded', function () {
+      inicializarMenuRodape();
       var prosseguir = function () { renderizarCiclos(); };
       if (window.JetSyncReady && typeof window.JetSyncReady.finally === 'function') {
         window.JetSyncReady.finally(prosseguir);
