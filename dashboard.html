@@ -1410,14 +1410,14 @@ function inicializarMenuRodape() {
         });
 
         // Cálculo de Horas
-        if (escala.saida && escala.chegada) {
-          const [h1, m1] = escala.saida.split(':').map(Number);
-          const [h2, m2] = escala.chegada.split(':').map(Number);
-          let diffMin = (h2 * 60 + m2) - (h1 * 60 + m1);
-          if (diffMin < 0) diffMin += 24 * 60;
-          horasVigente += (diffMin / 60);
-        } else {
-          horasVigente += 4;
+        // Usa os campos reais salvos por escalas.html (horarioSaida/horarioChegada).
+        // Escalas em home office não entram no total de horas trabalhadas.
+        if (escala.homeOffice !== true) {
+          const minTrab = calcularMinutosEntreHorarios(
+            escala.horarioSaida || escala.saida,
+            escala.horarioChegada || escala.chegada
+          );
+          horasVigente += (minTrab / 60);
         }
 
         // Mapeamento de Turnos Operacionais e Contagem
@@ -1509,14 +1509,24 @@ function inicializarMenuRodape() {
           pernoitesVigente++;
         }
 
-        if (elegivelDiaria) {
+        // Escalas novas gravam valores e flags individuais; usa-os quando existirem.
+        const temCamposIndividuais = escala.valorDiariaAlimentacao !== undefined || escala.valorAuxAlimentacao !== undefined;
+        if (temCamposIndividuais) {
+          diariasVigente += parseMoeda(escala.valorDiarias || 0);
+          auxiliosVigente += parseMoeda(escala.valorAuxilios || 0);
+          if (escala.diariaAlimentacaoRecebivel === true) diariasRecebivelVigente += parseMoeda(escala.valorDiariaAlimentacao || 0);
+          if (escala.diariaPernoiteRecebivel === true) diariasRecebivelVigente += parseMoeda(escala.valorDiariaPernoite || 0);
+          if (escala.diariaTrasladoRecebivel === true) diariasRecebivelVigente += parseMoeda(escala.valorDiariaTraslado || 0);
+          if (escala.auxAlimentacaoRecebivel === true) auxiliosRecebivelVigente += parseMoeda(escala.valorAuxAlimentacao || 0);
+          if (escala.auxTransporteRecebivel === true) auxiliosRecebivelVigente += parseMoeda(escala.valorAuxTransporte || 0);
+        } else if (elegivelDiaria) {
           const valorDiariaEstaEscala = valDiariaAlim + (comPernoite ? valDiariaHosp : 0);
           diariasVigente += valorDiariaEstaEscala;
           if (escala.diariasRecebivel !== false) diariasRecebivelVigente += valorDiariaEstaEscala;
         }
 
         // Verificação de Auxílios (Fim de semana ou feriado)
-        if (escala.data) {
+        if (!temCamposIndividuais && escala.data) {
           const dt = new Date(escala.data + 'T00:00:00');
           const diaSemana = dt.getDay();
           if (diaSemana === 0 || diaSemana === 6 || escala.isFeriado) {
@@ -1798,16 +1808,15 @@ function inicializarMenuRodape() {
           }]
         },
         options: {
-          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
-            tooltip: { callbacks: { label: (item) => formatMoeda(item.parsed.x) } }
+            tooltip: { callbacks: { label: (item) => formatMoeda(item.parsed.y) } }
           },
           scales: {
-            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: (v) => formatMoeda(v) } },
-            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: (v) => formatMoeda(v) } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
       });
@@ -1829,13 +1838,12 @@ function inicializarMenuRodape() {
           }]
         },
         options: {
-          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1 } },
-            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1 } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
       });
@@ -1857,13 +1865,12 @@ function inicializarMenuRodape() {
           }]
         },
         options: {
-          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
-            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
       });
@@ -1885,13 +1892,12 @@ function inicializarMenuRodape() {
           }]
         },
         options: {
-          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
-            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
       });
@@ -1918,13 +1924,12 @@ function inicializarMenuRodape() {
           }]
         },
         options: {
-          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
-            y: { grid: { display: false }, ticks: { color: '#94a3b8', autoSkip: false, font: { size: 10 } } }
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8', autoSkip: false, font: { size: 10 } } }
           }
         }
       });
@@ -1948,16 +1953,15 @@ function inicializarMenuRodape() {
           ]
         },
         options: {
-          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: { position: 'bottom', labels: { color: '#f8fafc', padding: 15 } },
-            tooltip: { callbacks: { label: (item) => `${item.dataset.label}: ${formatMoeda(item.parsed.x)}` } }
+            tooltip: { callbacks: { label: (item) => `${item.dataset.label}: ${formatMoeda(item.parsed.y)}` } }
           },
           scales: {
-            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: (v) => formatMoeda(v) } },
-            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: (v) => formatMoeda(v) } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
       });
@@ -1983,13 +1987,12 @@ function inicializarMenuRodape() {
           }]
         },
         options: {
-          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
-            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
       });
@@ -2017,16 +2020,15 @@ function inicializarMenuRodape() {
           }]
         },
         options: {
-          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
-            tooltip: { callbacks: { label: (item) => ehMoeda ? formatMoeda(item.parsed.x) : `${item.parsed.x.toFixed(1)}H` } }
+            tooltip: { callbacks: { label: (item) => ehMoeda ? formatMoeda(item.parsed.y) : `${item.parsed.y.toFixed(1)}H` } }
           },
           scales: {
-            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: (v) => ehMoeda ? formatMoeda(v) : `${v}H` } },
-            y: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', callback: (v) => ehMoeda ? formatMoeda(v) : `${v}H` } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
       });
@@ -2064,24 +2066,21 @@ function inicializarMenuRodape() {
 
     // Escutar alterações efetuadas em outras páginas/abas do navegador em tempo real
     window.addEventListener('storage', (event) => {
-      if ([
-        'jetcontrol_escalas_dados',
-        'jetcontrol_ciclos_fechados',
-        'jetcontrol_cotas_extras_dados',
-        'valores',
-        'jetcontrol_valores_custom',
-        'jetcontrol_valores'
-      ].includes(event.key)) {
+      if (!event.key || event.key.indexOf('jetcontrol_') === 0 || event.key === 'valores') {
         carregarEProcessarDados();
       }
     });
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) carregarEProcessarDados();
+    });
+    window.addEventListener('focus', () => carregarEProcessarDados());
 
     // Inicialização e Loop de Atualização Automática a cada 1 segundo (100000 ms)
     document.addEventListener('DOMContentLoaded', () => {
       inicializarMenuRodape();
       var iniciar = function () {
         carregarEProcessarDados();
-        setInterval(carregarEProcessarDados, 100000);
+        setInterval(carregarEProcessarDados, 5000);
       };
       if (window.JetSyncReady && typeof window.JetSyncReady.finally === 'function') {
         window.JetSyncReady.finally(iniciar);

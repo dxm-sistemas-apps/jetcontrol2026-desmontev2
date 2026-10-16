@@ -91,6 +91,21 @@
 
   // ------------------------- ENVIO (LOCAL → NUVEM) -------------------------
   var timersPendentes = {};
+  var pendentes = {};
+
+  // Ao fechar/trocar de página, envia já o que ainda estava aguardando o atraso.
+  function descarregarPendentes() {
+    Object.keys(pendentes).forEach(function (chave) {
+      var p = pendentes[chave];
+      clearTimeout(timersPendentes[chave]);
+      delete pendentes[chave];
+      enviarAgora(chave, p.valor, p.apagar, p.carimbo, true);
+    });
+  }
+  window.addEventListener('pagehide', descarregarPendentes);
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') descarregarPendentes();
+  });
 
   // -----------------------------------------------------------------------
   // CORREÇÃO DE CORRIDA (LOCAL PENDENTE x SINCRONIZAÇÃO):
@@ -118,7 +133,9 @@
     meta[chave] = carimboDestaEdicao;
     salvarMeta(meta);
 
+    pendentes[chave] = { valor: valor, apagar: apagar, carimbo: carimboDestaEdicao };
     timersPendentes[chave] = setTimeout(function () {
+      delete pendentes[chave];
       enviarAgora(chave, valor, apagar, carimboDestaEdicao);
     }, ATRASO_ENVIO_MS);
   }
@@ -126,7 +143,7 @@
   // "carimbo" é o horário definido no momento em que a edição foi agendada
   // (não quando o envio de fato acontece), para ficar consistente com o
   // valor já gravado em meta[chave] por agendarEnvio.
-  function enviarAgora(chave, valor, apagar, carimbo) {
+  function enviarAgora(chave, valor, apagar, carimbo, keepalive) {
     var agora = carimbo || Date.now();
     var mascara = apagar
       ? '?updateMask.fieldPaths=deleted&updateMask.fieldPaths=atualizadoEm'
@@ -143,7 +160,8 @@
     fetch(URL_BASE + '/' + encodeURIComponent(chave) + mascara, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fields: campos })
+      body: JSON.stringify({ fields: campos }),
+      keepalive: !!keepalive
     }).catch(function () {
       // Sem internet ou nuvem fora do ar: o dado já está salvo localmente
       // (como sempre esteve) e será reenviado na próxima gravação/abertura.
