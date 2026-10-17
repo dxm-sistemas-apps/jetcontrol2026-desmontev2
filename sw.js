@@ -1,11 +1,11 @@
 /* JETCONTROL — service worker (app instalável + uso offline).
    Os dados continuam no localStorage; a sincronização com a nuvem
    (Firestore) NUNCA passa pelo cache. */
-const VERSAO = 'jetcontrol-v1';
+const VERSAO = 'jetcontrol-v2';
 const SHELL = [
   './', 'index.html', 'cotas-extras.html', 'escalas.html', 'ciclos.html',
   'dashboard.html', 'resetar-dados.html', 'jetcontrol-sync.js',
-  'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'
+  'manifest.json', 'icons/icon-192.png', 'icons/icon-512.png'
 ];
 
 self.addEventListener('install', (e) => {
