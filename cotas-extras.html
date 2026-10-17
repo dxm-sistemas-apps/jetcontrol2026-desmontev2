@@ -3,6 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="JETCONTROL">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <script src="pwa.js" defer></script>
   <title>JETCONTROL 2026®™ - COTAS EXTRAS</title>
   <script src="jetcontrol-sync.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -175,12 +184,13 @@
               <th scope="col" class="px-4 py-3 text-center">DATA</th>
               <th scope="col" class="px-4 py-3 text-right">DIÁRIA DE ALIMENTAÇÃO</th>
               <th scope="col" class="px-4 py-3 text-right">DIÁRIA DE PERNOITE</th>
+              <th scope="col" class="px-4 py-3 text-right">DIÁRIA DE TRASLADO</th>
               <th scope="col" class="px-4 py-3 text-right">TOTAL DIÁRIO</th>
             </tr>
           </thead>
           <tbody id="tabelaDiariasBody" class="divide-y divide-slate-800">
             <tr>
-              <td colspan="6" class="px-4 py-8 text-center text-slate-500 italic">
+              <td colspan="7" class="px-4 py-8 text-center text-slate-500 italic">
                 NENHUMA ESCALA COM LOCAL ELEGÍVEL A DIÁRIAS CADASTRADA ATÉ O MOMENTO.
               </td>
             </tr>
@@ -255,7 +265,7 @@
       <div class="flex justify-end pt-2">
         <div class="bg-slate-900 border border-slate-800 rounded-xl px-5 py-3 flex items-center space-x-4 shadow-inner">
           <span class="text-xs uppercase font-bold text-slate-400 tracking-wider">TOTAL GERAL DE AUXÍLIOS:</span>
-          <span id="totalAuxilios" class="text-emerald-400 font-black text-lg">R$ 0,00</span>
+          <span id="totalAuxilios" class="text-amber-400 font-black text-lg">R$ 0,00</span>
         </div>
       </div>
     </section>
@@ -335,26 +345,55 @@
       return isNaN(num) ? 0.00 : num;
     }
 
+    // Cor dos valores de diárias/auxílios: vermelho se negativo; amber-400 se zero ou positivo.
+    function classeCorValorDiariaAux(v) {
+      return (Number(v) || 0) < -0.004 ? 'text-red-400' : 'text-amber-400';
+    }
+
+    function verificarElegibilidade(localStr) {
+      if (!localStr) return false;
+      const upper = String(localStr).toUpperCase().trim();
+      return MUNICIPIOS_ELEGIVEIS.some(mun => upper.includes(mun));
+    }
+
+    // MESMA REGRA usada em escalas.html (obterValoresExtrasEscala), para que os
+    // totais desta página, do dashboard e da página de escalas sempre coincidam.
+    function obterValoresExtrasEscala(escala, valoresSalvos) {
+      const conv = (valor, padrao) => {
+        if (typeof valor === 'number') return valor;
+        if (!valor) return padrao;
+        return parseFloat(String(valor).replace('R$', '').replace(/\./g, '').replace(',', '.')) || padrao;
+      };
+      const valDiariaAlimentacao = conv(valoresSalvos.diariaAlimentacao, 52.00);
+      const valDiariaHospedagem = conv(valoresSalvos.diariaHospedagem, 274.10);
+      const valDiariaTraslado = conv(valoresSalvos.diariaTraslado, 0.00);
+      const valAuxAlimentacao = conv(valoresSalvos.alimentacao, 57.70);
+      const valAuxTransporte = conv(valoresSalvos.transporte, 31.08);
+
+      const turnos = [
+        { local: escala.localManha || escala.local, pernoite: escala.pernoiteManha || escala.pernoite },
+        { local: escala.localTarde, pernoite: escala.pernoiteTarde },
+        { local: escala.localNoite, pernoite: escala.pernoiteNoite }
+      ];
+      const elegivel = turnos.some(t => verificarElegibilidade(t.local));
+      const possuiPernoite = turnos.some(t => verificarElegibilidade(t.local) && ['SIM', 'TRUE', '1', 'S'].includes(String(t.pernoite || '').toUpperCase().trim()));
+      const d = escala.data ? new Date(escala.data + 'T00:00:00') : null;
+      const diaEspecial = d ? (d.getDay() === 0 || d.getDay() === 6 || escala.isFeriado === true) : false;
+
+      return {
+        elegivel, possuiPernoite, diaEspecial,
+        diariaAlimentacao: elegivel ? valDiariaAlimentacao : 0,
+        diariaPernoite: possuiPernoite ? valDiariaHospedagem : 0,
+        diariaTraslado: elegivel ? valDiariaTraslado : 0,
+        auxAlimentacao: diaEspecial ? valAuxAlimentacao : 0,
+        auxTransporte: diaEspecial ? valAuxTransporte : 0,
+        turnos
+      };
+    }
+
     function renderizarOrganogramas() {
-      const escalasSalvas = JSON.parse(localStorage.getItem(STORAGE_KEY_ESCALAS)) || [];
-      
-      const valoresSalvos = JSON.parse(
-        localStorage.getItem(STORAGE_KEY_VALORES) || 
-        localStorage.getItem('valores') || 
-        localStorage.getItem('jetcontrol_valores') || 
-        localStorage.getItem('jetcontrol_configuracoes') || '{}'
-      );
-
-      const valAlimentacaoAux = converterValorMonetario(valoresSalvos.alimentacao || '57,70');
-      const valTransporteAux = converterValorMonetario(valoresSalvos.transporte || '31,08');
-      
-      const valDiariaAlimentacao = converterValorMonetario(
-        valoresSalvos.diariaAlimentacao || valoresSalvos.alimentacaoDiaria || valoresSalvos.diaria || valoresSalvos.valorDiaria || '52,00'
-      );
-
-      const valDiariaHospedagem = converterValorMonetario(
-        valoresSalvos.diariaHospedagem || valoresSalvos.hospedagemDiaria || valoresSalvos.hospedagem || valoresSalvos.pernoite || valoresSalvos.valorHospedagem || '274,10'
-      );
+      const escalasSalvas = JSON.parse(localStorage.getItem(STORAGE_KEY_ESCALAS) || '[]') || [];
+      const valoresSalvos = JSON.parse(localStorage.getItem(STORAGE_KEY_VALORES) || '{}') || {};
 
       const tbodyDiarias = document.getElementById('tabelaDiariasBody');
       const tbodyAuxilios = document.getElementById('tabelaAuxiliosBody');
@@ -367,109 +406,87 @@
       escalasSalvas.forEach((escala, index) => {
         const numEscala = escala.numero || `#${index + 1}`;
         const dataObj = escala.data ? new Date(escala.data + 'T00:00:00') : null;
-        
-        const turnos = [
-          { nome: 'MANHÃ', local: escala.localManha || escala.local || '', pernoite: escala.pernoiteManha || escala.pernoite || 'NAO' },
-          { nome: 'TARDE', local: escala.localTarde || '', pernoite: escala.pernoiteTarde || 'NAO' },
-          { nome: 'NOITE', local: escala.localNoite || '', pernoite: escala.pernoiteNoite || 'NAO' }
-        ];
+        const dataTxt = dataObj ? dataObj.toLocaleDateString('pt-BR') : '-';
+        const ex = obterValoresExtrasEscala(escala, valoresSalvos);
 
-        let temElegivelNaEscala = false;
-        let temPernoiteNaEscala = false;
-        let locaisElegiveisDescricao = [];
-
-        turnos.forEach(turno => {
-          const localUpper = (turno.local || '').toUpperCase().trim();
-          const isElegivel = MUNICIPIOS_ELEGIVEIS.some(mun => localUpper.includes(mun));
-
-          if (isElegivel) {
-            temElegivelNaEscala = true;
-            locaisElegiveisDescricao.push(turno.local);
-            const pernoiteUpper = (turno.pernoite || '').toUpperCase().trim();
-            if (pernoiteUpper === "SIM" || pernoiteUpper === "TRUE" || pernoiteUpper === "1" || pernoiteUpper === "S") {
-              temPernoiteNaEscala = true;
-            }
-          }
-        });
-
-        if (temElegivelNaEscala) {
-          const valorAlimentacaoDiaria = valDiariaAlimentacao;
-          const valorHospedagemDiaria = temPernoiteNaEscala ? valDiariaHospedagem : 0.00;
-          
-          const totalLinhaDiaria = valorAlimentacaoDiaria + valorHospedagemDiaria;
+        if (ex.elegivel) {
+          const totalLinhaDiaria = ex.diariaAlimentacao + ex.diariaPernoite + ex.diariaTraslado;
           somaTotalDiarias += totalLinhaDiaria;
-          
-          const descricaoLocais = [...new Set(locaisElegiveisDescricao)].join(' / ');
+          const descricaoLocais = [...new Set(ex.turnos.filter(t => verificarElegibilidade(t.local)).map(t => t.local))].join(' / ');
 
           htmlDiarias += `
             <tr class="hover:bg-slate-800/50 transition uppercase">
               <td class="px-4 py-3 text-center font-bold text-brand-500">${numEscala}</td>
               <td class="px-4 py-3 font-semibold text-white">${descricaoLocais}</td>
-              <td class="px-4 py-3 text-center">${escala.data ? dataObj.toLocaleDateString('pt-BR') : '-'}</td>
-              <td class="px-4 py-3 text-right text-slate-300">${formatarMoeda(valorAlimentacaoDiaria)}</td>
-              <td class="px-4 py-3 text-right text-slate-300">${formatarMoeda(valorHospedagemDiaria)}</td>
-              <td class="px-4 py-3 text-right font-bold text-amber-400">${formatarMoeda(totalLinhaDiaria)}</td>
+              <td class="px-4 py-3 text-center">${dataTxt}</td>
+              <td class="px-4 py-3 text-right ${classeCorValorDiariaAux(ex.diariaAlimentacao)}">${formatarMoeda(ex.diariaAlimentacao)}</td>
+              <td class="px-4 py-3 text-right ${classeCorValorDiariaAux(ex.diariaPernoite)}">${formatarMoeda(ex.diariaPernoite)}</td>
+              <td class="px-4 py-3 text-right ${classeCorValorDiariaAux(ex.diariaTraslado)}">${formatarMoeda(ex.diariaTraslado)}</td>
+              <td class="px-4 py-3 text-right font-bold ${classeCorValorDiariaAux(totalLinhaDiaria)}">${formatarMoeda(totalLinhaDiaria)}</td>
             </tr>
           `;
         }
 
-        let isFimDeSemanaOuFeriado = false;
-        if (dataObj) {
-          const diaSemana = dataObj.getDay();
-          isFimDeSemanaOuFeriado = (diaSemana === 0 || diaSemana === 6 || escala.isFeriado === true);
-        }
+        if (ex.diaEspecial) {
+          const totalLinhaAuxilio = ex.auxAlimentacao + ex.auxTransporte;
+          somaTotalAuxilios += totalLinhaAuxilio;
+          const locaisEscala = ex.turnos.map(t => t.local).filter(l => l && String(l).trim() !== '');
+          const locaisFormatados = locaisEscala.length ? locaisEscala.join(' / ') : '-';
 
-        if (isFimDeSemanaOuFeriado) {
-          const locaisEscala = [
-            escala.localManha || escala.local,
-            escala.localTarde,
-            escala.localNoite
-          ].filter(l => l && l.trim() !== '');
-
-          if (locaisEscala.length > 0) {
-            const totalLinhaAuxilio = valAlimentacaoAux + valTransporteAux;
-            somaTotalAuxilios += totalLinhaAuxilio;
-            const locaisFormatados = locaisEscala.join(' / ');
-
-            htmlAuxilios += `
-              <tr class="hover:bg-slate-800/50 transition uppercase">
-                <td class="px-4 py-3 text-center font-bold text-brand-500">${numEscala}</td>
-                <td class="px-4 py-3 font-semibold text-white">${locaisFormatados}</td>
-                <td class="px-4 py-3 text-center">${dataObj ? dataObj.toLocaleDateString('pt-BR') : '-'}</td>
-                <td class="px-4 py-3 text-right text-slate-300">${formatarMoeda(valAlimentacaoAux)}</td>
-                <td class="px-4 py-3 text-right text-slate-300">${formatarMoeda(valTransporteAux)}</td>
-                <td class="px-4 py-3 text-right font-bold text-emerald-400">${formatarMoeda(totalLinhaAuxilio)}</td>
-              </tr>
-            `;
-          }
+          htmlAuxilios += `
+            <tr class="hover:bg-slate-800/50 transition uppercase">
+              <td class="px-4 py-3 text-center font-bold text-brand-500">${numEscala}</td>
+              <td class="px-4 py-3 font-semibold text-white">${locaisFormatados}</td>
+              <td class="px-4 py-3 text-center">${dataTxt}</td>
+              <td class="px-4 py-3 text-right ${classeCorValorDiariaAux(ex.auxAlimentacao)}">${formatarMoeda(ex.auxAlimentacao)}</td>
+              <td class="px-4 py-3 text-right ${classeCorValorDiariaAux(ex.auxTransporte)}">${formatarMoeda(ex.auxTransporte)}</td>
+              <td class="px-4 py-3 text-right font-bold ${classeCorValorDiariaAux(totalLinhaAuxilio)}">${formatarMoeda(totalLinhaAuxilio)}</td>
+            </tr>
+          `;
         }
       });
 
-      if (htmlDiarias !== '') {
-        tbodyDiarias.innerHTML = htmlDiarias;
-      } else {
-        tbodyDiarias.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">NENHUMA ESCALA COM LOCAL ELEGÍVEL A DIÁRIAS CADASTRADA ATÉ O MOMENTO.</td></tr>`;
-      }
-      document.getElementById('totalDiarias').innerText = formatarMoeda(somaTotalDiarias);
+      tbodyDiarias.innerHTML = htmlDiarias !== '' ? htmlDiarias :
+        `<tr><td colspan="7" class="text-center py-4 text-slate-500">NENHUMA ESCALA COM LOCAL ELEGÍVEL A DIÁRIAS CADASTRADA ATÉ O MOMENTO.</td></tr>`;
+      tbodyAuxilios.innerHTML = htmlAuxilios !== '' ? htmlAuxilios :
+        `<tr><td colspan="6" class="text-center py-4 text-slate-500">NENHUMA ESCALA COM DATA ELEGÍVEL AO AUXÍLIOS CADASTRADA ATÉ O MOMENTO.</td></tr>`;
 
-      if (htmlAuxilios !== '') {
-        tbodyAuxilios.innerHTML = htmlAuxilios;
-      } else {
-        tbodyAuxilios.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">NENHUMA ESCALA COM DATA ELEGÍVEL AO AUXÍLIOS CADASTRADA ATÉ O MOMENTO.</td></tr>`;
-      }
-      document.getElementById('totalAuxilios').innerText = formatarMoeda(somaTotalAuxilios);
+      const elTotalDiarias = document.getElementById('totalDiarias');
+      elTotalDiarias.innerText = formatarMoeda(somaTotalDiarias);
+      elTotalDiarias.classList.remove('text-red-400', 'text-amber-400', 'text-emerald-400');
+      elTotalDiarias.classList.add(classeCorValorDiariaAux(somaTotalDiarias));
+      const elTotalAuxilios = document.getElementById('totalAuxilios');
+      elTotalAuxilios.innerText = formatarMoeda(somaTotalAuxilios);
+      elTotalAuxilios.classList.remove('text-red-400', 'text-amber-400', 'text-emerald-400');
+      elTotalAuxilios.classList.add(classeCorValorDiariaAux(somaTotalAuxilios));
 
-      const dadosCotasExtras = {
+      // Grava MESCLANDO com o que já existe (escalas.html guarda ali também os
+      // totais recebíveis, pernoites etc., que não podem ser perdidos) e só
+      // grava se algo mudou, para não gerar sincronizações desnecessárias.
+      let dadosCotasExtras = {};
+      try { dadosCotasExtras = JSON.parse(localStorage.getItem(STORAGE_KEY_COTAS_EXTRAS) || '{}') || {}; } catch (_) {}
+      Object.assign(dadosCotasExtras, {
         totalDiarias: somaTotalDiarias,
         totalAuxilios: somaTotalAuxilios,
         diarias: somaTotalDiarias,
         auxilios: somaTotalAuxilios,
         organogramaDiariasHTML: document.getElementById('secao-organograma-diarias')?.outerHTML || '',
         organogramaAuxiliosHTML: document.getElementById('secao-organograma-auxilios')?.outerHTML || ''
+      });
+      const gravarSeMudou = (chave, texto) => {
+        if (localStorage.getItem(chave) !== texto) localStorage.setItem(chave, texto);
       };
-      localStorage.setItem(STORAGE_KEY_COTAS_EXTRAS, JSON.stringify(dadosCotasExtras));
-      localStorage.setItem('jetcontrol_organograma_diarias_html', dadosCotasExtras.organogramaDiariasHTML);
-      localStorage.setItem('jetcontrol_organograma_auxilios_html', dadosCotasExtras.organogramaAuxiliosHTML);
+      gravarSeMudou(STORAGE_KEY_COTAS_EXTRAS, JSON.stringify(dadosCotasExtras));
+      gravarSeMudou('jetcontrol_organograma_diarias_html', dadosCotasExtras.organogramaDiariasHTML);
+      gravarSeMudou('jetcontrol_organograma_auxilios_html', dadosCotasExtras.organogramaAuxiliosHTML);
+
+      // Avisa a página de escalas (que abre esta página num quadro invisível)
+      // que a atualização terminou.
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ tipo: 'jetcontrol-cotas-renderizado' }, location.origin);
+        }
+      } catch (_) {}
     }
 
     // ATIVAÇÃO E ROLAGEM AUTOMÁTICA DO MENU DO RODAPÉ
@@ -524,6 +541,20 @@
         prosseguir();
       }
     });
+
+    // Atualiza sozinha quando as escalas/valores mudarem (outra aba/janela,
+    // nuvem) ou quando a página voltar a ficar visível / sair do cache.
+    var _timerAtualizacao = null;
+    function agendarAtualizacao() {
+      clearTimeout(_timerAtualizacao);
+      _timerAtualizacao = setTimeout(renderizarOrganogramas, 150);
+    }
+    window.addEventListener('storage', function (e) {
+      if (!e.key || e.key === STORAGE_KEY_ESCALAS || e.key === STORAGE_KEY_VALORES || e.key === 'valores') agendarAtualizacao();
+    });
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) agendarAtualizacao(); });
+    window.addEventListener('pageshow', function (e) { if (e.persisted) agendarAtualizacao(); });
+    window.addEventListener('focus', agendarAtualizacao);
 
     if (window.JetSyncOnChange) {
       window.JetSyncOnChange(function () { renderizarOrganogramas(); });

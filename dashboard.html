@@ -11,6 +11,15 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="JETCONTROL">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <script src="pwa.js" defer></script>
   <title>JETCONTROL 2026®™ - DASHBOARD</title>
   <script src="jetcontrol-sync.js"></script>
   
@@ -1084,6 +1093,11 @@ function inicializarMenuRodape() {
     }
 
     // PROCESSAMENTO E CONSOLIDAÇÃO DE TODOS OS DADOS (HISTÓRICOS + CICLO VIGENTE)
+    // Cor dos valores de diárias/auxílios: vermelho se negativo; amber-400 se zero ou positivo.
+    function corDiariaAuxiliar(v) {
+      return (Number(v) || 0) < -0.004 ? 'var(--accent-danger)' : '#fbbf24';
+    }
+
     function carregarEProcessarDados() {
       // Configurações e Parâmetros
       // IMPORTANTE: a chave ATUAL usada pelo sistema é 'jetcontrol_valores_custom'
@@ -1610,7 +1624,9 @@ function inicializarMenuRodape() {
       document.getElementById('kpi-horas-home-office').textContent = `${horasHomeOfficeReuniaoGeral}H ${String(minutosHomeOfficeReuniaoGeral).padStart(2, '0')}M`;
       definirTextoRotulo('kpi-horas-home-office-sub', textoHorasHomeOfficeSub(acumuladoGeral.homeOfficesReuniao));
 
-      document.getElementById('kpi-diarias-auxilios').textContent = formatMoeda(totalDiariasEAuxiliosGeral);
+      const elKpiDiariasAux = document.getElementById('kpi-diarias-auxilios');
+      elKpiDiariasAux.textContent = formatMoeda(totalDiariasEAuxiliosGeral);
+      elKpiDiariasAux.style.color = corDiariaAuxiliar(totalDiariasEAuxiliosGeral);
       definirTextoRotulo('kpi-pernoites-count',
         textoDiariasAuxiliosSub(acumuladoGeral.auxAlimentacao, acumuladoGeral.auxTransporte, acumuladoGeral.diariaAlimentacao, acumuladoGeral.diariaHospedagem));
 
@@ -1627,12 +1643,14 @@ function inicializarMenuRodape() {
       const balancoAuxiliosGeral = acumuladoGeral.auxiliosRecebivel - acumuladoGeral.auxilios;
       const balancoGeral = balancoDiariasGeral + balancoAuxiliosGeral;
 
-      document.getElementById('kpi-recebiveis').textContent = formatMoeda(totalRecebivelGeral);
+      const elKpiRecebiveis = document.getElementById('kpi-recebiveis');
+      elKpiRecebiveis.textContent = formatMoeda(totalRecebivelGeral);
+      elKpiRecebiveis.style.color = corDiariaAuxiliar(totalRecebivelGeral);
       definirTextoRotulo('kpi-recebiveis-sub', textoRecebiveisSub(acumuladoGeral.diariasRecebivel, acumuladoGeral.auxiliosRecebivel));
 
       const elKpiBalanco = document.getElementById('kpi-balanco');
       elKpiBalanco.textContent = formatMoeda(balancoGeral);
-      elKpiBalanco.style.color = balancoGeral < 0 ? 'var(--accent-danger)' : 'var(--accent-success)';
+      elKpiBalanco.style.color = corDiariaAuxiliar(balancoGeral);
       definirTextoRotulo('kpi-balanco-sub', textoBalancoSub(balancoDiariasGeral, balancoAuxiliosGeral));
 
       // Atualizar timestamp
@@ -2053,7 +2071,7 @@ function inicializarMenuRodape() {
           <td>${c.escalas}</td>
           <td>${c.horas.toFixed(1)}h</td>
           <td>${formatMoeda(c.rendimentoHora)}/h</td>
-          <td>${formatMoeda(c.diariasEAuxilios)}</td>
+          <td style="font-weight: 700; color: ${corDiariaAuxiliar(c.diariasEAuxilios)};">${formatMoeda(c.diariasEAuxilios)}</td>
           <td>${formatMoeda(c.jetonBruto)}</td>
           <td style="font-weight: 700; color: var(--accent-success);">${formatMoeda(c.receitaLiquida)}</td>
           <td><span class="badge ${badgeClass}">${statusText}</span></td>
@@ -2062,25 +2080,44 @@ function inicializarMenuRodape() {
       });
     }
 
-    // --- REATIVIDADE E ATUALIZAÇÃO AUTOMÁTICA EM TEMPO REAL ---
+    // --- ATUALIZAÇÃO DO DASHBOARD ---
+    // O dashboard NÃO se atualiza sozinho enquanto o usuário está nele (isso
+    // fazia os gráficos "se mexerem"). Ele é montado ao abrir a página e só
+    // recarrega quando o usuário volta para ela depois de ter estado fora
+    // (outra aba/app/janela), e apenas se os dados realmente mudaram.
+    function assinaturaDados() {
+      try {
+        const partes = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && (k.indexOf('jetcontrol_') === 0 || k === 'valores') && k !== '__jetcontrol_sync_meta__') {
+            partes.push(k + '=' + localStorage.getItem(k));
+          }
+        }
+        return partes.sort().join('\u0001');
+      } catch (_) { return ''; }
+    }
+    let assinaturaRenderizada = null;
 
-    // Escutar alterações efetuadas em outras páginas/abas do navegador em tempo real
-    window.addEventListener('storage', (event) => {
-      if (!event.key || event.key.indexOf('jetcontrol_') === 0 || event.key === 'valores') {
-        carregarEProcessarDados();
-      }
-    });
+    function atualizarSeDadosMudaram() {
+      const atual = assinaturaDados();
+      if (atual === assinaturaRenderizada) return;
+      assinaturaRenderizada = atual;
+      carregarEProcessarDados();
+    }
+
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) carregarEProcessarDados();
+      if (!document.hidden) atualizarSeDadosMudaram();
     });
-    window.addEventListener('focus', () => carregarEProcessarDados());
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) atualizarSeDadosMudaram();
+    });
 
-    // Inicialização e Loop de Atualização Automática a cada 1 segundo (100000 ms)
     document.addEventListener('DOMContentLoaded', () => {
       inicializarMenuRodape();
       var iniciar = function () {
+        assinaturaRenderizada = assinaturaDados();
         carregarEProcessarDados();
-        setInterval(carregarEProcessarDados, 5000);
       };
       if (window.JetSyncReady && typeof window.JetSyncReady.finally === 'function') {
         window.JetSyncReady.finally(iniciar);
@@ -2088,14 +2125,6 @@ function inicializarMenuRodape() {
         iniciar();
       }
     });
-
-    // Atualiza os dados sozinho quando outro navegador/aparelho salvar algo
-    // novo (sem precisar dar F5). Os títulos dos cards são texto fixo direto
-    // no HTML e não mudam com a sincronização, então não precisam ser
-    // reaplicados aqui.
-    if (window.JetSyncOnChange) {
-      window.JetSyncOnChange(function () { carregarEProcessarDados(); });
-    }
   </script>
 </body>
 </html>

@@ -3,6 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="JETCONTROL">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <script src="pwa.js" defer></script>
   <title>JETCONTROL 2026®™ - ESCALAS</title>
   <script src="jetcontrol-sync.js"></script>
   <!-- Tailwind CSS CDN -->
@@ -1033,6 +1042,16 @@ function inicializarMenuRodape() {
       focarCampo(id);
     }
 
+    // Cor dos valores de diárias/auxílios: vermelho se negativo; amber-400 se zero ou positivo.
+    function classeCorValorDiariaAux(v) {
+      return (Number(v) || 0) < -0.004 ? 'text-red-400' : 'text-amber-400';
+    }
+    function aplicarCorValorDiariaAux(el, v) {
+      if (!el) return;
+      el.classList.remove('text-red-400', 'text-amber-400', 'text-emerald-400');
+      el.classList.add(classeCorValorDiariaAux(v));
+    }
+
     function bloquearOrganogramaEscala(bloquear) {
       const form = document.getElementById('formEscala');
       if (!form) return;
@@ -1203,14 +1222,23 @@ function inicializarMenuRodape() {
         iframe.style.border = '0';
         iframe.src = 'cotas-extras.html';
 
-        iframe.onload = () => {
-          setTimeout(() => {
-            if (document.body.contains(iframe)) {
-              document.body.removeChild(iframe);
-            }
-            resolve();
-          }, 50);
+        // Espera a página de Cotas Extras terminar de recalcular (ela avisa por
+        // mensagem) — com limite de tempo, para nunca travar o salvamento.
+        let concluido = false;
+        const concluir = () => {
+          if (concluido) return;
+          concluido = true;
+          window.removeEventListener('message', aoReceber);
+          if (document.body.contains(iframe)) document.body.removeChild(iframe);
+          resolve();
         };
+        const aoReceber = (ev) => {
+          if (ev.source === iframe.contentWindow && ev.data && ev.data.tipo === 'jetcontrol-cotas-renderizado') {
+            setTimeout(concluir, 30);
+          }
+        };
+        window.addEventListener('message', aoReceber);
+        setTimeout(concluir, 6000);
 
         document.body.appendChild(iframe);
       });
@@ -1910,17 +1938,19 @@ function inicializarMenuRodape() {
       const balancoAuxilios = valorAuxiliosRecebivel - valorAuxilios;
 
       document.getElementById('recValorDiarias').innerText = formatarMoeda(valorDiarias);
+      aplicarCorValorDiariaAux(document.getElementById('recValorDiarias'), valorDiarias);
       document.getElementById('recValorAuxilios').innerText = formatarMoeda(valorAuxilios);
+      aplicarCorValorDiariaAux(document.getElementById('recValorAuxilios'), valorAuxilios);
       document.getElementById('recValorRecebivelDiarias').innerText = formatarMoeda(valorDiariasRecebivel);
+      aplicarCorValorDiariaAux(document.getElementById('recValorRecebivelDiarias'), valorDiariasRecebivel);
       document.getElementById('recValorRecebivelAuxilios').innerText = formatarMoeda(valorAuxiliosRecebivel);
+      aplicarCorValorDiariaAux(document.getElementById('recValorRecebivelAuxilios'), valorAuxiliosRecebivel);
       const elBalancoDiarias = document.getElementById('recBalancoDiarias');
       elBalancoDiarias.innerText = formatarMoeda(balancoDiarias);
-      elBalancoDiarias.classList.toggle('text-red-400', balancoDiarias < 0);
-      elBalancoDiarias.classList.toggle('text-emerald-400', balancoDiarias >= 0);
+      aplicarCorValorDiariaAux(elBalancoDiarias, balancoDiarias);
       const elBalancoAuxilios = document.getElementById('recBalancoAuxilios');
       elBalancoAuxilios.innerText = formatarMoeda(balancoAuxilios);
-      elBalancoAuxilios.classList.toggle('text-red-400', balancoAuxilios < 0);
-      elBalancoAuxilios.classList.toggle('text-emerald-400', balancoAuxilios >= 0);
+      aplicarCorValorDiariaAux(elBalancoAuxilios, balancoAuxilios);
 
       // Alíquota fixa de Imposto de Renda (22%)
       const aliqIR = 22;
@@ -2819,15 +2849,15 @@ function inicializarMenuRodape() {
                 </div>
                 <div class="space-y-2">
                   <div><strong>VALOR DIÁRIO DO JETON:</strong> <span class="text-brand-400 font-bold">${formatarMoeda(jetonCard)}</span></div>
-                  <div class="pt-1"><strong>DIÁRIA ALIMENTAÇÃO:</strong> <span class="text-emerald-400 font-bold">${formatarMoeda(extrasCard.diariaAlimentacao)}</span>${badgeRecebivel(flagsCard.diariaAlimentacaoRecebivel)}</div>
-                  <div><strong>DIÁRIA PERNOITE:</strong> <span class="text-emerald-400 font-bold">${formatarMoeda(extrasCard.diariaPernoite)}</span>${badgeRecebivel(flagsCard.diariaPernoiteRecebivel)}</div>
-                  <div><strong>DIÁRIA TRASLADO:</strong> <span class="text-emerald-400 font-bold">${formatarMoeda(extrasCard.diariaTraslado)}</span>${badgeRecebivel(flagsCard.diariaTrasladoRecebivel)}</div>
-                  <div><strong>AUXÍLIO ALIMENTAÇÃO:</strong> <span class="text-amber-400 font-bold">${formatarMoeda(extrasCard.auxAlimentacao)}</span>${badgeRecebivel(flagsCard.auxAlimentacaoRecebivel)}</div>
-                  <div><strong>AUXÍLIO TRANSPORTE:</strong> <span class="text-amber-400 font-bold">${formatarMoeda(extrasCard.auxTransporte)}</span>${badgeRecebivel(flagsCard.auxTransporteRecebivel)}</div>
+                  <div class="pt-1"><strong>DIÁRIA ALIMENTAÇÃO:</strong> <span class="${classeCorValorDiariaAux(extrasCard.diariaAlimentacao)} font-bold">${formatarMoeda(extrasCard.diariaAlimentacao)}</span>${badgeRecebivel(flagsCard.diariaAlimentacaoRecebivel)}</div>
+                  <div><strong>DIÁRIA PERNOITE:</strong> <span class="${classeCorValorDiariaAux(extrasCard.diariaPernoite)} font-bold">${formatarMoeda(extrasCard.diariaPernoite)}</span>${badgeRecebivel(flagsCard.diariaPernoiteRecebivel)}</div>
+                  <div><strong>DIÁRIA TRASLADO:</strong> <span class="${classeCorValorDiariaAux(extrasCard.diariaTraslado)} font-bold">${formatarMoeda(extrasCard.diariaTraslado)}</span>${badgeRecebivel(flagsCard.diariaTrasladoRecebivel)}</div>
+                  <div><strong>AUXÍLIO ALIMENTAÇÃO:</strong> <span class="${classeCorValorDiariaAux(extrasCard.auxAlimentacao)} font-bold">${formatarMoeda(extrasCard.auxAlimentacao)}</span>${badgeRecebivel(flagsCard.auxAlimentacaoRecebivel)}</div>
+                  <div><strong>AUXÍLIO TRANSPORTE:</strong> <span class="${classeCorValorDiariaAux(extrasCard.auxTransporte)} font-bold">${formatarMoeda(extrasCard.auxTransporte)}</span>${badgeRecebivel(flagsCard.auxTransporteRecebivel)}</div>
                   <div class="pt-1"><strong>QTD. DE HORAS TRABALHADAS:</strong> <span class="text-amber-400 font-bold">${esc.horasTrabalhadasStr || '0H 00M'}</span></div>
                   <div><strong>VALOR POR HORA TRABALHADA:</strong> <span class="text-indigo-400 font-bold">${valorHoraStrCorrigido}</span></div>
-                  <div class="pt-2 mt-2 border-t border-slate-800"><strong>VALOR TOTAL DIÁRIO DAS DIÁRIAS:</strong> <span class="text-emerald-400 font-bold">${formatarMoeda(extrasCard.valorDiarias)}</span></div>
-                  <div><strong>VALOR TOTAL DIÁRIO DOS AUXÍLIOS:</strong> <span class="text-amber-400 font-bold">${formatarMoeda(extrasCard.valorAuxilios)}</span></div>
+                  <div class="pt-2 mt-2 border-t border-slate-800"><strong>VALOR TOTAL DIÁRIO DAS DIÁRIAS:</strong> <span class="${classeCorValorDiariaAux(extrasCard.valorDiarias)} font-bold">${formatarMoeda(extrasCard.valorDiarias)}</span></div>
+                  <div><strong>VALOR TOTAL DIÁRIO DOS AUXÍLIOS:</strong> <span class="${classeCorValorDiariaAux(extrasCard.valorAuxilios)} font-bold">${formatarMoeda(extrasCard.valorAuxilios)}</span></div>
                   <div class="pt-2 mt-2 border-t border-slate-800"><strong>VALOR DIÁRIO TOTAL:</strong> <span class="text-emerald-400 font-black text-sm">${formatarMoeda(valorDiarioTotal)}</span></div>
                   <div><strong>VALOR DIÁRIO DO DESCONTO DE IR:</strong> <span class="text-red-400 font-black text-sm">${formatarMoeda(valorDescontoIR)}</span></div>
                   <div><strong>VALOR DIÁRIO REAL APÓS IR:</strong> <span class="text-cyan-400 font-black text-sm">${formatarMoeda(valorDiarioRealAposIR)}</span></div>
@@ -3052,12 +3082,12 @@ function inicializarMenuRodape() {
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Médio por Escala</span><span id="recValorMedioEscala" class="text-xl font-black text-white">${formatarMoeda(v.valorMedioEscala)}</span></div>
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Médio por Atividade</span><span id="recValorMedioAtividade" class="text-xl font-black text-white">${formatarMoeda(v.valorMedioAtividade)}</span></div>
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Médio por Hora Trabalhada</span><span id="recValorMedioHora" class="text-xl font-black text-white">${formatarMoeda(v.valorMedioHora)} /H</span></div>
-            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor das Diárias</span><span id="recValorDiarias" class="text-xl font-black text-amber-400">${formatarMoeda(v.valorDiarias)}</span></div>
-            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor dos Auxílios</span><span id="recValorAuxilios" class="text-xl font-black text-amber-400">${formatarMoeda(v.valorAuxilios)}</span></div>
-            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Recebível das Diárias</span><span id="recValorRecebivelDiarias" class="text-xl font-black text-amber-400">${formatarMoeda(v.valorDiariasRecebivel)}</span></div>
-            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Recebível dos Auxílios</span><span id="recValorRecebivelAuxilios" class="text-xl font-black text-amber-400">${formatarMoeda(v.valorAuxiliosRecebivel)}</span></div>
-            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Balanço das Diárias</span><span id="recBalancoDiarias" class="text-xl font-black ${v.balancoDiarias < 0 ? 'text-red-400' : 'text-amber-400'}">${formatarMoeda(v.balancoDiarias)}</span></div>
-            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Balanço dos Auxílios</span><span id="recBalancoAuxilios" class="text-xl font-black ${v.balancoAuxilios < 0 ? 'text-red-400' : 'text-amber-400'}">${formatarMoeda(v.balancoAuxilios)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor das Diárias</span><span id="recValorDiarias" class="text-xl font-black ${classeCorValorDiariaAux(v.valorDiarias)}">${formatarMoeda(v.valorDiarias)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor dos Auxílios</span><span id="recValorAuxilios" class="text-xl font-black ${classeCorValorDiariaAux(v.valorAuxilios)}">${formatarMoeda(v.valorAuxilios)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Recebível das Diárias</span><span id="recValorRecebivelDiarias" class="text-xl font-black ${classeCorValorDiariaAux(v.valorDiariasRecebivel)}">${formatarMoeda(v.valorDiariasRecebivel)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Recebível dos Auxílios</span><span id="recValorRecebivelAuxilios" class="text-xl font-black ${classeCorValorDiariaAux(v.valorAuxiliosRecebivel)}">${formatarMoeda(v.valorAuxiliosRecebivel)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Balanço das Diárias</span><span id="recBalancoDiarias" class="text-xl font-black ${classeCorValorDiariaAux(v.balancoDiarias)}">${formatarMoeda(v.balancoDiarias)}</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Balanço dos Auxílios</span><span id="recBalancoAuxilios" class="text-xl font-black ${classeCorValorDiariaAux(v.balancoAuxilios)}">${formatarMoeda(v.balancoAuxilios)}</span></div>
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Desconto de IR (22%)</span><span id="recValorDescontoIR" class="text-xl font-black text-red-400">${formatarMoeda(v.valorDescontoIR)}</span></div>
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1"><span class="block text-xs uppercase font-bold text-slate-400">Valor Real de Jeton</span><span id="recValorRealJeton" class="text-xl font-black text-emerald-400">${formatarMoeda(v.valorRealJeton)}</span></div>
           </div>
