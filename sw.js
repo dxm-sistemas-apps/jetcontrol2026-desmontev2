@@ -1,7 +1,7 @@
 /* JETCONTROL — service worker (app instalável + uso offline).
    Os dados continuam no localStorage; a sincronização com a nuvem
    (Firestore) NUNCA passa pelo cache. */
-const VERSAO = 'jetcontrol-v2';
+const VERSAO = 'jetcontrol-v3';
 const SHELL = [
   './', 'index.html', 'cotas-extras.html', 'escalas.html', 'ciclos.html',
   'dashboard.html', 'resetar-dados.html', 'jetcontrol-sync.js',
@@ -36,7 +36,9 @@ self.addEventListener('fetch', (e) => {
   if (mesmaOrigem) {
     // Rede primeiro (sempre a versão mais nova), cache se estiver offline.
     e.respondWith(
-      fetch(req).then((res) => {
+      // 'no-cache' = sempre confere com o servidor (ETag) em vez de usar a cópia
+      // que o navegador guardou por alguns minutos (o GitHub Pages guarda ~10 min).
+      fetch(req.url, { cache: 'no-cache' }).then((res) => {
         if (res && res.ok) { const cp = res.clone(); caches.open(VERSAO).then((c) => c.put(req, cp)); }
         return res;
       }).catch(() => caches.match(req, { ignoreSearch: true }).then((r) => r || (req.mode === 'navigate' ? caches.match('index.html') : Response.error())))
