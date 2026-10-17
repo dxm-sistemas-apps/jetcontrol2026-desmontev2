@@ -1052,6 +1052,14 @@ function inicializarMenuRodape() {
       el.classList.add(classeCorValorDiariaAux(v));
     }
 
+    // TEXTO DA LEGENDA DO CARD "HOME OFFICES" (uma condição embaixo da outra).
+    // Para mudar os rótulos (Compulsório / Reunião / Solicitado) ou a ordem,
+    // edite SOMENTE esta função — ela é usada ao carregar a página, a cada
+    // atualização do card e na cópia arquivada do ciclo.
+    function textoHomeOfficesDetalhe(qtdCompulsorio, qtdReuniao, qtdSolicitado) {
+      return `${qtdCompulsorio} Compulsório <br> ${qtdReuniao} Reunião <br> ${qtdSolicitado} Solicitado`;
+    }
+
     function bloquearOrganogramaEscala(bloquear) {
       const form = document.getElementById('formEscala');
       if (!form) return;
@@ -1918,7 +1926,7 @@ function inicializarMenuRodape() {
       document.getElementById('statTotalEscalas').innerText = escalasSalvas.length;
       document.getElementById('statTotalHoras').innerText = `${horasTotais}H ${minutosTotais.toString().padStart(2, '0')}M`;
       document.getElementById('statHomeOffices').innerText = totalHomeOffices;
-      document.getElementById('statHomeOfficesDetalhe').innerText = `${totalHomeOfficesCompulsorio} Compulsório | ${totalHomeOfficesReuniao} Reunião | ${totalHomeOfficesSolicitado} Solicitado`;
+      document.getElementById('statHomeOfficesDetalhe').innerHTML = textoHomeOfficesDetalhe(totalHomeOfficesCompulsorio, totalHomeOfficesReuniao, totalHomeOfficesSolicitado);
       document.getElementById('statHorasHomeOfficeReuniao').innerText = `${horasHomeOfficeReuniao}H ${String(minutosHomeOfficeReuniao).padStart(2, '0')}M`;
 
       document.getElementById('recValorTotalJeton').innerText = formatarMoeda(valorTotalJeton);
@@ -3062,7 +3070,7 @@ function inicializarMenuRodape() {
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Atividades Quádruplas</span><span id="statQuadruplas" class="text-xl font-black text-emerald-400">${v.totalQuadruplas}</span></div>
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Total de Escalas</span><span id="statTotalEscalas" class="text-xl font-black text-white">${v.totalEscalas}</span></div>
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Horas Trabalhadas</span><span id="statTotalHoras" class="text-xl font-black text-cyan-400">${v.horasTotais}H ${String(v.minutosTotais).padStart(2, '0')}M</span></div>
-            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Home Offices</span><span id="statHomeOffices" class="text-xl font-black text-purple-400">${v.totalHomeOffices}</span><span id="statHomeOfficesDetalhe" class="block text-[10px] text-slate-500 uppercase mt-0.5">${v.totalHomeOfficesCompulsorio} Compulsório | ${v.totalHomeOfficesReuniao} Reunião | ${v.totalHomeOfficesSolicitado} Solicitado</span></div>
+            <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Home Offices</span><span id="statHomeOffices" class="text-xl font-black text-purple-400">${v.totalHomeOffices}</span><span id="statHomeOfficesDetalhe" class="block text-[10px] text-slate-500 uppercase mt-0.5">${textoHomeOfficesDetalhe(v.totalHomeOfficesCompulsorio, v.totalHomeOfficesReuniao, v.totalHomeOfficesSolicitado)}</span></div>
             <div class="bg-slate-900/60 border border-slate-800 p-4 rounded-xl"><span class="block text-xs uppercase font-bold text-slate-400">Horas de Home Office (Reunião - Sede)</span><span id="statHorasHomeOfficeReuniao" class="text-xl font-black text-indigo-400">${v.horasHomeOfficeReuniao}H ${String(v.minutosHomeOfficeReuniao).padStart(2, '0')}M</span></div>
           </div>
         </section>
