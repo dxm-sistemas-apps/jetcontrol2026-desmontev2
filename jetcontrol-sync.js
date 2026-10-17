@@ -93,6 +93,86 @@
   var timersPendentes = {};
   var pendentes = {};
 
+  // ----- FILA DE ENVIOS PENDENTES (sobrevive a fechar o app / ficar offline) -----
+  // Toda alteração entra aqui ao ser agendada e só sai quando a nuvem CONFIRMA
+  // o recebimento. Se estiver sem internet (ou a nuvem falhar), o item fica na
+  // fila e é reenviado quando a conexão voltar, a cada verificação periódica e
+  // na próxima abertura do app. O valor enviado é sempre o ATUAL do aparelho.
+  var CHAVE_FILA = '__jetcontrol_sync_fila__';
+
+  function lerFila() {
+    try { return JSON.parse(originalGetItem.call(localStorage, CHAVE_FILA) || '{}') || {}; }
+    catch (e) { return {}; }
+  }
+  function salvarFila(fila) {
+    try {
+      if (Object.keys(fila).length === 0) originalRemoveItem.call(localStorage, CHAVE_FILA);
+      else originalSetItem.call(localStorage, CHAVE_FILA, JSON.stringify(fila));
+    } catch (e) {}
+    atualizarIndicador();
+  }
+  function entrarNaFila(chave, apagar, carimbo) {
+    var fila = lerFila();
+    fila[chave] = { apagar: !!apagar, carimbo: carimbo };
+    salvarFila(fila);
+  }
+  function sairDaFila(chave, carimbo) {
+    var fila = lerFila();
+    // Só remove se não houve uma edição mais nova da mesma chave nesse meio-tempo.
+    if (fila[chave] && fila[chave].carimbo <= carimbo) {
+      delete fila[chave];
+      salvarFila(fila);
+    }
+  }
+
+  var reenviandoFila = false;
+  function reenviarFila() {
+    if (!configurado || reenviandoFila) return Promise.resolve();
+    var fila = lerFila();
+    var chaves = Object.keys(fila);
+    if (chaves.length === 0) return Promise.resolve();
+    reenviandoFila = true;
+    var meta = lerMeta();
+    var envios = [];
+    chaves.forEach(function (chave) {
+      var item = fila[chave];
+      // Já tem envio normal agendado para esta chave: ele cuida disso.
+      if (timersPendentes[chave] && pendentes[chave]) return;
+      // A nuvem já tem algo mais novo (de outro aparelho): não sobrescrever.
+      if ((meta[chave] || 0) > item.carimbo) { sairDaFila(chave, item.carimbo); return; }
+      var valor = originalGetItem.call(localStorage, chave);
+      var apagar = item.apagar || valor === null;
+      envios.push(enviarAgora(chave, apagar ? null : valor, apagar, item.carimbo));
+    });
+    return Promise.all(envios).then(function () { reenviandoFila = false; },
+                                    function () { reenviandoFila = false; });
+  }
+
+  // ----- INDICADOR NA TELA (só aparece se estiver offline ou com envios pendentes) -----
+  var indicadorEl = null;
+  function atualizarIndicador() {
+    if (window.parent !== window) return;           // não mostrar dentro de quadros invisíveis
+    if (!document.body) { document.addEventListener('DOMContentLoaded', atualizarIndicador); return; }
+    var qtd = Object.keys(lerFila()).length;
+    var offline = (typeof navigator !== 'undefined') && navigator.onLine === false;
+    if (!offline && qtd === 0) { if (indicadorEl) indicadorEl.style.display = 'none'; return; }
+    if (!indicadorEl) {
+      indicadorEl = document.createElement('div');
+      indicadorEl.setAttribute('role', 'status');
+      indicadorEl.style.cssText = 'position:fixed;left:12px;bottom:84px;z-index:99998;padding:6px 12px;border-radius:999px;font:700 11px/1.2 system-ui,sans-serif;letter-spacing:.03em;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none;text-transform:uppercase';
+      document.body.appendChild(indicadorEl);
+    }
+    indicadorEl.style.display = 'block';
+    indicadorEl.style.background = offline ? '#b45309' : '#1d4ed8';
+    indicadorEl.style.color = '#fff';
+    var txt = offline ? 'Offline — dados salvos neste aparelho' : 'Sincronizando…';
+    if (qtd > 0) txt += ' · ' + qtd + ' pendente' + (qtd > 1 ? 's' : '');
+    indicadorEl.textContent = txt;
+  }
+  window.addEventListener('online', function () { atualizarIndicador(); reenviarFila(); });
+  window.addEventListener('offline', atualizarIndicador);
+  document.addEventListener('DOMContentLoaded', atualizarIndicador);
+
   // Ao fechar/trocar de página, envia já o que ainda estava aguardando o atraso.
   function descarregarPendentes() {
     Object.keys(pendentes).forEach(function (chave) {
@@ -132,6 +212,7 @@
     var meta = lerMeta();
     meta[chave] = carimboDestaEdicao;
     salvarMeta(meta);
+    entrarNaFila(chave, apagar, carimboDestaEdicao);
 
     pendentes[chave] = { valor: valor, apagar: apagar, carimbo: carimboDestaEdicao };
     timersPendentes[chave] = setTimeout(function () {
@@ -157,14 +238,16 @@
           deleted: { booleanValue: false }
         };
 
-    fetch(URL_BASE + '/' + encodeURIComponent(chave) + mascara, {
+    return fetch(URL_BASE + '/' + encodeURIComponent(chave) + mascara, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ fields: campos }),
       keepalive: !!keepalive
+    }).then(function (resposta) {
+      if (resposta && resposta.ok) sairDaFila(chave, agora);   // nuvem confirmou
     }).catch(function () {
-      // Sem internet ou nuvem fora do ar: o dado já está salvo localmente
-      // (como sempre esteve) e será reenviado na próxima gravação/abertura.
+      // Sem internet ou nuvem fora do ar: o dado continua salvo localmente e
+      // PERMANECE NA FILA, sendo reenviado quando a conexão voltar.
     });
   }
 
@@ -351,7 +434,7 @@
       return;
     }
     verificandoAgora = true;
-    sincronizarUmaVez().then(function (houveMudanca) {
+    reenviarFila().then(function () { return sincronizarUmaVez(); }).then(function (houveMudanca) {
       verificandoAgora = false;
       if (houveMudanca) avisarOuvintes();
       agendarProximoCiclo();
@@ -365,6 +448,8 @@
 
   if (configurado) {
     agendarProximoCiclo();
+    // Reenvia o que ficou pendente de uma sessão anterior (ex.: editou offline e fechou o app).
+    window.JetSyncReady.then(function () { return reenviarFila(); }, function () {});
 
     // Ao voltar para a aba (trocar de janela/aplicativo e retornar),
     // verifica na hora em vez de esperar o próximo ciclo.
