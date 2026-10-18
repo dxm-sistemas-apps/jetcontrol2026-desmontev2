@@ -336,13 +336,13 @@
          ===================================================================== -->
     <section class="kpi-grid">
       <div class="kpi-card">
-        <div class="kpi-label" id="label-kpi-receita-bruta">Receita Bruta Total</div>
+        <div class="kpi-label" id="label-kpi-receita-bruta">Receita Bruta</div>
         <div class="kpi-value" id="kpi-receita-bruta">R$ 0,00</div>
         <!-- Legenda calculada: editar em textoReceitaBrutaSub() -->
         <div class="kpi-subtext" id="kpi-receita-bruta-sub">(calculado automaticamente)</div>
       </div>
       <div class="kpi-card success">
-        <div class="kpi-label" id="label-kpi-receita-liquida">Receita Líquida Estimada</div>
+        <div class="kpi-label" id="label-kpi-receita-liquida">Receita Líquida</div>
         <div class="kpi-value" id="kpi-receita-liquida">R$ 0,00</div>
         <!-- Legenda calculada: editar em textoReceitaLiquidaSub() -->
         <div class="kpi-subtext" id="kpi-ir-desc">(calculado automaticamente)</div>
@@ -615,14 +615,14 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>Período / Ciclo</th>
+                <th>Ciclo</th>
                 <th>Escalas Registradas</th>
                 <th>Horas Totais</th>
-                <th>Rendimento Médio / Hora</th>
+                <th>Rendimento Médio/Hora</th>
                 <th>Diárias & Auxílios</th>
                 <th>Jeton Bruto</th>
                 <th>Receita Líquida Total</th>
-                <th>Status / Recebimento</th>
+                <th>Status/Recebimento</th>
               </tr>
             </thead>
             <tbody id="table-ciclos-body">
@@ -814,10 +814,10 @@ function inicializarMenuRodape() {
       return `${qtdSimples} Simples <br> ${qtdDobrada} Dobradas <br> ${qtdTripla} Triplas <br> ${qtdQuadrupla} Quádruplas`;
     }
     function textoHomeOfficesSub(qtdCompulsorio, qtdReuniao, qtdSolicitado) {
-      return `${qtdCompulsorio} Compulsório <br> ${qtdReuniao} Reunião <br> ${qtdSolicitado} Solicitado`;
+      return `${qtdReuniao} Reunião <br> ${qtdSolicitado} Solicitado <br> ${qtdCompulsorio} Compulsório`;
     }
     function textoPerdaRendimentoSub(valorCompulsorio, valorReuniao, valorSolicitado) {
-      return `${formatMoeda(valorCompulsorio)} Compulsório <br> ${formatMoeda(valorReuniao)} Reunião <br> ${formatMoeda(valorSolicitado)} Solicitado`;
+      return `${formatMoeda(valorReuniao)} Reunião <br> ${formatMoeda(valorSolicitado)} Solicitado <br> ${formatMoeda(valorCompulsorio)} Compulsório`;
     }
     function textoHorasHomeOfficeSub(qtdReunioes) {
       return `${qtdReunioes} Reunião/Reuniões Registrada(s)`;
