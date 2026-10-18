@@ -1,6 +1,6 @@
 {
   "name": "JETCONTROL 2026",
-  "short_name": "Desmonte",
+  "short_name": "JC-Desmonte",
   "description": "Controle de escalas, jetons, diárias e ciclos.",
   "lang": "pt-BR",
   "start_url": "./index.html",
