@@ -131,6 +131,8 @@
     .kpi-card.warning::before { background-color: var(--accent-warning); }
     .kpi-card.purple::before { background-color: var(--accent-purple); }
     .kpi-card.cyan::before { background-color: var(--accent-cyan); }
+    .kpi-card.danger::before { background-color: var(--accent-danger); }
+    .kpi-card.white::before { background-color: #ffffff; }
 
     .kpi-label {
       font-size: 0.85rem;
@@ -335,67 +337,67 @@
             é mesmo fixa e pode ser editada aqui normalmente.
          ===================================================================== -->
     <section class="kpi-grid">
-      <div class="kpi-card">
+      <div class="kpi-card success">
         <div class="kpi-label" id="label-kpi-receita-bruta">Receita Bruta</div>
-        <div class="kpi-value" id="kpi-receita-bruta">R$ 0,00</div>
+        <div class="kpi-value" text-emerald-400" id="kpi-receita-bruta">R$ 0,00</div>
         <!-- Legenda calculada: editar em textoReceitaBrutaSub() -->
         <div class="kpi-subtext" id="kpi-receita-bruta-sub">(calculado automaticamente)</div>
       </div>
       <div class="kpi-card success">
         <div class="kpi-label" id="label-kpi-receita-liquida">Receita Líquida</div>
-        <div class="kpi-value" id="kpi-receita-liquida">R$ 0,00</div>
+        <div class="kpi-value" text-emerald-400" id="kpi-receita-liquida">R$ 0,00</div>
         <!-- Legenda calculada: editar em textoReceitaLiquidaSub() -->
         <div class="kpi-subtext" id="kpi-ir-desc">(calculado automaticamente)</div>
       </div>
-      <div class="kpi-card warning">
+      <div class="kpi-card white">
         <div class="kpi-label" id="label-kpi-total-escalas">Volume de Escalas</div>
         <div class="kpi-value" id="kpi-total-escalas">0</div>
         <!-- Legenda calculada: editar em textoVolumeEscalasSub() -->
         <div class="kpi-subtext" id="kpi-escalas-sub">(calculado automaticamente)</div>
       </div>
-      <div class="kpi-card">
+      <div class="kpi-card white">
         <div class="kpi-label" id="label-kpi-home-offices">Volume de Home Offices</div>
         <div class="kpi-value" id="kpi-home-offices">0</div>
         <!-- Legenda calculada: editar em textoHomeOfficesSub() -->
         <div class="kpi-subtext" id="kpi-home-offices-sub">(calculado automaticamente)</div>
       </div>
-      <div class="kpi-card warning">
+      <div class="kpi-card danger">
         <div class="kpi-label" id="label-kpi-perda-rendimento">Perda de Rendimento (Home Office)</div>
-        <div class="kpi-value" id="kpi-perda-rendimento">R$ 0,00</div>
+        <div class="kpi-value" text-red-400 id="kpi-perda-rendimento">R$ 0,00</div>
         <!-- Legenda calculada: editar em textoPerdaRendimentoSub() -->
         <div class="kpi-subtext" id="kpi-perda-rendimento-sub">(calculado automaticamente)</div>
       </div>
-      <div class="kpi-card">
+      <div class="kpi-card white">
         <div class="kpi-label" id="label-kpi-horas-home-office">Horas de Home Office (Reunião - Sede)</div>
         <div class="kpi-value" id="kpi-horas-home-office">0H 00M</div>
         <!-- Legenda calculada: editar em textoHorasHomeOfficeSub() -->
         <div class="kpi-subtext" id="kpi-horas-home-office-sub">(calculado automaticamente)</div>
       </div>
-      <div class="kpi-card purple">
-        <div class="kpi-label" id="label-kpi-diarias-auxilios">Diárias & Auxílios</div>
+      <div class="kpi-card warning">
+        <div class="kpi-label" id="label-kpi-diarias-auxilios">Diárias/Auxílios</div>
         <div class="kpi-value" id="kpi-diarias-auxilios">R$ 0,00</div>
         <!-- Legenda calculada: editar em textoDiariasAuxiliosSub() -->
         <div class="kpi-subtext" id="kpi-pernoites-count">(calculado automaticamente)</div>
       </div>
-      <div class="kpi-card cyan">
+      <div class="kpi-card success">
         <div class="kpi-label" id="label-kpi-rendimento-hora">Rendimento Médio / Hora</div>
         <div class="kpi-value" id="kpi-rendimento-hora">R$ 0,00/h</div>
         <!-- Legenda calculada: editar em textoRendimentoHoraSub() -->
         <div class="kpi-subtext" id="kpi-total-horas">(calculado automaticamente)</div>
       </div>
-      <div class="kpi-card">
+      <div class="kpi-card danger">
         <div class="kpi-label" id="label-kpi-total-desconto-ir">Total de Descontos de IR</div>
-        <div class="kpi-value" id="kpi-total-desconto-ir">R$ 0,00</div>
+        <div class="kpi-value" text-red-400 id="kpi-total-desconto-ir">R$ 0,00</div>
         <!-- Esta legenda é FIXA de verdade — pode editar aqui direto. -->
         <div class="kpi-subtext" id="kpi-total-desconto-ir-sub">Alíquota de 22% Sobre o Jeton Bruto</div>
       </div>
-      <div class="kpi-card success">
+      <div class="kpi-card warning">
         <div class="kpi-label" id="label-kpi-recebiveis">Auxílios e Diárias Recebíveis</div>
         <div class="kpi-value" id="kpi-recebiveis">R$ 0,00</div>
         <!-- Legenda calculada: editar em textoRecebiveisSub() -->
         <div class="kpi-subtext" id="kpi-recebiveis-sub">(calculado automaticamente)</div>
       </div>
-      <div class="kpi-card">
+      <div class="kpi-card warning">
         <div class="kpi-label" id="label-kpi-balanco">Balanço dos Auxílios e Diárias</div>
         <div class="kpi-value" id="kpi-balanco">R$ 0,00</div>
         <!-- Legenda calculada: editar em textoBalancoSub() -->
@@ -619,7 +621,7 @@
                 <th>Escalas Registradas</th>
                 <th>Horas Totais</th>
                 <th>Rendimento Médio/Hora</th>
-                <th>Diárias & Auxílios</th>
+                <th>Diárias/Auxílios</th>
                 <th>Jeton Bruto</th>
                 <th>Receita Líquida Total</th>
                 <th>Status/Recebimento</th>
@@ -1070,7 +1072,7 @@ function inicializarMenuRodape() {
     // SOMA OS VALORES DE UMA COLUNA ESPECÍFICA (ÍNDICE 0-BASEADO) DE UMA TABELA
     // ARQUIVADA DE "ORGANOGRAMA DAS DIÁRIAS" OU "ORGANOGRAMA DOS AUXÍLIOS", USADO
     // PARA OBTER O DETALHAMENTO POR TIPO DE DIÁRIA/AUXÍLIO (ALIMENTAÇÃO, HOSPEDAGEM,
-    // TRANSPORTE) EXIBIDO NO CARD "DIÁRIAS & AUXÍLIOS".
+    // TRANSPORTE) EXIBIDO NO CARD "DIÁRIAS/AUXÍLIOS".
     function somarColunaTabelaOrganograma(html, colIndex) {
       if (!html) return 0;
       const temp = document.createElement('div');
@@ -1152,7 +1154,7 @@ function inicializarMenuRodape() {
         // TOTAL DE MINUTOS DE HOME OFFICE NA CONDIÇÃO REUNIÃO (SEDE), calculado
         // a partir de horarioSaida/horarioChegada de cada escala nessa condição.
         minutosHomeOfficeReuniao: 0,
-        // DETALHAMENTO POR TIPO DE DIÁRIA/AUXÍLIO (CARD "DIÁRIAS & AUXÍLIOS")
+        // DETALHAMENTO POR TIPO DE DIÁRIA/AUXÍLIO (CARD "DIÁRIAS/AUXÍLIOS")
         diariaAlimentacao: 0,
         diariaHospedagem: 0,
         auxAlimentacao: 0,
@@ -1310,8 +1312,8 @@ function inicializarMenuRodape() {
         // sequencial antigo como último recurso.
         const nomeCicloProcessado = ciclo.nome ||
           (ciclo.dataAbertura && ciclo.dataFechamento
-            ? `CICLO - ${dataBR(ciclo.dataAbertura)} À ${dataBR(ciclo.dataFechamento)}`
-            : `CICLO ${ciclo.numero || (idx + 1)}`);
+            ? `${dataBR(ciclo.dataAbertura)} À ${dataBR(ciclo.dataFechamento)}`
+            : `${ciclo.numero || (idx + 1)}`);
 
         // NOVOS CAMPOS (RANKINGS): Desconto de IR, Valores Médios (por Escala/
         // Atividade/Hora) e Valor Real de Jeton do ciclo — todos já calculados
@@ -1364,8 +1366,8 @@ function inicializarMenuRodape() {
       const cicloVigenteDadosPrevia = JSON.parse(localStorage.getItem('jetcontrol_ciclo_dados') || '{}');
       const nomeCicloVigente = cicloVigenteDadosPrevia.nomeCiclo ||
         (cicloVigenteDadosPrevia.dataAbertura && cicloVigenteDadosPrevia.dataFechamento
-          ? `CICLO - ${dataBR(cicloVigenteDadosPrevia.dataAbertura)} À ${dataBR(cicloVigenteDadosPrevia.dataFechamento)} (ABERTO)`
-          : `CICLO ${ciclosFechados.length + 1} (ABERTO)`);
+          ? `${dataBR(cicloVigenteDadosPrevia.dataAbertura)} À ${dataBR(cicloVigenteDadosPrevia.dataFechamento)} (ABERTO)`
+          : `${ciclosFechados.length + 1} (ABERTO)`);
 
       let jetonBrutoVigente = 0;
       let diariasVigente = 0;
