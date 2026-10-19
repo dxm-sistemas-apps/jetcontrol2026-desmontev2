@@ -1,1 +1,8 @@
-
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "br.com.jetcontrol.app",
+        "sha256_cert_fingerprints": ["EA:0A:03:4E:4D:B0:1D:5F:0F:92:2E:A4:58:EB:37:0E:5E:99:E5:66:C7:B6:8C:D5:FB:BA:F4:E6:44:C7:E8:A9"]
+      }
+    }]
