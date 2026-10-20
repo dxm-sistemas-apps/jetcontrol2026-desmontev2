@@ -852,13 +852,13 @@ function inicializarMenuRodape() {
     function textoRendimentoHoraSub(totalHoras) {
       return `Total de ${totalHoras.toFixed(1)}h Trabalhadas`;
     }
-    // valorDiarias = diárias recebíveis SEM traslado; valorTraslado = traslado recebível.
+    // valorDiarias = diárias recebíveis (já inclui a diária de traslado).
     function textoRecebiveisSub(valorDiarias, valorAuxilios, valorTraslado) {
-      return `${formatMoeda(valorAuxilios)} Auxílios <br> ${formatMoeda(valorDiarias)} Diárias <br> ${formatMoeda(valorTraslado)} Diária de Traslado`;
+      return `${formatMoeda(valorAuxilios)} Auxílios <br> ${formatMoeda(valorDiarias)} Diárias`;
     }
-    // valorDiferencaDiarias = balanço das diárias SEM traslado; valorDiferencaTraslado = balanço do traslado.
+    // valorDiferencaDiarias = balanço das diárias (já inclui a diária de traslado).
     function textoBalancoSub(valorDiferencaDiarias, valorDiferencaAuxilios, valorDiferencaTraslado) {
-      return `${formatMoeda(valorDiferencaAuxilios)} Auxílios <br> ${formatMoeda(valorDiferencaDiarias)} Diárias <br> ${formatMoeda(valorDiferencaTraslado)} Diária de Traslado`;
+      return `${formatMoeda(valorDiferencaAuxilios)} Auxílios <br> ${formatMoeda(valorDiferencaDiarias)} Diárias`;
     }
 
     // Helper: Extrai valor textual do HTML arquivado
@@ -1716,14 +1716,14 @@ function inicializarMenuRodape() {
       const elKpiRecebiveis = document.getElementById('kpi-recebiveis');
       elKpiRecebiveis.textContent = formatMoeda(totalRecebivelGeral);
       elKpiRecebiveis.style.color = corDiariaAuxiliar(totalRecebivelGeral);
-      definirTextoRotulo('kpi-recebiveis-sub', textoRecebiveisSub(acumuladoGeral.diariasRecebivel - acumuladoGeral.trasladoRecebivel, acumuladoGeral.auxiliosRecebivel, acumuladoGeral.trasladoRecebivel));
+      definirTextoRotulo('kpi-recebiveis-sub', textoRecebiveisSub(acumuladoGeral.diariasRecebivel, acumuladoGeral.auxiliosRecebivel));
 
       const elKpiBalanco = document.getElementById('kpi-balanco');
       elKpiBalanco.textContent = formatMoeda(balancoGeral);
       elKpiBalanco.style.color = corDiariaAuxiliar(balancoGeral);
       const cardBalanco = elKpiBalanco.closest('.kpi-card');
       if (cardBalanco) cardBalanco.classList.toggle('negativo', balancoGeral < -0.004);
-      definirTextoRotulo('kpi-balanco-sub', textoBalancoSub(balancoDiariasGeral - balancoTrasladoGeral, balancoAuxiliosGeral, balancoTrasladoGeral));
+      definirTextoRotulo('kpi-balanco-sub', textoBalancoSub(balancoDiariasGeral, balancoAuxiliosGeral));
 
       // Atualizar timestamp
       const agora = new Date();
@@ -1841,18 +1841,15 @@ function inicializarMenuRodape() {
 
     // --- RENDERIZADORES DE GRÁFICOS (Chart.js) ---
 
-    // Rótulo de período em 3 linhas (sem "CICLO - "): ['26/06/2026', 'À', '25/07/2026'].
-    // Para o ciclo aberto, "(ABERTO)" é acrescentado à 3ª linha.
+    // Rótulo de período em 3 linhas, SOMENTE o período (sem "CICLO - ", sem
+    // "(ABERTO)" e sem qualquer outro texto): ['26/06/2026', 'À', '25/07/2026'].
     function rotuloPeriodo(nome, numFallback) {
-      const t = String(nome || '').replace(/^\s*CICLO\s*-\s*/i, '').trim();
-      const m = t.match(/(\d{2}\/\d{2}\/\d{4})\s*À\s*(\d{2}\/\d{2}\/\d{4})(.*)$/i);
-      if (m) {
-        const extra = m[3] && /ABERTO/i.test(m[3]) ? ' (ABERTO)' : '';
-        return [m[1], 'À', m[2] + extra];
-      }
-      return [t || `${numFallback || ''}`];
+      const t = String(nome || '');
+      const fmt = (d) => /^\d{4}-\d{2}-\d{2}$/.test(d) ? d.split('-').reverse().join('/') : d;
+      const m = t.match(/(\d{2}\/\d{2}\/\d{4}|\d{4}-\d{2}-\d{2})\s*À\s*(\d{2}\/\d{2}\/\d{4}|\d{4}-\d{2}-\d{2})/i);
+      if (m) return [fmt(m[1]), 'À', fmt(m[2])];
+      return [t.replace(/^\s*CICLO\s*-\s*/i, '').replace(/\(.*?\)/g, '').trim() || `${numFallback || ''}`];
     }
-
 
     function renderizarGraficoEvolucao(listaCiclos) {
       const ctx = document.getElementById('chartEvolucaoCiclos').getContext('2d');
