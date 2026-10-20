@@ -402,6 +402,12 @@
           </div>
           <input type="hidden" id="homeOfficeCondicao">
 
+          <!-- MOTIVO (SÓ APARECE NA CONDIÇÃO COMPULSÓRIO) -->
+          <div id="wrapperHomeOfficeMotivo" class="hidden mt-3">
+            <label for="homeOfficeMotivo" class="block text-sm uppercase font-bold text-slate-400 mb-1">Motivo</label>
+            <input type="text" id="homeOfficeMotivo" maxlength="200" autocomplete="off" placeholder="DESCREVA O MOTIVO DO HOME OFFICE COMPULSÓRIO" oninput="this.value = this.value.toUpperCase()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm uppercase placeholder-slate-600 focus:outline-none focus:border-brand-500">
+          </div>
+
           <div id="boxMotivoHomeOffice" class="hidden mt-3 bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <span class="block text-[11px] uppercase font-bold text-slate-400">Motivo do Home Office</span>
@@ -755,6 +761,11 @@
           </div>
           <input type="hidden" id="modalHomeOfficeCondicao">
 
+          <div id="modalWrapperHomeOfficeMotivo" class="hidden mt-3">
+            <label for="modalHomeOfficeMotivo" class="block text-xs uppercase font-bold text-slate-400 mb-1">Motivo</label>
+            <input type="text" id="modalHomeOfficeMotivo" maxlength="200" autocomplete="off" placeholder="DESCREVA O MOTIVO DO HOME OFFICE COMPULSÓRIO" oninput="this.value = this.value.toUpperCase()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm uppercase placeholder-slate-600 focus:outline-none focus:border-brand-500">
+          </div>
+
           <div id="modalBoxMotivoHomeOffice" class="hidden mt-3 bg-slate-900 border border-slate-700 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <span class="block text-[11px] uppercase font-bold text-slate-400">Motivo do Home Office</span>
@@ -1045,6 +1056,10 @@ function inicializarMenuRodape() {
     // Cor dos valores de diárias/auxílios: vermelho se negativo; amber-400 se zero ou positivo.
     function classeCorValorDiariaAux(v) {
       return (Number(v) || 0) < -0.004 ? 'text-red-400' : 'text-amber-400';
+    }
+    // Itens do card JORNADA: se NÃO recebível → red-400; senão amber-400 (ou red-400 se negativo).
+    function classeCorItemJornada(v, recebivel) {
+      return recebivel ? classeCorValorDiariaAux(v) : 'text-red-400';
     }
     function aplicarCorValorDiariaAux(el, v) {
       if (!el) return;
@@ -1597,18 +1612,22 @@ function inicializarMenuRodape() {
         condicaoInputId: prefixo ? `${prefixo}HomeOfficeCondicao` : 'homeOfficeCondicao',
         motivoBoxId: prefixo ? `${prefixo}BoxMotivoHomeOffice` : 'boxMotivoHomeOffice',
         motivoTextoId: prefixo ? `${prefixo}TextoMotivoHomeOffice` : 'textoMotivoHomeOffice',
-        mediaPerdaId: prefixo ? `${prefixo}ValorMediaPerdaRendimento` : 'valorMediaPerdaRendimento'
+        mediaPerdaId: prefixo ? `${prefixo}ValorMediaPerdaRendimento` : 'valorMediaPerdaRendimento',
+        motivoCampoWrapperId: prefixo ? `${prefixo}WrapperHomeOfficeMotivo` : 'wrapperHomeOfficeMotivo',
+        motivoCampoId: prefixo ? `${prefixo}HomeOfficeMotivo` : 'homeOfficeMotivo'
       };
     }
 
-    function definirEstadoHomeOffice(prefixo, valor, decidido, condicao) {
-      const { chkId, condicaoInputId } = idsHomeOffice(prefixo);
+    function definirEstadoHomeOffice(prefixo, valor, decidido, condicao, motivo) {
+      const { chkId, condicaoInputId, motivoCampoId } = idsHomeOffice(prefixo);
       const chk = document.getElementById(chkId);
       if (!chk) return;
       chk.checked = valor === true;
       chk.dataset.decidido = decidido ? '1' : '0';
       const inputCondicao = document.getElementById(condicaoInputId);
       if (inputCondicao) inputCondicao.value = condicao || '';
+      const campoMotivo = document.getElementById(motivoCampoId);
+      if (campoMotivo) campoMotivo.value = String(motivo || '').toUpperCase();
       atualizarVisualHomeOffice(prefixo);
     }
 
@@ -1679,6 +1698,10 @@ function inicializarMenuRodape() {
       });
       const textoMotivo = document.getElementById(motivoTextoId);
       if (textoMotivo) textoMotivo.textContent = LABELS_CONDICAO_HOME_OFFICE[valor] || 'Selecione ao Lado';
+      // Campo MOTIVO: só aparece (e só é salvo) na condição Compulsório.
+      const { motivoCampoWrapperId } = idsHomeOffice(prefixo);
+      const wrapperMotivo = document.getElementById(motivoCampoWrapperId);
+      if (wrapperMotivo) wrapperMotivo.classList.toggle('hidden', valor !== 'compulsorio');
       aplicarBloqueioCamposHomeOffice(prefixo);
     }
 
@@ -1696,6 +1719,15 @@ function inicializarMenuRodape() {
       const { condicaoInputId } = idsHomeOffice(prefixo);
       const input = document.getElementById(condicaoInputId);
       return (input && input.value) ? input.value : null;
+    }
+
+    // MOTIVO do home office compulsório (caixa alta). null nas demais condições.
+    function motivoHomeOfficeParaSalvar(prefixo) {
+      if (condicaoHomeOfficeParaSalvar(prefixo) !== 'compulsorio') return null;
+      const { motivoCampoId } = idsHomeOffice(prefixo);
+      const campo = document.getElementById(motivoCampoId);
+      const texto = campo ? campo.value.trim().toUpperCase() : '';
+      return texto || null;
     }
 
     // Só existe (e só faz sentido) quando homeOffice === true.
@@ -2187,6 +2219,7 @@ function inicializarMenuRodape() {
         auxTransporteRecebivel: flagsSalvar.auxTransporteRecebivel,
         homeOffice: valorHomeOfficeParaSalvar(''),
         homeOfficeCondicao: condicaoHomeOfficeParaSalvar(''),
+        homeOfficeMotivo: motivoHomeOfficeParaSalvar(''),
         valorMediaPerdaRendimento: valorMediaPerdaRendimentoParaSalvar(''),
         horasTrabalhadasStr,
         valorHoraStr,
@@ -2645,7 +2678,7 @@ function inicializarMenuRodape() {
       definirEstadoRecebivel('', 'DiariaTraslado', esc.diariaTrasladoRecebivel === true, esc.diariaTrasladoRecebivel !== undefined && esc.diariaTrasladoRecebivel !== null);
       definirEstadoRecebivel('', 'AuxAlimentacao', esc.auxAlimentacaoRecebivel === true, esc.auxAlimentacaoRecebivel !== undefined && esc.auxAlimentacaoRecebivel !== null);
       definirEstadoRecebivel('', 'AuxTransporte', esc.auxTransporteRecebivel === true, esc.auxTransporteRecebivel !== undefined && esc.auxTransporteRecebivel !== null);
-      definirEstadoHomeOffice('', esc.homeOffice === true, esc.homeOffice !== null, esc.homeOfficeCondicao);
+      definirEstadoHomeOffice('', esc.homeOffice === true, esc.homeOffice !== null, esc.homeOfficeCondicao, esc.homeOfficeMotivo);
 
       document.querySelectorAll('input[name="funcaoManha"]').forEach(cb => { cb.checked = esc.funcaoManha?.includes(cb.value); });
       document.querySelectorAll('input[name="funcaoTarde"]').forEach(cb => { cb.checked = esc.funcaoTarde?.includes(cb.value); });
@@ -2787,6 +2820,14 @@ function inicializarMenuRodape() {
         jetonNoiteEfetivoCard *= 2;
       }
 
+      // FAIXA DE HOME OFFICE (condição + MOTIVO, este último só no Compulsório)
+      const escaparHtml = (t) => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const blocoHomeOfficeCard = esc.homeOffice === true ? `
+            <div class="bg-purple-900/20 border border-purple-800/50 rounded-xl px-3 py-2 text-xs text-slate-300 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+              <span class="font-bold text-purple-400 uppercase"><i class="fa-solid fa-house-laptop mr-1"></i> HOME OFFICE${esc.homeOfficeCondicao && LABELS_CONDICAO_HOME_OFFICE[esc.homeOfficeCondicao] ? ': ' + LABELS_CONDICAO_HOME_OFFICE[esc.homeOfficeCondicao] : ''}</span>
+              ${esc.homeOfficeCondicao === 'compulsorio' && esc.homeOfficeMotivo ? `<span><strong>MOTIVO:</strong> <span class="text-white font-bold">${escaparHtml(esc.homeOfficeMotivo)}</span></span>` : ''}
+            </div>` : '';
+
       const botoesHTML = modo === 'fechado'
         ? `<button type="button" onclick="editarEscalaCicloFechado('${cicloId}', ${index})" title="Editar Escala do Ciclo Fechado" class="text-slate-300 hover:text-white p-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 transition"><i class="fa-solid fa-pen-to-square"></i></button>`
         : `<button type="button" onclick="editarEscala(${index})" title="Editar Escala" class="text-slate-300 hover:text-white p-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 transition"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -2804,6 +2845,8 @@ function inicializarMenuRodape() {
                 ${botoesHTML}
               </div>
             </div>
+
+            ${blocoHomeOfficeCard}
 
             <!-- LAYOUT LADO A LADO: TURNOS (ESQUERDA) + JORNADA (DIREITA) -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
@@ -2857,11 +2900,11 @@ function inicializarMenuRodape() {
                 </div>
                 <div class="space-y-2">
                   <div><strong>VALOR DIÁRIO DO JETON:</strong> <span class="text-emerald-400 font-bold">${formatarMoeda(jetonCard)}</span></div>
-                  <div class="pt-1"><strong>DIÁRIA ALIMENTAÇÃO:</strong> <span class="${classeCorValorDiariaAux(extrasCard.diariaAlimentacao)} font-bold">${formatarMoeda(extrasCard.diariaAlimentacao)}</span>${badgeRecebivel(flagsCard.diariaAlimentacaoRecebivel)}</div>
-                  <div><strong>DIÁRIA PERNOITE:</strong> <span class="${classeCorValorDiariaAux(extrasCard.diariaPernoite)} font-bold">${formatarMoeda(extrasCard.diariaPernoite)}</span>${badgeRecebivel(flagsCard.diariaPernoiteRecebivel)}</div>
-                  <div><strong>DIÁRIA TRASLADO:</strong> <span class="${classeCorValorDiariaAux(extrasCard.diariaTraslado)} font-bold">${formatarMoeda(extrasCard.diariaTraslado)}</span>${badgeRecebivel(flagsCard.diariaTrasladoRecebivel)}</div>
-                  <div><strong>AUXÍLIO ALIMENTAÇÃO:</strong> <span class="${classeCorValorDiariaAux(extrasCard.auxAlimentacao)} font-bold">${formatarMoeda(extrasCard.auxAlimentacao)}</span>${badgeRecebivel(flagsCard.auxAlimentacaoRecebivel)}</div>
-                  <div><strong>AUXÍLIO TRANSPORTE:</strong> <span class="${classeCorValorDiariaAux(extrasCard.auxTransporte)} font-bold">${formatarMoeda(extrasCard.auxTransporte)}</span>${badgeRecebivel(flagsCard.auxTransporteRecebivel)}</div>
+                  <div class="pt-1"><strong>DIÁRIA ALIMENTAÇÃO:</strong> <span class="${classeCorItemJornada(extrasCard.diariaAlimentacao, flagsCard.diariaAlimentacaoRecebivel)} font-bold">${formatarMoeda(extrasCard.diariaAlimentacao)}</span>${badgeRecebivel(flagsCard.diariaAlimentacaoRecebivel)}</div>
+                  <div><strong>DIÁRIA PERNOITE:</strong> <span class="${classeCorItemJornada(extrasCard.diariaPernoite, flagsCard.diariaPernoiteRecebivel)} font-bold">${formatarMoeda(extrasCard.diariaPernoite)}</span>${badgeRecebivel(flagsCard.diariaPernoiteRecebivel)}</div>
+                  <div><strong>DIÁRIA TRASLADO:</strong> <span class="${classeCorItemJornada(extrasCard.diariaTraslado, flagsCard.diariaTrasladoRecebivel)} font-bold">${formatarMoeda(extrasCard.diariaTraslado)}</span>${badgeRecebivel(flagsCard.diariaTrasladoRecebivel)}</div>
+                  <div><strong>AUXÍLIO ALIMENTAÇÃO:</strong> <span class="${classeCorItemJornada(extrasCard.auxAlimentacao, flagsCard.auxAlimentacaoRecebivel)} font-bold">${formatarMoeda(extrasCard.auxAlimentacao)}</span>${badgeRecebivel(flagsCard.auxAlimentacaoRecebivel)}</div>
+                  <div><strong>AUXÍLIO TRANSPORTE:</strong> <span class="${classeCorItemJornada(extrasCard.auxTransporte, flagsCard.auxTransporteRecebivel)} font-bold">${formatarMoeda(extrasCard.auxTransporte)}</span>${badgeRecebivel(flagsCard.auxTransporteRecebivel)}</div>
                   <div class="pt-1"><strong>QTD. DE HORAS TRABALHADAS:</strong> <span class="text-white font-bold">${esc.horasTrabalhadasStr || '0H 00M'}</span></div>
                   <div><strong>VALOR POR HORA TRABALHADA:</strong> <span class="text-white font-bold">${valorHoraStrCorrigido}</span></div>
                   <div class="pt-2 mt-2 border-t border-slate-800"><strong>VALOR TOTAL DIÁRIO DAS DIÁRIAS:</strong> <span class="${classeCorValorDiariaAux(extrasCard.valorDiarias)} font-bold">${formatarMoeda(extrasCard.valorDiarias)}</span></div>
@@ -3166,7 +3209,7 @@ function inicializarMenuRodape() {
       definirEstadoRecebivel('modal', 'DiariaTraslado', esc.diariaTrasladoRecebivel === true, esc.diariaTrasladoRecebivel !== undefined && esc.diariaTrasladoRecebivel !== null);
       definirEstadoRecebivel('modal', 'AuxAlimentacao', esc.auxAlimentacaoRecebivel === true, esc.auxAlimentacaoRecebivel !== undefined && esc.auxAlimentacaoRecebivel !== null);
       definirEstadoRecebivel('modal', 'AuxTransporte', esc.auxTransporteRecebivel === true, esc.auxTransporteRecebivel !== undefined && esc.auxTransporteRecebivel !== null);
-      definirEstadoHomeOffice('modal', esc.homeOffice === true, esc.homeOffice !== null, esc.homeOfficeCondicao);
+      definirEstadoHomeOffice('modal', esc.homeOffice === true, esc.homeOffice !== null, esc.homeOfficeCondicao, esc.homeOfficeMotivo);
       atualizarVisibilidadeItensRecebiveis('modal', obterValoresExtrasEscala(esc.data, [
         { local: esc.localManha || '', pernoite: esc.pernoiteManha },
         { local: esc.localTarde || '', pernoite: esc.pernoiteTarde },
@@ -3305,6 +3348,7 @@ function inicializarMenuRodape() {
         auxTransporteRecebivel: flagsModal.auxTransporteRecebivel,
         homeOffice: valorHomeOfficeParaSalvar('modal'),
         homeOfficeCondicao: condicaoHomeOfficeParaSalvar('modal'),
+        homeOfficeMotivo: motivoHomeOfficeParaSalvar('modal'),
         valorMediaPerdaRendimento: valorMediaPerdaRendimentoParaSalvar('modal'),
         horasTrabalhadasStr, valorHoraStr,
         anotacoes: {
