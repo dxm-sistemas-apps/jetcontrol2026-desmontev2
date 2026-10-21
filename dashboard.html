@@ -2240,6 +2240,7 @@ function inicializarMenuRodape() {
       if (graficosExtras[chaveInstancia]) graficosExtras[chaveInstancia].destroy();
 
       const labels = listaCiclosTop.map(c => rotuloPeriodo(c.nome, c.num));
+      const ehMoeda = /R\$/.test(labelDataset || ''); // gráficos em R$ são formatados com 2 casas
       const dados = listaCiclosTop.map(c => c[campo] || 0);
 
       graficosExtras[chaveInstancia] = new Chart(ctx, {
@@ -2256,9 +2257,12 @@ function inicializarMenuRodape() {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
+          plugins: {
+            legend: { display: false },
+            tooltip: ehMoeda ? { callbacks: { label: (item) => formatMoeda(item.parsed.y) } } : {}
+          },
           scales: {
-            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8', stepSize: 1, precision: 0 } },
+            y: { grid: { color: '#334155' }, ticks: ehMoeda ? { color: '#94a3b8', callback: (v) => formatMoeda(v) } : { color: '#94a3b8', stepSize: 1, precision: 0 } },
             x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
@@ -2272,7 +2276,7 @@ function inicializarMenuRodape() {
       const ctx = document.getElementById(canvasId).getContext('2d');
       if (graficosExtras[chaveInstancia]) graficosExtras[chaveInstancia].destroy();
 
-      const labels = listaTop.map(e => [e.data, ...rotuloPeriodo(e.cicloNome)]);
+      const labels = listaTop.map(e => [`${e.data} -`, ...rotuloPeriodo(e.cicloNome)]);
       const dados = listaTop.map(e => e[campo] || 0);
 
       graficosExtras[chaveInstancia] = new Chart(ctx, {
