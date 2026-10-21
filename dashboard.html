@@ -132,6 +132,7 @@
     .kpi-card.purple::before { background-color: var(--accent-purple); }
     .kpi-card.cyan::before { background-color: var(--accent-cyan); }
     .kpi-card.negativo::before { background-color: #f87171 !important; }
+    .kpi-card.neutro::before { background-color: #ffffff !important; }
     .kpi-card.danger::before { background-color: var(--accent-danger); }
     .kpi-card.white::before { background-color: #ffffff; }
 
@@ -1191,7 +1192,11 @@ function inicializarMenuRodape() {
           if (m) horas = parseInt(m[1], 10) + (parseInt(m[2], 10) / 60);
         }
 
-        const valorRealAposIR = (jetonBruto * 0.78) + diarias + auxilios;
+        // Valor/hora = "VALOR DIÁRIO REAL APÓS IR" do card (já considera só os recebíveis).
+        const realTxt = extrairCampoPorRotulo(card, 'VALOR DIÁRIO REAL APÓS IR:');
+        const valorRealAposIR = !computarDiariasEAuxilios
+          ? (jetonBruto * 0.78)
+          : (realTxt !== null ? parseMoeda(realTxt) : ((jetonBruto * 0.78) + diarias + auxilios));
         const valorHora = horas > 0 ? (valorRealAposIR / horas) : 0;
 
         lista.push({
@@ -1248,7 +1253,55 @@ function inicializarMenuRodape() {
     // PROCESSAMENTO E CONSOLIDAÇÃO DE TODOS OS DADOS (HISTÓRICOS + CICLO VIGENTE)
     // Cor dos valores de diárias/auxílios: vermelho se negativo; amber-400 se zero ou positivo.
     function corDiariaAuxiliar(v) {
-      return (Number(v) || 0) < -0.004 ? '#f87171' : '#fbbf24';
+      const n = Number(v) || 0;
+      if (Math.abs(n) < 0.005) return '#ffffff'; // neutro
+      return n < 0 ? '#f87171' : '#fbbf24';
+    }
+
+    // =========================================================================
+    // STATUS DE CADA ITEM (diária/auxílio) DE UMA ESCALA — 3 ESTADOS:
+    //   'rec' = recebível (amber-400) | 'nao' = NÃO recebível (red-400)
+    //   'pend' = NEUTRO (ainda não decidido): não computa em nenhum card/gráfico,
+    //            exceto no total "perceptível" do card Diárias/Auxílios.
+    // =========================================================================
+    const ITENS_STATUS = [
+      { chave: 'diariaAlimentacao', flag: 'diariaAlimentacaoRecebivel', tipo: 'diaria' },
+      { chave: 'diariaPernoite',    flag: 'diariaPernoiteRecebivel',    tipo: 'diaria' },
+      { chave: 'diariaTraslado',    flag: 'diariaTrasladoRecebivel',    tipo: 'diaria' },
+      { chave: 'auxAlimentacao',    flag: 'auxAlimentacaoRecebivel',    tipo: 'aux' },
+      { chave: 'auxTransporte',     flag: 'auxTransporteRecebivel',     tipo: 'aux' }
+    ];
+    function statusItemEscala(esc, chave) {
+      const item = ITENS_STATUS.find(i => i.chave === chave);
+      const temFlags = ITENS_STATUS.some(i => esc[i.flag] !== undefined);
+      if (temFlags) {
+        const v = esc[item.flag];
+        return v === true ? 'rec' : (v === false ? 'nao' : 'pend');
+      }
+      const geral = item.tipo === 'diaria' ? esc.diariasRecebivel : esc.auxiliosRecebivel;
+      return geral === false ? 'nao' : 'rec';
+    }
+    function somarPorStatus(esc, extras) {
+      const r = { rec: { diarias: 0, auxilios: 0 }, nao: { diarias: 0, auxilios: 0 }, pend: { diarias: 0, auxilios: 0 } };
+      ITENS_STATUS.forEach(i => {
+        const st = statusItemEscala(esc, i.chave);
+        r[st][i.tipo === 'diaria' ? 'diarias' : 'auxilios'] += (parseFloat(extras[i.chave]) || 0);
+      });
+      return r;
+    }
+    // Valores por item GRAVADOS na escala (ciclos fechados).
+    function extrasGravadosEscala(esc) {
+      const temItens = esc.valorDiariaAlimentacao !== undefined || esc.valorAuxAlimentacao !== undefined;
+      if (temItens) {
+        return {
+          diariaAlimentacao: parseFloat(esc.valorDiariaAlimentacao) || 0,
+          diariaPernoite: parseFloat(esc.valorDiariaPernoite) || 0,
+          diariaTraslado: parseFloat(esc.valorDiariaTraslado) || 0,
+          auxAlimentacao: parseFloat(esc.valorAuxAlimentacao) || 0,
+          auxTransporte: parseFloat(esc.valorAuxTransporte) || 0
+        };
+      }
+      return { diariaAlimentacao: parseFloat(esc.valorDiarias) || 0, diariaPernoite: 0, diariaTraslado: 0, auxAlimentacao: parseFloat(esc.valorAuxilios) || 0, auxTransporte: 0 };
     }
 
     function carregarEProcessarDados() {
@@ -1283,6 +1336,8 @@ function inicializarMenuRodape() {
         diarias: 0,
         auxilios: 0,
         diariasRecebivel: 0,
+        diariasNaoRecebivel: 0,
+        auxiliosNaoRecebivel: 0,
         auxiliosRecebivel: 0,
         escalas: 0,
         horas: 0,
@@ -1430,8 +1485,25 @@ function inicializarMenuRodape() {
         // Acumula locais fiscalizados deste ciclo no mapa global
         metricasEscalas.locais.forEach(loc => registrarLocal(contagemLocais, loc));
 
-        // Receita Bruta Total do ciclo = Valor Total de Jeton + Valor das Diárias + Valor dos Auxílios
-        const totalBrutoCiclo = jetonBrutoCiclo + diariasCiclo + auxiliosCiclo;
+        // NÃO RECEBÍVEIS do ciclo: só itens marcados como 👎 (pendentes ficam neutros).
+        // Ciclos antigos sem escalasData: diferença entre o total e o recebível.
+        let naoDiariasCiclo = 0, naoAuxiliosCiclo = 0;
+        if (Array.isArray(ciclo.escalasData) && ciclo.escalasData.length) {
+          ciclo.escalasData.forEach(e => {
+            const st = somarPorStatus(e, extrasGravadosEscala(e));
+            naoDiariasCiclo += st.nao.diarias;
+            naoAuxiliosCiclo += st.nao.auxilios;
+          });
+        } else {
+          naoDiariasCiclo = Math.max(0, diariasCiclo - diariasRecebivelCiclo);
+          naoAuxiliosCiclo = Math.max(0, auxiliosCiclo - auxiliosRecebivelCiclo);
+        }
+        acumuladoGeral.diariasNaoRecebivel += naoDiariasCiclo;
+        acumuladoGeral.auxiliosNaoRecebivel += naoAuxiliosCiclo;
+
+        // Receita Bruta do ciclo = Jeton + diárias/auxílios já decididos (recebíveis + não recebíveis);
+        // itens pendentes (neutros) não entram.
+        const totalBrutoCiclo = jetonBrutoCiclo + diariasRecebivelCiclo + auxiliosRecebivelCiclo + naoDiariasCiclo + naoAuxiliosCiclo;
         // Receita Líquida Estimada do ciclo = Valor Real de Jeton (já vem pronto da página de Escalas;
         // se indisponível em ciclos antigos, cai no cálculo equivalente como respaldo)
         const receitaLiquidaCiclo = receitaLiquidaCicloDireta > 0
@@ -1507,7 +1579,7 @@ function inicializarMenuRodape() {
           minutosHomeOfficeReuniao: minutosHomeOfficeReuniaoCiclo,
           perdaRendimentoHomeOffice: somarPerda(),
           diariasEAuxiliosRecebiveis: diariasRecebivelCiclo + auxiliosRecebivelCiclo,
-          diariasEAuxiliosNaoRecebiveis: (diariasRecebivelCiclo + auxiliosRecebivelCiclo) - (diariasCiclo + auxiliosCiclo),
+          diariasEAuxiliosNaoRecebiveis: -(naoDiariasCiclo + naoAuxiliosCiclo),
           descontoIR: jetonBrutoCiclo * aliquotaIR,
           simples: metricasEscalas.simples,
           dobrada: metricasEscalas.dobrada,
@@ -1553,6 +1625,7 @@ function inicializarMenuRodape() {
       let auxiliosRecebivelVigente = 0;
       let horasVigente = 0;
       let pernoitesVigente = 0;
+      let naoDiariasVigente = 0, naoAuxiliosVigente = 0;
       let diariaAlimVigente = 0, diariaPernVigente = 0, diariaTrasVigente = 0, auxAlimVigente = 0, auxTranspVigente = 0, trasRecebivelVigente = 0;
 
       let simplesVigente = 0;
@@ -1572,6 +1645,32 @@ function inicializarMenuRodape() {
 
       const computarDiariasEAuxiliosVigente = localStorage.getItem('jetcontrol_computar_diarias_auxilios') !== 'false';
 
+      // Componentes (diárias/auxílios) de uma escala do ciclo vigente, recalculados
+      // com os valores ATUAIS de Cotas Extras e separados por status (rec/nao/pend).
+      const calcularComponentesVigente = (escala) => {
+        const turnosVig = [
+          { local: escala.localManha || escala.local, pernoite: escala.pernoiteManha || escala.pernoite },
+          { local: escala.localTarde, pernoite: escala.pernoiteTarde },
+          { local: escala.localNoite, pernoite: escala.pernoiteNoite }
+        ];
+        const ehElegivelLocal = (l) => !!l && MUNICIPIOS_ELEGIVEIS.some(m => String(l).toUpperCase().includes(m));
+        const elegivelVig = turnosVig.some(t => ehElegivelLocal(t.local));
+        const pernoiteVig = turnosVig.some(t => ehElegivelLocal(t.local) && ['SIM', 'TRUE', '1', 'S'].includes(String(t.pernoite || '').toUpperCase().trim()));
+        let diaEspecialVig = false;
+        if (escala.data) {
+          const dtv = new Date(escala.data + 'T00:00:00');
+          diaEspecialVig = dtv.getDay() === 0 || dtv.getDay() === 6 || escala.isFeriado === true;
+        }
+        const extras = {
+          diariaAlimentacao: elegivelVig ? valDiariaAlim : 0,
+          diariaPernoite: pernoiteVig ? valDiariaHosp : 0,
+          diariaTraslado: elegivelVig ? valDiariaTraslado : 0,
+          auxAlimentacao: diaEspecialVig ? valAuxAlim : 0,
+          auxTransporte: diaEspecialVig ? valAuxTransp : 0
+        };
+        return { extras, st: somarPorStatus(escala, extras) };
+      };
+
       escalasVigentes.forEach(escala => {
         // NOVO: coleta os dados desta escala individual para os rankings
         // "TOP 10 ESCALAS", recalculando o valor/hora e o valor real de jeton
@@ -1581,8 +1680,10 @@ function inicializarMenuRodape() {
         const jTardeDetalhe = parseMoeda(escala.jetonTarde || 0);
         const jNoiteDetalhe = parseMoeda(escala.jetonNoite || 0) * (escala.percepcaoQuartoJeton === 'SIM' ? 2 : 1);
         const jetonBrutoDetalhe = jManhaDetalhe + jTardeDetalhe + jNoiteDetalhe;
-        const diariasDetalhe = computarDiariasEAuxiliosVigente ? (parseFloat(escala.valorDiarias) || 0) : 0;
-        const auxiliosDetalhe = computarDiariasEAuxiliosVigente ? (parseFloat(escala.valorAuxilios) || 0) : 0;
+        // Valor/hora usa só os RECEBÍVEIS (mesma regra do card da escala), sempre recalculados.
+        const compDetalhe = calcularComponentesVigente(escala);
+        const diariasDetalhe = computarDiariasEAuxiliosVigente ? compDetalhe.st.rec.diarias : 0;
+        const auxiliosDetalhe = computarDiariasEAuxiliosVigente ? compDetalhe.st.rec.auxilios : 0;
 
         let horasDetalhe = 0;
         if (escala.horarioSaida && escala.horarioChegada) {
@@ -1703,47 +1804,23 @@ function inicializarMenuRodape() {
           pernoitesVigente++;
         }
 
-        // RECÁLCULO "FRESCO": os valores de diárias/auxílios do ciclo vigente são
-        // sempre recalculados aqui a partir da escala + valores ATUAIS (Cotas
-        // Extras). Assim, editar uma escala ou alterar os valores atualiza o
-        // card na hora, sem depender de números gravados antes na escala.
-        const temFlagsIndividuais = escala.diariaAlimentacaoRecebivel !== undefined || escala.auxAlimentacaoRecebivel !== undefined;
-        const turnosVig = [
-          { local: escala.localManha || escala.local, pernoite: escala.pernoiteManha || escala.pernoite },
-          { local: escala.localTarde, pernoite: escala.pernoiteTarde },
-          { local: escala.localNoite, pernoite: escala.pernoiteNoite }
-        ];
-        const ehElegivelLocal = (l) => !!l && MUNICIPIOS_ELEGIVEIS.some(m => String(l).toUpperCase().includes(m));
-        const elegivelVig = turnosVig.some(t => ehElegivelLocal(t.local));
-        const pernoiteVig = turnosVig.some(t => ehElegivelLocal(t.local) && ['SIM', 'TRUE', '1', 'S'].includes(String(t.pernoite || '').toUpperCase().trim()));
-        let diaEspecialVig = false;
-        if (escala.data) {
-          const dtv = new Date(escala.data + 'T00:00:00');
-          diaEspecialVig = dtv.getDay() === 0 || dtv.getDay() === 6 || escala.isFeriado === true;
-        }
-        const vDA = elegivelVig ? valDiariaAlim : 0;
-        const vDP = pernoiteVig ? valDiariaHosp : 0;
-        const vDT = elegivelVig ? valDiariaTraslado : 0;
-        const vAA = diaEspecialVig ? valAuxAlim : 0;
-        const vAT = diaEspecialVig ? valAuxTransp : 0;
+        // RECÁLCULO "FRESCO" (valores atuais) separado por status.
+        const compVig = calcularComponentesVigente(escala);
+        const ex = compVig.extras, st = compVig.st;
+        const vDA = ex.diariaAlimentacao, vDP = ex.diariaPernoite, vDT = ex.diariaTraslado, vAA = ex.auxAlimentacao, vAT = ex.auxTransporte;
 
+        // PERCEPTÍVEL (todos os itens, inclusive pendentes) → card Diárias/Auxílios
         diariasVigente += vDA + vDP + vDT;
         auxiliosVigente += vAA + vAT;
         diariaAlimVigente += vDA; diariaPernVigente += vDP; diariaTrasVigente += vDT;
         auxAlimVigente += vAA; auxTranspVigente += vAT;
 
-        if (temFlagsIndividuais) {
-          const fTras = escala.diariaTrasladoRecebivel !== undefined ? escala.diariaTrasladoRecebivel === true : escala.diariaAlimentacaoRecebivel === true;
-          if (escala.diariaAlimentacaoRecebivel === true) { diariasRecebivelVigente += vDA; }
-          if (escala.diariaPernoiteRecebivel === true) { diariasRecebivelVigente += vDP; }
-          if (fTras) { diariasRecebivelVigente += vDT; trasRecebivelVigente += vDT; }
-          if (escala.auxAlimentacaoRecebivel === true) auxiliosRecebivelVigente += vAA;
-          if (escala.auxTransporteRecebivel === true) auxiliosRecebivelVigente += vAT;
-        } else {
-          // Escalas antigas (sem flags individuais): flag geral (padrão = recebível).
-          if (escala.diariasRecebivel !== false) { diariasRecebivelVigente += vDA + vDP + vDT; trasRecebivelVigente += vDT; }
-          if (escala.auxiliosRecebivel !== false) auxiliosRecebivelVigente += vAA + vAT;
-        }
+        // RECEBÍVEL / NÃO RECEBÍVEL (pendentes ficam neutros: não entram)
+        diariasRecebivelVigente += st.rec.diarias;
+        auxiliosRecebivelVigente += st.rec.auxilios;
+        naoDiariasVigente += st.nao.diarias;
+        naoAuxiliosVigente += st.nao.auxilios;
+        if (statusItemEscala(escala, 'diariaTraslado') === 'rec') trasRecebivelVigente += vDT;
       });
 
       // Consolidação do Ciclo Vigente no Acumulado Global
@@ -1751,6 +1828,8 @@ function inicializarMenuRodape() {
       acumuladoGeral.diarias += diariasVigente;
       acumuladoGeral.auxilios += auxiliosVigente;
       acumuladoGeral.diariasRecebivel += diariasRecebivelVigente;
+      acumuladoGeral.diariasNaoRecebivel += naoDiariasVigente;
+      acumuladoGeral.auxiliosNaoRecebivel += naoAuxiliosVigente;
       acumuladoGeral.auxiliosRecebivel += auxiliosRecebivelVigente;
       acumuladoGeral.escalas += escalasVigentes.length;
       acumuladoGeral.horas += horasVigente;
@@ -1810,7 +1889,8 @@ function inicializarMenuRodape() {
       const preencherKpis = (P, av) => {
       const totalDiariasEAuxiliosVig = av.diarias + av.auxilios;
       const totalDiariasEAuxiliosRecebivelVig = av.diariasRecebivel + av.auxiliosRecebivel;
-      const receitaBrutaVig = av.jetonBruto + totalDiariasEAuxiliosVig;
+      // Receita Bruta = Jeton + diárias/auxílios já decididos (recebíveis + não recebíveis); pendentes não entram.
+      const receitaBrutaVig = av.jetonBruto + av.diariasRecebivel + av.auxiliosRecebivel + av.diariasNaoRecebivel + av.auxiliosNaoRecebivel;
       const receitaLiquidaVig = av.jetonBruto * (1 - aliquotaIR) + totalDiariasEAuxiliosRecebivelVig;
       const rendimentoHoraVig = av.horas > 0 ? (receitaLiquidaVig / av.horas) : 0;
 
@@ -1849,9 +1929,9 @@ function inicializarMenuRodape() {
       // recebíveis em cada escala, de todos os ciclos) e "Balanço dos
       // Auxílios e Diárias" (diferença entre o recebível e o total incorrido).
       const totalRecebivelVig = av.diariasRecebivel + av.auxiliosRecebivel;
-      const balancoDiariasVig = av.diariasRecebivel - av.diarias;
-      const balancoTrasladoVig = av.trasladoRecebivel - av.diariaTraslado;
-      const balancoAuxiliosVig = av.auxiliosRecebivel - av.auxilios;
+      // BALANÇO = somente o que foi marcado como NÃO recebível (negativo); pendentes ficam neutros.
+      const balancoDiariasVig = -av.diariasNaoRecebivel;
+      const balancoAuxiliosVig = -av.auxiliosNaoRecebivel;
       const balancoVig = balancoDiariasVig + balancoAuxiliosVig;
 
       const elKpiRecebiveis = document.getElementById(P + 'kpi-recebiveis');
@@ -1863,7 +1943,15 @@ function inicializarMenuRodape() {
       elKpiBalanco.textContent = formatMoeda(balancoVig);
       elKpiBalanco.style.color = corDiariaAuxiliar(balancoVig);
       const cardBalanco = elKpiBalanco.closest('.kpi-card');
-      if (cardBalanco) cardBalanco.classList.toggle('negativo', balancoVig < -0.004);
+      if (cardBalanco) {
+        cardBalanco.classList.toggle('negativo', balancoVig < -0.004);
+        cardBalanco.classList.toggle('neutro', Math.abs(balancoVig) < 0.005);
+      }
+      // Barras laterais neutras (brancas) quando o valor é R$ 0,00
+      const cardDA = elKpiDiariasAux.closest('.kpi-card');
+      if (cardDA) cardDA.classList.toggle('neutro', Math.abs(totalDiariasEAuxiliosVig) < 0.005);
+      const cardRec = elKpiRecebiveis.closest('.kpi-card');
+      if (cardRec) cardRec.classList.toggle('neutro', Math.abs(totalRecebivelVig) < 0.005);
       definirTextoRotulo(P + 'kpi-balanco-sub', textoBalancoSub(balancoDiariasVig, balancoAuxiliosVig));
       };
       preencherKpis('', av);               // CICLO VIGENTE
@@ -1876,7 +1964,7 @@ function inicializarMenuRodape() {
       // ---------------------------------------------------------------------
       // 4. ADICIONAR CICLO VIGENTE NA LISTA DE CICLOS PARA A TABELA E GRÁFICO
       // ---------------------------------------------------------------------
-      const totalBrutoVigente = jetonBrutoVigente + diariasVigente + auxiliosVigente;
+      const totalBrutoVigente = jetonBrutoVigente + diariasRecebivelVigente + auxiliosRecebivelVigente + naoDiariasVigente + naoAuxiliosVigente;
       // Mesma correção do cálculo geral: usa o total RECEBÍVEL de diárias/
       // auxílios (não o incorrido), para já refletir o balanço.
       const receitaLiquidaVigente = (jetonBrutoVigente * (1 - aliquotaIR)) + diariasRecebivelVigente + auxiliosRecebivelVigente;
@@ -1904,7 +1992,7 @@ function inicializarMenuRodape() {
         minutosHomeOfficeReuniao: minutosHomeOfficeReuniaoVigente,
         perdaRendimentoHomeOffice: perdaRendimentoVigente,
         diariasEAuxiliosRecebiveis: diariasRecebivelVigente + auxiliosRecebivelVigente,
-        diariasEAuxiliosNaoRecebiveis: (diariasRecebivelVigente + auxiliosRecebivelVigente) - (diariasVigente + auxiliosVigente),
+        diariasEAuxiliosNaoRecebiveis: -(naoDiariasVigente + naoAuxiliosVigente),
         descontoIR: jetonBrutoVigente * aliquotaIR,
         simples: simplesVigente,
         dobrada: dobradaVigente,
@@ -2359,6 +2447,7 @@ function inicializarMenuRodape() {
 
       const fmtHM = (min) => `${Math.floor(min / 60)}H ${String(Math.round(min % 60)).padStart(2, '0')}M`;
       const EMERALD = '#34d399', AMBER = '#fbbf24', RED = '#f87171';
+      const corZ = (v, cor) => Math.abs(v) < 0.005 ? '#ffffff' : cor; // R$ 0,00 (neutro) em branco
       const cel = (txt, cor) => `<td style="font-weight: 700;${cor ? ` color: ${cor};` : ''}">${txt}</td>`;
       const T = { escalas: 0, ho: 0, minHO: 0, perda: 0, horas: 0, diAux: 0, naoRec: 0, rec: 0, jeton: 0, bruta: 0, ir: 0, liq: 0 };
 
@@ -2384,8 +2473,8 @@ function inicializarMenuRodape() {
           <td>${c.horas.toFixed(1)}h</td>
           ${cel(formatMoeda(c.rendimentoHora) + '/h', EMERALD)}
           ${cel(formatMoeda(v.diAux), corDiariaAuxiliar(v.diAux))}
-          ${cel(formatMoeda(v.rec), AMBER)}
-          ${cel(formatMoeda(v.naoRec), RED)}
+          ${cel(formatMoeda(v.rec), corZ(v.rec, AMBER))}
+          ${cel(formatMoeda(v.naoRec), corZ(v.naoRec, RED))}
           ${cel(formatMoeda(c.jetonBruto), EMERALD)}
           ${cel(formatMoeda(v.bruta), EMERALD)}
           ${cel(formatMoeda(v.ir), RED)}
@@ -2409,8 +2498,8 @@ function inicializarMenuRodape() {
             <td style="font-weight: 900;">${T.horas.toFixed(1)}h</td>
             ${cel(formatMoeda(rendTotal) + '/h', EMERALD)}
             ${cel(formatMoeda(T.diAux), corDiariaAuxiliar(T.diAux))}
-            ${cel(formatMoeda(T.rec), AMBER)}
-            ${cel(formatMoeda(T.naoRec), RED)}
+            ${cel(formatMoeda(T.rec), corZ(T.rec, AMBER))}
+            ${cel(formatMoeda(T.naoRec), corZ(T.naoRec, RED))}
             ${cel(formatMoeda(T.jeton), EMERALD)}
             ${cel(formatMoeda(T.bruta), EMERALD)}
             ${cel(formatMoeda(T.ir), RED)}
