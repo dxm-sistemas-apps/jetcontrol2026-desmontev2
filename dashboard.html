@@ -152,15 +152,15 @@
     }
 
     /* Cores dos valores dos KPIs */
-#kpi-receita-bruta,
-#kpi-receita-liquida {
+#kpi-receita-bruta, #tc-kpi-receita-bruta,
+#kpi-receita-liquida, #tc-kpi-receita-liquida {
   color: #34d399 !important; /* emerald-400 */
 }
 
-#kpi-rendimento-hora { color: #34d399 !important; } /* emerald-400 */
+#kpi-rendimento-hora, #tc-kpi-rendimento-hora { color: #34d399 !important; } /* emerald-400 */
 
-#kpi-perda-rendimento,
-#kpi-total-desconto-ir {
+#kpi-perda-rendimento, #tc-kpi-perda-rendimento,
+#kpi-total-desconto-ir, #tc-kpi-total-desconto-ir {
   color: #f87171 !important; /* red-400 */
 }
 
@@ -368,6 +368,30 @@
         </div>
       </div>
     <div class="kpi-grid">
+      <div class="kpi-card white">
+        <div class="kpi-label" id="label-kpi-total-escalas">Qtd. de Escalas</div>
+        <div class="kpi-value" id="kpi-total-escalas">0</div>
+        <!-- Legenda calculada: editar em textoVolumeEscalasSub() -->
+        <div class="kpi-subtext" id="kpi-escalas-sub">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card white">
+        <div class="kpi-label" id="label-kpi-home-offices">Qtd. de Home Offices</div>
+        <div class="kpi-value" id="kpi-home-offices">0</div>
+        <!-- Legenda calculada: editar em textoHomeOfficesSub() -->
+        <div class="kpi-subtext" id="kpi-home-offices-sub">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card white">
+        <div class="kpi-label" id="label-kpi-horas-home-office">Tempo de Home Office (Reunião - Sede)</div>
+        <div class="kpi-value" id="kpi-horas-home-office">0H 00M</div>
+        <!-- Legenda calculada: editar em textoHorasHomeOfficeSub() -->
+        <div class="kpi-subtext" id="kpi-horas-home-office-sub">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card danger">
+        <div class="kpi-label" id="label-kpi-perda-rendimento">Perda de Rendimento <br>(Home Office)</div>
+        <div class="kpi-value" text-red-400 id="kpi-perda-rendimento">R$ 0,00</div>
+        <!-- Legenda calculada: editar em textoPerdaRendimentoSub() -->
+        <div class="kpi-subtext" id="kpi-perda-rendimento-sub">(calculado automaticamente)</div>
+      </div>
       <div class="kpi-card success">
         <div class="kpi-label" id="label-kpi-receita-bruta">Receita Bruta</div>
         <div class="kpi-value" text-emerald-400" id="kpi-receita-bruta">R$ 0,00</div>
@@ -380,59 +404,112 @@
         <!-- Legenda calculada: editar em textoReceitaLiquidaSub() -->
         <div class="kpi-subtext" id="kpi-ir-desc">(calculado automaticamente)</div>
       </div>
-      <div class="kpi-card white">
-        <div class="kpi-label" id="label-kpi-total-escalas">Volume de Escalas</div>
-        <div class="kpi-value" id="kpi-total-escalas">0</div>
-        <!-- Legenda calculada: editar em textoVolumeEscalasSub() -->
-        <div class="kpi-subtext" id="kpi-escalas-sub">(calculado automaticamente)</div>
-      </div>
-      <div class="kpi-card white">
-        <div class="kpi-label" id="label-kpi-home-offices">Volume de Home Offices</div>
-        <div class="kpi-value" id="kpi-home-offices">0</div>
-        <!-- Legenda calculada: editar em textoHomeOfficesSub() -->
-        <div class="kpi-subtext" id="kpi-home-offices-sub">(calculado automaticamente)</div>
-      </div>
-      <div class="kpi-card danger">
-        <div class="kpi-label" id="label-kpi-perda-rendimento">Perda de Rendimento (Home Office)</div>
-        <div class="kpi-value" text-red-400 id="kpi-perda-rendimento">R$ 0,00</div>
-        <!-- Legenda calculada: editar em textoPerdaRendimentoSub() -->
-        <div class="kpi-subtext" id="kpi-perda-rendimento-sub">(calculado automaticamente)</div>
-      </div>
-      <div class="kpi-card white">
-        <div class="kpi-label" id="label-kpi-horas-home-office">Horas de Home Office (Reunião - Sede)</div>
-        <div class="kpi-value" id="kpi-horas-home-office">0H 00M</div>
-        <!-- Legenda calculada: editar em textoHorasHomeOfficeSub() -->
-        <div class="kpi-subtext" id="kpi-horas-home-office-sub">(calculado automaticamente)</div>
-      </div>
-      <div class="kpi-card warning">
-        <div class="kpi-label" id="label-kpi-diarias-auxilios">Diárias/Auxílios</div>
-        <div class="kpi-value" id="kpi-diarias-auxilios">R$ 0,00</div>
-        <!-- Legenda calculada: editar em textoDiariasAuxiliosSub() -->
-        <div class="kpi-subtext" id="kpi-pernoites-count">(calculado automaticamente)</div>
-      </div>
       <div class="kpi-card success">
-        <div class="kpi-label" id="label-kpi-rendimento-hora">Rendimento Médio / Hora</div>
+        <div class="kpi-label" id="label-kpi-rendimento-hora">Valor Médio / Hora</div>
         <div class="kpi-value" id="kpi-rendimento-hora">R$ 0,00/h</div>
         <!-- Legenda calculada: editar em textoRendimentoHoraSub() -->
         <div class="kpi-subtext" id="kpi-total-horas">(calculado automaticamente)</div>
       </div>
       <div class="kpi-card danger">
-        <div class="kpi-label" id="label-kpi-total-desconto-ir">Total de Descontos de IR</div>
+        <div class="kpi-label" id="label-kpi-total-desconto-ir">Desconto de IR</div>
         <div class="kpi-value" text-red-400 id="kpi-total-desconto-ir">R$ 0,00</div>
         <!-- Esta legenda é FIXA de verdade — pode editar aqui direto. -->
         <div class="kpi-subtext" id="kpi-total-desconto-ir-sub">Alíquota de 22% Sobre o Jeton Bruto</div>
       </div>
       <div class="kpi-card warning">
-        <div class="kpi-label" id="label-kpi-recebiveis">Auxílios e Diárias Recebíveis</div>
+        <div class="kpi-label" id="label-kpi-diarias-auxilios">Auxílios e Diárias <br>Perceptíveis</div>
+        <div class="kpi-value" id="kpi-diarias-auxilios">R$ 0,00</div>
+        <!-- Legenda calculada: editar em textoDiariasAuxiliosSub() -->
+        <div class="kpi-subtext" id="kpi-pernoites-count">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card warning">
+        <div class="kpi-label" id="label-kpi-recebiveis">Auxílios e Diárias <br>Recebíveis</div>
         <div class="kpi-value" id="kpi-recebiveis">R$ 0,00</div>
         <!-- Legenda calculada: editar em textoRecebiveisSub() -->
         <div class="kpi-subtext" id="kpi-recebiveis-sub">(calculado automaticamente)</div>
       </div>
       <div class="kpi-card warning">
-        <div class="kpi-label" id="label-kpi-balanco">Balanço dos Auxílios e Diárias</div>
+        <div class="kpi-label" id="label-kpi-balanco">Auxílios e Diárias <br>Não Recebíveis</div>
         <div class="kpi-value" id="kpi-balanco">R$ 0,00</div>
         <!-- Legenda calculada: editar em textoBalancoSub() -->
         <div class="kpi-subtext" id="kpi-balanco-sub">(calculado automaticamente)</div>
+      </div>
+    </div>
+    </section>
+
+    <section class="chart-card" id="card-todos-ciclos">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-card-title" id="title-todos-ciclos">Todos os Ciclos</div>
+          <div class="kpi-subtext" style="margin-top:2px;">Os valores abaixo correspondem ao acumulado de todos os ciclos (fechados + ciclo vigente).</div>
+        </div>
+      </div>
+    <div class="kpi-grid">
+      <div class="kpi-card white">
+        <div class="kpi-label" id="tc-label-kpi-total-escalas">Qtd. de Escalas</div>
+        <div class="kpi-value" id="tc-kpi-total-escalas">0</div>
+        <!-- Legenda calculada: editar em textoVolumeEscalasSub() -->
+        <div class="kpi-subtext" id="tc-kpi-escalas-sub">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card white">
+        <div class="kpi-label" id="tc-label-kpi-home-offices">Qtd. de Home Offices</div>
+        <div class="kpi-value" id="tc-kpi-home-offices">0</div>
+        <!-- Legenda calculada: editar em textoHomeOfficesSub() -->
+        <div class="kpi-subtext" id="tc-kpi-home-offices-sub">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card white">
+        <div class="kpi-label" id="tc-label-kpi-horas-home-office">Tempo de Home Office (Reunião - Sede)</div>
+        <div class="kpi-value" id="tc-kpi-horas-home-office">0H 00M</div>
+        <!-- Legenda calculada: editar em textoHorasHomeOfficeSub() -->
+        <div class="kpi-subtext" id="tc-kpi-horas-home-office-sub">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card danger">
+        <div class="kpi-label" id="tc-label-kpi-perda-rendimento">Perda de Rendimento <br>(Home Office)</div>
+        <div class="kpi-value" text-red-400 id="tc-kpi-perda-rendimento">R$ 0,00</div>
+        <!-- Legenda calculada: editar em textoPerdaRendimentoSub() -->
+        <div class="kpi-subtext" id="tc-kpi-perda-rendimento-sub">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card success">
+        <div class="kpi-label" id="tc-label-kpi-receita-bruta">Receita Bruta</div>
+        <div class="kpi-value" text-emerald-400" id="tc-kpi-receita-bruta">R$ 0,00</div>
+        <!-- Legenda calculada: editar em textoReceitaBrutaSub() -->
+        <div class="kpi-subtext" id="tc-kpi-receita-bruta-sub">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card success">
+        <div class="kpi-label" id="tc-label-kpi-receita-liquida">Receita Líquida</div>
+        <div class="kpi-value" text-emerald-400" id="tc-kpi-receita-liquida">R$ 0,00</div>
+        <!-- Legenda calculada: editar em textoReceitaLiquidaSub() -->
+        <div class="kpi-subtext" id="tc-kpi-ir-desc">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card success">
+        <div class="kpi-label" id="tc-label-kpi-rendimento-hora">Valor Médio / Hora</div>
+        <div class="kpi-value" id="tc-kpi-rendimento-hora">R$ 0,00/h</div>
+        <!-- Legenda calculada: editar em textoRendimentoHoraSub() -->
+        <div class="kpi-subtext" id="tc-kpi-total-horas">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card danger">
+        <div class="kpi-label" id="tc-label-kpi-total-desconto-ir">Desconto de IR</div>
+        <div class="kpi-value" text-red-400 id="tc-kpi-total-desconto-ir">R$ 0,00</div>
+        <!-- Esta legenda é FIXA de verdade — pode editar aqui direto. -->
+        <div class="kpi-subtext" id="tc-kpi-total-desconto-ir-sub">Alíquota de 22% Sobre o Jeton Bruto</div>
+      </div>
+      <div class="kpi-card warning">
+        <div class="kpi-label" id="tc-label-kpi-diarias-auxilios">Auxílios e Diárias <br>Perceptíveis</div>
+        <div class="kpi-value" id="tc-kpi-diarias-auxilios">R$ 0,00</div>
+        <!-- Legenda calculada: editar em textoDiariasAuxiliosSub() -->
+        <div class="kpi-subtext" id="tc-kpi-pernoites-count">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card warning">
+        <div class="kpi-label" id="tc-label-kpi-recebiveis">Auxílios e Diárias <br>Recebíveis</div>
+        <div class="kpi-value" id="tc-kpi-recebiveis">R$ 0,00</div>
+        <!-- Legenda calculada: editar em textoRecebiveisSub() -->
+        <div class="kpi-subtext" id="tc-kpi-recebiveis-sub">(calculado automaticamente)</div>
+      </div>
+      <div class="kpi-card warning">
+        <div class="kpi-label" id="tc-label-kpi-balanco">Auxílios e Diárias <br>Não Recebíveis</div>
+        <div class="kpi-value" id="tc-kpi-balanco">R$ 0,00</div>
+        <!-- Legenda calculada: editar em textoBalancoSub() -->
+        <div class="kpi-subtext" id="tc-kpi-balanco-sub">(calculado automaticamente)</div>
       </div>
     </div>
     </section>
@@ -441,7 +518,7 @@
          PARA MUDAR O TÍTULO DE UM GRÁFICO, EDITE O TEXTO DIRETO DENTRO DA
          DIV "chart-card-title" CORRESPONDENTE (mesma regra dos KPIs acima). -->
     <section class="dashboard-grid">
-      <div class="chart-card col-8">
+      <div class="chart-card col-12">
         <div class="chart-card-header">
           <div class="chart-card-title" id="title-chartEvolucaoCiclos">Evolução de Faturamento por Ciclo</div>
         </div>
@@ -449,7 +526,11 @@
           <canvas id="chartEvolucaoCiclos"></canvas>
         </div>
       </div>
-      <div class="chart-card col-4">
+    </section>
+
+    <!-- COMPOSIÇÃO DA RECEITA (TODOS OS CICLOS: FECHADOS + VIGENTE) -->
+    <section class="dashboard-grid">
+      <div class="chart-card col-6">
         <div class="chart-card-header">
           <div class="chart-card-title" id="title-chartComposicaoReceita">Composição da Receita Bruta</div>
         </div>
@@ -459,6 +540,18 @@
         <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
           <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">VALOR FINAL</span>
           <span id="composicaoValorFinal" style="font-size: 1.25rem; font-weight: 900; color: var(--accent-success);">R$ 0,00</span>
+        </div>
+      </div>
+      <div class="chart-card col-6">
+        <div class="chart-card-header">
+          <div class="chart-card-title" id="title-chartComposicaoReceitaLiquida">Composição da Receita Líquida</div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartComposicaoReceitaLiquida"></canvas>
+        </div>
+        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">VALOR FINAL</span>
+          <span id="composicaoLiquidaValorFinal" style="font-size: 1.25rem; font-weight: 900; color: var(--accent-success);">R$ 0,00</span>
         </div>
       </div>
     </section>
@@ -646,24 +739,24 @@
           <div class="chart-card-title" id="title-historico-ciclos">Histórico de Ciclos & Período Vigente</div>
         </div>
         <div class="data-table-wrapper">
-          <table class="data-table">
+          <table class="data-table" id="tabela-historico-ciclos">
             <thead>
               <tr>
-                <th>Ciclo</th>
-                <th>Escalas Registradas</th>
-                <th>Total de Home Offices</th>
-                <th>Horas de Home Office (Reunião - Sede)</th>
-                <th>Perda de Rendimento (Home Offices)</th>
-                <th>Horas Totais</th>
-                <th>Rendimento Médio/Hora</th>
-                <th>Diárias/Auxílios</th>
-                <th>Auxílios e Diárias Não Recebíveis</th>
-                <th>Auxílios e Diárias Recebíveis</th>
-                <th>Jeton Bruto</th>
-                <th>Receita Bruta</th>
-                <th>Total de Descontos de IR</th>
-                <th>Receita Líquida Total</th>
-                <th>Status/Recebimento</th>
+                <th>Ciclos</th>
+                <th>Escalas <br>Trabalhadas</th>
+                <th>Home <br>Offices</th>
+                <th>Tempo de Home Office <br>(Reunião - Sede)</th>
+                <th>Perda de Rendimento <br>(Home Offices)</th>
+                <th>Horas <br>Trabalhadas</th>
+                <th>Valor <br>Médio/Hora</th>
+                <th>Auxílios e Diárias <br>Perceptíveis</th>
+                <th>Auxílios e Diárias <br>Recebíveis</th>
+                <th>Auxílios e Diárias <br>Não Recebíveis</th>
+                <th>Jeton <br>Bruto</th>
+                <th>Receita <br>Bruta</th>
+                <th>Desconto <br>IR</th>
+                <th>Receita <br>Líquida</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody id="table-ciclos-body">
@@ -846,8 +939,10 @@ function inicializarMenuRodape() {
     // editar o texto entre aspas dentro de cada função abaixo, mantendo os
     // trechos ${...} (esses colam os números calculados; não apague-os).
     // =========================================================================
-    function textoReceitaBrutaSub(qtdCiclosFechados) {
-      return `Jeton Bruto + Auxílios e Diárias (Ciclo Vigente)`;
+    function textoReceitaBrutaSub(qtdCiclosFechados, todosOsCiclos) {
+      return todosOsCiclos
+        ? `${qtdCiclosFechados} Ciclo(s) Fechado(s) + Ciclo Vigente`
+        : `Jeton Bruto + Auxílios e Diárias (Ciclo Vigente)`;
     }
     function textoReceitaLiquidaSub(percentualLiquidoIR) {
       return `Jeton Líquido (${percentualLiquidoIR}%) + Auxílios e Diárias`;
@@ -928,7 +1023,7 @@ function inicializarMenuRodape() {
         quadrupla: 0,
         pernoites: 0,
         turnos: { Manhã: 0, Tarde: 0, Noite: 0 },
-        funcoes: { AGENTE: 0, Coordenador: 0, Motorista: 0, Relator: 0 },
+        funcoes: { AGENTE: 0, Relator: 0, Motorista: 0, Coordenador: 0 },
         locais: []
       };
 
@@ -1220,7 +1315,7 @@ function inicializarMenuRodape() {
         auxAlimentacao: 0,
         auxTransporte: 0,
         turnos: { Manhã: 0, Tarde: 0, Noite: 0 },
-        funcoes: { AGENTE: 0, Coordenador: 0, Motorista: 0, Relator: 0 }
+        funcoes: { AGENTE: 0, Relator: 0, Motorista: 0, Coordenador: 0  }
       };
 
       // ---------------------------------------------------------------------
@@ -1328,9 +1423,9 @@ function inicializarMenuRodape() {
         acumuladoGeral.turnos.Noite += metricasEscalas.turnos.Noite;
 
         acumuladoGeral.funcoes.AGENTE += metricasEscalas.funcoes.AGENTE;
-        acumuladoGeral.funcoes.Coordenador += metricasEscalas.funcoes.Coordenador;
-        acumuladoGeral.funcoes.Motorista += metricasEscalas.funcoes.Motorista;
         acumuladoGeral.funcoes.Relator += metricasEscalas.funcoes.Relator;
+        acumuladoGeral.funcoes.Motorista += metricasEscalas.funcoes.Motorista;
+        acumuladoGeral.funcoes.Coordenador += metricasEscalas.funcoes.Coordenador;
 
         // Acumula locais fiscalizados deste ciclo no mapa global
         metricasEscalas.locais.forEach(loc => registrarLocal(contagemLocais, loc));
@@ -1710,42 +1805,45 @@ function inicializarMenuRodape() {
       // ---------------------------------------------------------------------
       // 3. ATUALIZAÇÃO DOS CARDS (KPIs) NA TELA
       // ---------------------------------------------------------------------
+      // Preenche um grupo de cards. P = prefixo dos ids ('' = Ciclo Vigente, 'tc-' = Todos os Ciclos);
+      // av = acumulado a exibir.
+      const preencherKpis = (P, av) => {
       const totalDiariasEAuxiliosVig = av.diarias + av.auxilios;
       const totalDiariasEAuxiliosRecebivelVig = av.diariasRecebivel + av.auxiliosRecebivel;
       const receitaBrutaVig = av.jetonBruto + totalDiariasEAuxiliosVig;
       const receitaLiquidaVig = av.jetonBruto * (1 - aliquotaIR) + totalDiariasEAuxiliosRecebivelVig;
       const rendimentoHoraVig = av.horas > 0 ? (receitaLiquidaVig / av.horas) : 0;
 
-      document.getElementById('kpi-receita-bruta').textContent = formatMoeda(receitaBrutaVig);
-      definirTextoRotulo('kpi-receita-bruta-sub', textoReceitaBrutaSub(ciclosFechados.length));
+      document.getElementById(P + 'kpi-receita-bruta').textContent = formatMoeda(receitaBrutaVig);
+      definirTextoRotulo(P + 'kpi-receita-bruta-sub', textoReceitaBrutaSub(ciclosFechados.length, P === 'tc-'));
 
-      document.getElementById('kpi-receita-liquida').textContent = formatMoeda(receitaLiquidaVig);
-      definirTextoRotulo('kpi-ir-desc', textoReceitaLiquidaSub(100 - aliquotaIR * 100));
+      document.getElementById(P + 'kpi-receita-liquida').textContent = formatMoeda(receitaLiquidaVig);
+      definirTextoRotulo(P + 'kpi-ir-desc', textoReceitaLiquidaSub(100 - aliquotaIR * 100));
 
-      document.getElementById('kpi-total-escalas').textContent = av.escalas;
-      definirTextoRotulo('kpi-escalas-sub', textoVolumeEscalasSub(av.simples, av.dobrada, av.tripla, av.quadrupla));
+      document.getElementById(P + 'kpi-total-escalas').textContent = av.escalas;
+      definirTextoRotulo(P + 'kpi-escalas-sub', textoVolumeEscalasSub(av.simples, av.dobrada, av.tripla, av.quadrupla));
 
-      document.getElementById('kpi-home-offices').textContent = av.homeOffices;
-      definirTextoRotulo('kpi-home-offices-sub', textoHomeOfficesSub(av.homeOfficesCompulsorio, av.homeOfficesReuniao, av.homeOfficesSolicitado));
+      document.getElementById(P + 'kpi-home-offices').textContent = av.homeOffices;
+      definirTextoRotulo(P + 'kpi-home-offices-sub', textoHomeOfficesSub(av.homeOfficesCompulsorio, av.homeOfficesReuniao, av.homeOfficesSolicitado));
 
-      document.getElementById('kpi-perda-rendimento').textContent = formatMoeda(av.perdaRendimentoHomeOffice);
-      definirTextoRotulo('kpi-perda-rendimento-sub', textoPerdaRendimentoSub(av.perdaRendimentoCompulsorio, av.perdaRendimentoReuniao, av.perdaRendimentoSolicitado));
+      document.getElementById(P + 'kpi-perda-rendimento').textContent = formatMoeda(av.perdaRendimentoHomeOffice);
+      definirTextoRotulo(P + 'kpi-perda-rendimento-sub', textoPerdaRendimentoSub(av.perdaRendimentoCompulsorio, av.perdaRendimentoReuniao, av.perdaRendimentoSolicitado));
 
       const horasHomeOfficeReuniaoVig = Math.floor(av.minutosHomeOfficeReuniao / 60);
       const minutosHomeOfficeReuniaoVig = av.minutosHomeOfficeReuniao % 60;
-      document.getElementById('kpi-horas-home-office').textContent = `${horasHomeOfficeReuniaoVig}H ${String(minutosHomeOfficeReuniaoVig).padStart(2, '0')}M`;
-      definirTextoRotulo('kpi-horas-home-office-sub', textoHorasHomeOfficeSub(av.homeOfficesReuniao));
+      document.getElementById(P + 'kpi-horas-home-office').textContent = `${horasHomeOfficeReuniaoVig}H ${String(minutosHomeOfficeReuniaoVig).padStart(2, '0')}M`;
+      definirTextoRotulo(P + 'kpi-horas-home-office-sub', textoHorasHomeOfficeSub(av.homeOfficesReuniao));
 
-      const elKpiDiariasAux = document.getElementById('kpi-diarias-auxilios');
+      const elKpiDiariasAux = document.getElementById(P + 'kpi-diarias-auxilios');
       elKpiDiariasAux.textContent = formatMoeda(totalDiariasEAuxiliosVig);
       elKpiDiariasAux.style.color = corDiariaAuxiliar(totalDiariasEAuxiliosVig);
-      definirTextoRotulo('kpi-pernoites-count',
+      definirTextoRotulo(P + 'kpi-pernoites-count',
         textoDiariasAuxiliosSub(av.auxAlimentacao, av.auxTransporte, av.diariaAlimentacao, av.diariaHospedagem, av.diariaTraslado));
 
-      document.getElementById('kpi-rendimento-hora').textContent = `${formatMoeda(rendimentoHoraVig)}/h`;
-      definirTextoRotulo('kpi-total-horas', textoRendimentoHoraSub(av.horas));
+      document.getElementById(P + 'kpi-rendimento-hora').textContent = `${formatMoeda(rendimentoHoraVig)}/h`;
+      definirTextoRotulo(P + 'kpi-total-horas', textoRendimentoHoraSub(av.horas));
 
-      document.getElementById('kpi-total-desconto-ir').textContent = formatMoeda(av.jetonBruto * aliquotaIR);
+      document.getElementById(P + 'kpi-total-desconto-ir').textContent = formatMoeda(av.jetonBruto * aliquotaIR);
 
       // NOVO: "Auxílios e Diárias Recebíveis" (soma dos valores marcados como
       // recebíveis em cada escala, de todos os ciclos) e "Balanço dos
@@ -1756,17 +1854,20 @@ function inicializarMenuRodape() {
       const balancoAuxiliosVig = av.auxiliosRecebivel - av.auxilios;
       const balancoVig = balancoDiariasVig + balancoAuxiliosVig;
 
-      const elKpiRecebiveis = document.getElementById('kpi-recebiveis');
+      const elKpiRecebiveis = document.getElementById(P + 'kpi-recebiveis');
       elKpiRecebiveis.textContent = formatMoeda(totalRecebivelVig);
       elKpiRecebiveis.style.color = corDiariaAuxiliar(totalRecebivelVig);
-      definirTextoRotulo('kpi-recebiveis-sub', textoRecebiveisSub(av.diariasRecebivel, av.auxiliosRecebivel));
+      definirTextoRotulo(P + 'kpi-recebiveis-sub', textoRecebiveisSub(av.diariasRecebivel, av.auxiliosRecebivel));
 
-      const elKpiBalanco = document.getElementById('kpi-balanco');
+      const elKpiBalanco = document.getElementById(P + 'kpi-balanco');
       elKpiBalanco.textContent = formatMoeda(balancoVig);
       elKpiBalanco.style.color = corDiariaAuxiliar(balancoVig);
       const cardBalanco = elKpiBalanco.closest('.kpi-card');
       if (cardBalanco) cardBalanco.classList.toggle('negativo', balancoVig < -0.004);
-      definirTextoRotulo('kpi-balanco-sub', textoBalancoSub(balancoDiariasVig, balancoAuxiliosVig));
+      definirTextoRotulo(P + 'kpi-balanco-sub', textoBalancoSub(balancoDiariasVig, balancoAuxiliosVig));
+      };
+      preencherKpis('', av);               // CICLO VIGENTE
+      preencherKpis('tc-', acumuladoGeral); // TODOS OS CICLOS (fechados + vigente)
 
       // Atualizar timestamp
       const agora = new Date();
@@ -1858,7 +1959,12 @@ function inicializarMenuRodape() {
       // 5. RENDERIZAÇÃO DOS GRÁFICOS E TABELA
       // ---------------------------------------------------------------------
       renderizarGraficoEvolucao(listaCiclosProcessados);
-      renderizarGraficoComposicao(acumuladoGeral.jetonBruto, acumuladoGeral.diarias, acumuladoGeral.auxilios, receitaLiquidaGeral);
+      // COMPOSIÇÃO (TODOS OS CICLOS): Jeton + Auxílios RECEBÍVEIS + Diárias RECEBÍVEIS.
+      // Bruta usa o Jeton Bruto; Líquida usa o Jeton Líquido (Jeton Bruto − IR).
+      renderizarGraficoComposicao('chartComposicaoReceita', 'composicaoValorFinal', 'composicaoBruta', 'JETON BRUTO',
+        acumuladoGeral.jetonBruto, acumuladoGeral.auxiliosRecebivel, acumuladoGeral.diariasRecebivel);
+      renderizarGraficoComposicao('chartComposicaoReceitaLiquida', 'composicaoLiquidaValorFinal', 'composicaoLiquida', 'JETON LÍQUIDO',
+        acumuladoGeral.jetonBruto * (1 - aliquotaIR), acumuladoGeral.auxiliosRecebivel, acumuladoGeral.diariasRecebivel);
       renderizarGraficoTipologia(acumuladoGeral.simples, acumuladoGeral.dobrada, acumuladoGeral.tripla, acumuladoGeral.quadrupla);
       renderizarGraficoTurnos(acumuladoGeral.turnos);
       renderizarGraficoFuncoes(acumuladoGeral.funcoes);
@@ -1949,20 +2055,21 @@ function inicializarMenuRodape() {
       });
     }
 
-    function renderizarGraficoComposicao(jeton, diarias, auxilios, valorFinal) {
-      const ctx = document.getElementById('chartComposicaoReceita').getContext('2d');
-      if (chartComposicaoInstance) chartComposicaoInstance.destroy();
+    function renderizarGraficoComposicao(canvasId, valorFinalId, chaveInstancia, rotuloJeton, jeton, auxiliosRecebivel, diariasRecebivel) {
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      if (graficosExtras[chaveInstancia]) graficosExtras[chaveInstancia].destroy();
 
-      const elValorFinal = document.getElementById('composicaoValorFinal');
-      if (elValorFinal) elValorFinal.textContent = formatMoeda(valorFinal);
+      // VALOR FINAL = Jeton (bruto ou líquido) + Auxílios Recebíveis + Diárias Recebíveis
+      const elValorFinal = document.getElementById(valorFinalId);
+      if (elValorFinal) elValorFinal.textContent = formatMoeda(jeton + auxiliosRecebivel + diariasRecebivel);
 
-      chartComposicaoInstance = new Chart(ctx, {
+      graficosExtras[chaveInstancia] = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['JETON BRUTO', 'DIÁRIAS', 'AUXÍLIOS'],
+          labels: [rotuloJeton, 'AUXÍLIOS RECEBÍVEIS', 'DIÁRIAS RECEBÍVEIS'],
           datasets: [{
             label: 'VALOR (R$)',
-            data: [jeton, diarias, auxilios],
+            data: [jeton, auxiliosRecebivel, diariasRecebivel],
             backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
             borderRadius: 6
           }]
@@ -2043,10 +2150,10 @@ function inicializarMenuRodape() {
       chartFuncoesInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['AGENTE', 'COORDENADOR', 'MOTORISTA', 'RELATOR'],
+          labels: ['AGENTE', 'RELATOR', 'MOTORISTA', 'COORDENADOR' ],
           datasets: [{
             label: 'ATUAÇÕES',
-            data: [funcoes.AGENTE, funcoes.Coordenador, funcoes.Motorista, funcoes.Relator],
+            data: [funcoes.AGENTE, funcoes.Relator, funcoes.Motorista, funcoes.Coordenador ],
             backgroundColor: '#10b981',
             borderRadius: 6
           }]
@@ -2194,7 +2301,48 @@ function inicializarMenuRodape() {
       });
     }
 
+    // =========================================================================
+    // CONFIGURAÇÃO DAS COLUNAS DO "HISTÓRICO DE CICLOS" — EDITE AQUI.
+    // Uma linha por coluna, NA MESMA ORDEM em que aparecem na tabela.
+    //   largura : largura fixa da coluna (px, rem, ... ex.: '140px')
+    //   alinhar : 'left' | 'center' | 'right'   (alinhamento do texto, cabeçalho e valores)
+    //   quebra  : 'normal' = o texto quebra em várias linhas se não couber
+    //             'nowrap' = mantém tudo em uma única linha (nunca quebra)
+    // A tabela soma as larguras; se passar da tela, aparece rolagem horizontal.
+    // =========================================================================
+    const COLUNAS_HISTORICO = [
+      { nome: 'Ciclo',                               largura: '115px', alinhar: 'center', quebra: 'normal' },
+      { nome: 'Escalas Registradas',                 largura: '135px', alinhar: 'center', quebra: 'normal' },
+      { nome: 'Total de Home Offices',               largura: '100px', alinhar: 'center', quebra: 'normal' },
+      { nome: 'Horas de Home Office (Reunião - Sede)', largura: '195px', alinhar: 'center', quebra: 'normal' },
+      { nome: 'Perda de Rendimento (Home Office)',  largura: '195px', alinhar: 'center', quebra: 'normal' },
+      { nome: 'Horas Totais',                        largura: '140px', alinhar: 'center', quebra: 'normal' },
+      { nome: 'Rendimento Médio/Hora',               largura: '140px', alinhar: 'center', quebra: 'normal' },
+      { nome: 'Diárias/Auxílios',                    largura: '165px', alinhar: 'center', quebra: 'normal' },
+      { nome: 'Auxílios e Diárias Recebíveis',       largura: '165px', alinhar: 'center', quebra: 'normal' },
+      { nome: 'Auxílios e Diárias Não Recebíveis',   largura: '165px', alinhar: 'center', quebra: 'normal' },
+      { nome: 'Jeton Bruto',                         largura: '140px', alinhar: 'center', quebra: 'normal' },
+      { nome: 'Receita Bruta',                       largura: '140px', alinhar: 'center', quebra: 'normal' },
+      { nome: 'Total de Descontos de IR',            largura: '140px', alinhar: 'center', quebra: 'normal' },
+      { nome: 'Receita Líquida Total',               largura: '140px', alinhar: 'center', quebra: 'normal' },
+      { nome: 'Status/Recebimento',                  largura: '140px', alinhar: 'center', quebra: 'normal' }
+    ];
+
+    // Aplica a configuração acima à tabela (gera o CSS de cada coluna).
+    function aplicarColunasHistorico() {
+      let st = document.getElementById('estilo-colunas-historico');
+      if (!st) { st = document.createElement('style'); st.id = 'estilo-colunas-historico'; document.head.appendChild(st); }
+      const t = '#tabela-historico-ciclos';
+      const soma = COLUNAS_HISTORICO.map(c => `${c.largura}`).join(' + ');
+      let css = `${t} { table-layout: fixed; width: calc(${soma}); min-width: 100%; }\n`;
+      COLUNAS_HISTORICO.forEach((c, i) => {
+        css += `${t} th:nth-child(${i + 1}), ${t} td:nth-child(${i + 1}) { width: ${c.largura}; text-align: ${c.alinhar}; white-space: ${c.quebra === 'nowrap' ? 'nowrap' : 'normal'}; overflow-wrap: anywhere; }\n`;
+      });
+      st.textContent = css;
+    }
+
     function renderizarTabelaCiclos(listaCiclos) {
+      aplicarColunasHistorico();
       const tbody = document.getElementById('table-ciclos-body');
       const tfoot = document.getElementById('table-ciclos-foot');
       tbody.innerHTML = '';
@@ -2220,7 +2368,7 @@ function inicializarMenuRodape() {
           bruta: c.receitaBruta || 0, ir: c.descontoIR || 0
         };
         T.escalas += c.escalas || 0; T.ho += v.ho; T.minHO += v.minHO; T.perda += v.perda; T.horas += c.horas || 0;
-        T.diAux += v.diAux; T.naoRec += v.naoRec; T.rec += v.rec; T.jeton += c.jetonBruto || 0;
+        T.diAux += v.diAux; T.rec += v.rec; T.naoRec += v.naoRec; T.jeton += c.jetonBruto || 0;
         T.bruta += v.bruta; T.ir += v.ir; T.liq += c.receitaLiquida || 0;
 
         tr.innerHTML = `
@@ -2232,8 +2380,8 @@ function inicializarMenuRodape() {
           <td>${c.horas.toFixed(1)}h</td>
           ${cel(formatMoeda(c.rendimentoHora) + '/h', EMERALD)}
           ${cel(formatMoeda(v.diAux), corDiariaAuxiliar(v.diAux))}
-          ${cel(formatMoeda(v.naoRec), RED)}
           ${cel(formatMoeda(v.rec), AMBER)}
+          ${cel(formatMoeda(v.naoRec), RED)}
           ${cel(formatMoeda(c.jetonBruto), EMERALD)}
           ${cel(formatMoeda(v.bruta), EMERALD)}
           ${cel(formatMoeda(v.ir), RED)}
@@ -2257,8 +2405,8 @@ function inicializarMenuRodape() {
             <td style="font-weight: 900;">${T.horas.toFixed(1)}h</td>
             ${cel(formatMoeda(rendTotal) + '/h', EMERALD)}
             ${cel(formatMoeda(T.diAux), corDiariaAuxiliar(T.diAux))}
-            ${cel(formatMoeda(T.naoRec), RED)}
             ${cel(formatMoeda(T.rec), AMBER)}
+            ${cel(formatMoeda(T.naoRec), RED)}
             ${cel(formatMoeda(T.jeton), EMERALD)}
             ${cel(formatMoeda(T.bruta), EMERALD)}
             ${cel(formatMoeda(T.ir), RED)}
